@@ -3,10 +3,10 @@ import * as React from "react";
 import * as RD from "@radix-ui/react-dropdown-menu";
 import { cn } from "../lib/cn";
 
-export const DropdownMenu = RD.Root;
-export const DropdownMenuTrigger = RD.Trigger;
-export const DropdownMenuGroup = RD.Group;
-export const DropdownMenuPortal = RD.Portal;
+export const DropdownMenu: typeof RD.Root = RD.Root;
+export const DropdownMenuTrigger: typeof RD.Trigger = RD.Trigger;
+export const DropdownMenuGroup: typeof RD.Group = RD.Group;
+export const DropdownMenuPortal: typeof RD.Portal = RD.Portal;
 
 export const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof RD.Content>,

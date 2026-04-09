@@ -4,10 +4,10 @@ import * as RD from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { cn } from "../lib/cn";
 
-export const Dialog = RD.Root;
-export const DialogTrigger = RD.Trigger;
-export const DialogPortal = RD.Portal;
-export const DialogClose = RD.Close;
+export const Dialog: typeof RD.Root = RD.Root;
+export const DialogTrigger: typeof RD.Trigger = RD.Trigger;
+export const DialogPortal: typeof RD.Portal = RD.Portal;
+export const DialogClose: typeof RD.Close = RD.Close;
 
 export const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof RD.Overlay>,

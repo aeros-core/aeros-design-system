@@ -3,9 +3,9 @@ import * as React from "react";
 import * as RT from "@radix-ui/react-tooltip";
 import { cn } from "../lib/cn";
 
-export const TooltipProvider = RT.Provider;
-export const Tooltip = RT.Root;
-export const TooltipTrigger = RT.Trigger;
+export const TooltipProvider: typeof RT.Provider = RT.Provider;
+export const Tooltip: typeof RT.Root = RT.Root;
+export const TooltipTrigger: typeof RT.Trigger = RT.Trigger;
 
 export const TooltipContent = React.forwardRef<
   React.ElementRef<typeof RT.Content>,

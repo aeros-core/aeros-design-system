@@ -4,9 +4,9 @@ import * as RS from "@radix-ui/react-select";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "../lib/cn";
 
-export const Select = RS.Root;
-export const SelectValue = RS.Value;
-export const SelectGroup = RS.Group;
+export const Select: typeof RS.Root = RS.Root;
+export const SelectValue: typeof RS.Value = RS.Value;
+export const SelectGroup: typeof RS.Group = RS.Group;
 
 export const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof RS.Trigger>,
