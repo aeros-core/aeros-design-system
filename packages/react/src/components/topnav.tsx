@@ -29,7 +29,7 @@ export function TopNavBrand({
       <div className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-white text-[13px] font-extrabold tracking-[-0.01em] text-ink-900">
         {mark}
       </div>
-      <div className="text-[15px] font-extrabold tracking-[-0.02em]">{name}</div>
+      <div className="aeros-logo text-[15px]">{name}</div>
     </div>
   );
 }

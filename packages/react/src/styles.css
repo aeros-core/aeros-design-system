@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wdth,wght@6..12,75..125,200..1000&display=swap");
+
 @import "@aeros/tokens/css";
 
 @import "tailwindcss";
@@ -38,6 +40,15 @@
 
   /* Monospace helper class */
   .aeros-mono { font-family: var(--aeros-font-mono); }
+
+  /* Aeros wordmark — Nunito Sans expanded (width axis 125) */
+  .aeros-logo {
+    font-family: var(--aeros-font-logo);
+    font-stretch: 125%;
+    font-variation-settings: "wdth" 125;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
 }
 
 @theme {

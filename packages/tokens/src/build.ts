@@ -38,6 +38,7 @@ function buildCss(): string {
   lines.push(":root {");
   lines.push(`  --aeros-font-sans: ${tokens.font.family.sans};`);
   lines.push(`  --aeros-font-mono: ${tokens.font.family.mono};`);
+  lines.push(`  --aeros-font-logo: ${tokens.font.family.logo};`);
   for (const [k, v] of Object.entries(COLOR)) lines.push(`  --aeros-color-${k}: ${v};`);
   for (const [k, v] of Object.entries(ALIAS_LIGHT)) lines.push(`  --aeros-${k}: ${v};`);
   for (const [k, v] of Object.entries(tokens.radius)) lines.push(`  --aeros-radius-${k}: ${typeof v === "number" ? v + "px" : v};`);

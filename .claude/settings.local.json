@@ -16,7 +16,10 @@
       "Bash(npx tsc:*)",
       "Bash(rm -rf .next)",
       "Bash(npm run:*)",
-      "Bash(export PATH=\"$HOME/.nvm/versions/node/v24.14.1/bin:$PATH\")"
+      "Bash(export PATH=\"$HOME/.nvm/versions/node/v24.14.1/bin:$PATH\")",
+      "Bash(node scripts/setup-design-system.mjs)",
+      "Bash(ls vendor/aeros-design-system/packages/react/dist/*.d.ts)",
+      "Bash(npx --yes pnpm --filter @aeros/react-docs build)"
     ]
   }
 }

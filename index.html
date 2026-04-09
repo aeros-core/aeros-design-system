@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aeros — UI Kit v2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=IBM+Plex+Mono:wght@400;500&family=Nunito+Sans:opsz,wdth,wght@6..12,75..125,200..1000&display=swap" rel="stylesheet">
 <style>
 
 /* ─────────────────────────────────────────
@@ -14,6 +15,7 @@
 :root {
   --font:        'Plus Jakarta Sans', sans-serif;
   --mono:        'IBM Plex Mono', monospace;
+  --logo:        'Nunito Sans', 'Plus Jakarta Sans', sans-serif;
 
   /* Royal Blue */
   --royal-50:    #EEF1FD;
@@ -79,6 +81,15 @@ body {
 
 a { text-decoration: none; color: inherit; }
 
+/* Aeros wordmark — Nunito Sans (Expanded, wdth 125) */
+.aeros-logo {
+  font-family: var(--logo);
+  font-stretch: 125%;
+  font-variation-settings: "wdth" 125;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
 /* ─────────────────────────────────────────
    LAYOUT
 ───────────────────────────────────────── */
@@ -124,7 +135,7 @@ a { text-decoration: none; color: inherit; }
   letter-spacing: -0.02em;
 }
 
-.sb-brand-name  { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.02em; line-height: 1.1; }
+.sb-brand-name  { font-family: var(--logo); font-stretch: 125%; font-variation-settings: "wdth" 125; font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.01em; line-height: 1.1; }
 .sb-brand-sub   { font-size: 10px; color: rgba(255,255,255,0.4); font-family: var(--mono); margin-top: 1px; }
 
 .sb-section { padding: 18px 12px 4px; }
@@ -217,8 +228,11 @@ a { text-decoration: none; color: inherit; }
 }
 
 .hero-title {
+  font-family: var(--logo);
+  font-stretch: 125%;
+  font-variation-settings: "wdth" 125;
   font-size: 42px; font-weight: 800;
-  letter-spacing: -0.04em; line-height: 1.05;
+  letter-spacing: -0.02em; line-height: 1.05;
   color: var(--ink-900); margin-bottom: 12px;
 }
 
@@ -556,7 +570,7 @@ tbody tr:hover td { background: var(--slate-50); }
   border-radius: 8px; display: flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: 800; color: var(--ink-900); flex-shrink: 0; letter-spacing: -0.01em;
 }
-.topnav-name  { font-size: 15px; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+.topnav-name  { font-family: var(--logo); font-stretch: 125%; font-variation-settings: "wdth" 125; font-size: 15px; font-weight: 800; color: #fff; letter-spacing: -0.01em; }
 .topnav-links { display: flex; gap: 2px; flex: 1; margin-left: 6px; }
 .topnav-link  { font-size: 13px; font-weight: 500; padding: 5px 11px; border-radius: var(--r-md); color: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.12s; }
 .topnav-link:hover  { color: rgba(255,255,255,0.7); }

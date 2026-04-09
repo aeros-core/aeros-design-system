@@ -32,7 +32,7 @@ export function SidebarBrand({
         {mark}
       </div>
       <div className="min-w-0">
-        <div className="text-base font-extrabold tracking-[-0.02em] text-white leading-tight">{name}</div>
+        <div className="aeros-logo text-base text-white leading-tight">{name}</div>
         {sub && <div className="mt-px font-mono text-[10px] text-ink-400 truncate">{sub}</div>}
       </div>
     </div>
