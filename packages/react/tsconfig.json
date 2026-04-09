@@ -11,7 +11,9 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "outDir": "dist",
-    "types": ["react"]
+    "types": ["react"],
+    "typeRoots": ["./node_modules/@types"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }
