@@ -1,0 +1,14 @@
+node_modules
+dist
+.next
+.turbo
+.DS_Store
+*.log
+.dart_tool
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+.pub-cache/
+.pub/
+ios/Pods/
+android/.gradle/
