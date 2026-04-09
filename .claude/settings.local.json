@@ -4,7 +4,19 @@
       "WebFetch(domain:aeros-x.com)",
       "Bash(npx --yes pnpm install)",
       "Bash(npx --yes pnpm --filter @aeros/tokens build)",
-      "Bash(npx --yes pnpm --filter @aeros/react build)"
+      "Bash(npx --yes pnpm --filter @aeros/react build)",
+      "Read(//Users/parthpanchal/Work/My Projects/Aeros/aeros-website/**)",
+      "Bash(wc -l components/landing/*.tsx app/globals.css app/layout.tsx)",
+      "Bash(wc -l components/landing/*.tsx)",
+      "Bash(grep -l 'bg-ink\\\\b\\\\|text-ink\\\\b\\\\|bg-paper-2\\\\|hairline\\\\|text-accent\\\\|font-jakarta' components/landing/*.tsx app/**/*.tsx)",
+      "Bash(grep -Hn 'bg-ink\\\\b\\\\|text-ink\\\\b\\\\|bg-paper-2\\\\|hairline\\\\|text-accent\\\\|font-jakarta' components/landing/*.tsx app/privacy/page.tsx)",
+      "Bash(grep -Hn 'bg-ink\\\\b\\\\|text-ink\\\\b\\\\|bg-paper\\\\|hairline\\\\|text-accent\\\\|font-jakarta\\\\|bg-line\\\\|text-muted\\\\b\\\\|bg-accent' components/landing/*.tsx app/privacy/page.tsx)",
+      "Bash(grep -Hn 'text-muted\\\\|bg-paper\\\\|bg-line\\\\|text-line\\\\|hairline\\\\|text-accent\\\\|bg-accent\\\\|font-jakarta\\\\|text-ink\\\\b' components/landing/*.tsx app/privacy/page.tsx)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(rm -rf .next)",
+      "Bash(npm run:*)",
+      "Bash(export PATH=\"$HOME/.nvm/versions/node/v24.14.1/bin:$PATH\")"
     ]
   }
 }

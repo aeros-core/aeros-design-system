@@ -41,7 +41,11 @@ function buildCss(): string {
   for (const [k, v] of Object.entries(COLOR)) lines.push(`  --aeros-color-${k}: ${v};`);
   for (const [k, v] of Object.entries(ALIAS_LIGHT)) lines.push(`  --aeros-${k}: ${v};`);
   for (const [k, v] of Object.entries(tokens.radius)) lines.push(`  --aeros-radius-${k}: ${typeof v === "number" ? v + "px" : v};`);
-  for (const [k, v] of Object.entries(tokens.space)) lines.push(`  --aeros-space-${k}: ${typeof v === "number" ? v + "px" : v};`);
+  for (const [k, v] of Object.entries(tokens.space)) {
+    // CSS custom property idents can't contain '.' — lightningcss rejects it.
+    const safe = String(k).replace(/\./g, "_");
+    lines.push(`  --aeros-space-${safe}: ${typeof v === "number" ? v + "px" : v};`);
+  }
   for (const [k, v] of Object.entries(tokens.shadow)) lines.push(`  --aeros-shadow-${k}: ${v};`);
   for (const [k, v] of Object.entries(tokens.motion.duration)) lines.push(`  --aeros-duration-${k}: ${v}ms;`);
   for (const [k, v] of Object.entries(tokens.motion.ease)) lines.push(`  --aeros-ease-${k}: ${v};`);
