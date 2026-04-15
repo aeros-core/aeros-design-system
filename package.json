@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "Aeros Design System — tokens, React components, and Flutter widgets.",
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@10.5.2",
   "scripts": {
     "build": "pnpm -r build",
     "build:tokens": "pnpm --filter @aeros/tokens build",
