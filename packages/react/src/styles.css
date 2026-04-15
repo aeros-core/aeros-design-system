@@ -4,6 +4,14 @@
 
 @import "tailwindcss";
 
+/* Tailwind v4 scans files relative to this stylesheet. Point it at the
+   component source tree explicitly so every class used inside
+   @aeros/react (Button, Input, Card, Sidebar, …) gets generated when
+   consumers import "@aeros/react/styles.css" — including in monorepo
+   consumers where transpilePackages compiles these from source. */
+@source "./components/**/*.{ts,tsx}";
+@source "./*.{ts,tsx}";
+
 @layer base {
   :root {
     color-scheme: light;
