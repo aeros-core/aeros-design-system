@@ -28,3 +28,5 @@ export 'src/widgets/aeros_radio.dart';
 export 'src/widgets/aeros_switch.dart';
 export 'src/widgets/aeros_empty_state.dart';
 export 'src/widgets/aeros_breadcrumb.dart';
+export 'src/widgets/aeros_stepper.dart';
+export 'src/widgets/aeros_intent_card.dart';
