@@ -82,7 +82,7 @@ class AerosIntentCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 6),
-                    Text(subtitle, style: AerosTypography.body(color: a.fgSecondary)),
+                    Text(subtitle, style: AerosTypography.bodyMd(color: a.fgSecondary)),
                   ],
                 ),
               ),
