@@ -21,4 +21,5 @@ export * from "./components/table";
 export * from "./components/empty-state";
 export * from "./components/topnav";
 export * from "./components/sidebar";
+export * from "./components/dot-matrix";
 export { cn } from "./lib/cn";
