@@ -145,6 +145,13 @@ class AerosDataTable<T> extends StatelessWidget {
 
     final dataRows = rows.map((row) {
       final isSelected = _isSelected(row);
+      // When BOTH selection and onRowTap are wired, the checkbox column toggles
+      // selection (via DataRow.onSelectChanged) and cell taps navigate (via
+      // DataCell.onTap). DataCell.onTap takes precedence on the cell click,
+      // so the two interactions don't fight each other.
+      final cellTap = (_hasSelection && onRowTap != null)
+          ? () => onRowTap!(row)
+          : null;
       return DataRow(
         selected: isSelected,
         onSelectChanged: _hasSelection
@@ -159,6 +166,7 @@ class AerosDataTable<T> extends StatelessWidget {
                     : Alignment.centerLeft,
                 child: col.cell(row),
               ),
+              onTap: cellTap,
             ),
         ],
       );
