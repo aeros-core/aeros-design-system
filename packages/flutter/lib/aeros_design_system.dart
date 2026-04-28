@@ -30,3 +30,6 @@ export 'src/widgets/aeros_empty_state.dart';
 export 'src/widgets/aeros_breadcrumb.dart';
 export 'src/widgets/aeros_stepper.dart';
 export 'src/widgets/aeros_intent_card.dart';
+export 'src/widgets/aeros_pagination.dart';
+export 'src/widgets/aeros_scaffold.dart';
+export 'src/widgets/aeros_dropdown_search.dart';
