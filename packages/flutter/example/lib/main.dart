@@ -42,6 +42,17 @@ class _GalleryState extends State<Gallery> {
   String _radio = 'a';
   double _progress = 0.64;
 
+  // Configurable-MTO gallery state.
+  AerosAttributeValue _cupSize = const AerosAttributeValue(enumValueId: '350ml');
+  AerosAttributeValue _gsm = const AerosAttributeValue(numericValue: 250);
+  AerosAttributeValue _printed = const AerosAttributeValue(boolValue: true);
+  AerosAttributeValue _quantity = const AerosAttributeValue(
+    numericValue: 1000,
+    unitCode: 'pcs',
+  );
+  AerosAttributeValue _artwork = const AerosAttributeValue();
+  String? _variantId = 'red';
+
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
@@ -201,6 +212,229 @@ class _GalleryState extends State<Gallery> {
               icon: Icons.inbox_outlined,
               title: 'No RFQs yet',
               description: 'When buyers submit requests, they\'ll show up here. Invite your team to get started.',
+            ),
+            const SizedBox(height: 32),
+
+            _section('Configurable MTO — attribute selectors'),
+            AerosCard(
+              title: 'Printed paper cups · 12oz',
+              subtitle: 'Configure your order, see the price update live',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // ENUM datatype, ≤6 options → AerosEnumChips
+                  AerosAttributeSelector(
+                    spec: const AerosAttributeSpec(
+                      key: 'cup_size',
+                      label: 'Cup size',
+                      datatype: AerosAttributeDatatype.enumValue,
+                      optionSource: AerosAttributeOptionSource.enumOptions,
+                      required: true,
+                      options: [
+                        AerosAttributeOption(id: '200ml', label: '200ml'),
+                        AerosAttributeOption(id: '250ml', label: '250ml'),
+                        AerosAttributeOption(id: '350ml', label: '350ml'),
+                        AerosAttributeOption(
+                          id: '500ml',
+                          label: '500ml',
+                          disabled: true,
+                          disabledReason: 'Out of stock for this paper weight',
+                        ),
+                      ],
+                    ),
+                    value: _cupSize,
+                    onChanged: (v) => setState(() => _cupSize = v),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // MEASUREMENT + RANGE → AerosRangeSlider
+                  AerosAttributeSelector(
+                    spec: const AerosAttributeSpec(
+                      key: 'paper_weight',
+                      label: 'Paper weight',
+                      datatype: AerosAttributeDatatype.measurement,
+                      optionSource: AerosAttributeOptionSource.range,
+                      range: AerosNumericRange(min: 150, max: 350, step: 25),
+                      defaultUnit: 'gsm',
+                      required: true,
+                    ),
+                    value: _gsm,
+                    onChanged: (v) => setState(() => _gsm = v),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // BOOLEAN → switch row
+                  AerosAttributeSelector(
+                    spec: const AerosAttributeSpec(
+                      key: 'printed',
+                      label: 'Print logo on cup',
+                      datatype: AerosAttributeDatatype.boolean,
+                      optionSource: AerosAttributeOptionSource.enumOptions,
+                    ),
+                    value: _printed,
+                    onChanged: (v) => setState(() => _printed = v),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // MEASUREMENT + free numeric input
+                  AerosAttributeSelector(
+                    spec: const AerosAttributeSpec(
+                      key: 'quantity',
+                      label: 'Order quantity',
+                      datatype: AerosAttributeDatatype.measurement,
+                      optionSource: AerosAttributeOptionSource.range,
+                      units: [
+                        AerosMeasurementUnit(code: 'pcs', label: 'pcs'),
+                        AerosMeasurementUnit(code: 'ctn', label: 'cartons'),
+                      ],
+                      defaultUnit: 'pcs',
+                      range: AerosNumericRange(min: 100, max: 500000, step: 100),
+                      required: true,
+                    ),
+                    value: _quantity,
+                    forceVariant: AerosAttributeInputVariant.measurement,
+                    onChanged: (v) => setState(() => _quantity = v),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // FILE upload (artwork)
+                  AerosAttributeSelector(
+                    spec: const AerosAttributeSpec(
+                      key: 'artwork',
+                      label: 'Upload artwork',
+                      datatype: AerosAttributeDatatype.enumValue,
+                      optionSource: AerosAttributeOptionSource.file,
+                    ),
+                    value: _artwork,
+                    onChanged: (v) => setState(() => _artwork = v),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            _section('Variant picker'),
+            AerosCard(
+              child: AerosVariantPicker(
+                label: 'Colour',
+                selectedVariantId: _variantId,
+                onChanged: (id) => setState(() => _variantId = id),
+                style: AerosVariantPickerStyle.swatch,
+                variants: const [
+                  AerosVariantOption(
+                    id: 'red',
+                    label: 'Crimson',
+                    sku: 'PC-12-RED',
+                    swatchColor: 0xFFDC2626,
+                    stockQty: 1200,
+                  ),
+                  AerosVariantOption(
+                    id: 'blue',
+                    label: 'Royal',
+                    sku: 'PC-12-BLU',
+                    swatchColor: 0xFF2347D9,
+                    stockQty: 7,
+                  ),
+                  AerosVariantOption(
+                    id: 'green',
+                    label: 'Forest',
+                    sku: 'PC-12-GRN',
+                    swatchColor: 0xFF15803D,
+                    stockQty: 0,
+                  ),
+                  AerosVariantOption(
+                    id: 'kraft',
+                    label: 'Kraft',
+                    sku: 'PC-12-KFT',
+                    swatchColor: 0xFFB45309,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            _section('Routing signals'),
+            const Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                AerosRoutingSignalBadge(
+                  signal: AerosRoutingSignal(
+                    kind: 'requires_rfq',
+                    label: 'Send as RFQ',
+                  ),
+                ),
+                AerosRoutingSignalBadge(
+                  signal: AerosRoutingSignal(
+                    kind: 'requires_credit_check',
+                    label: 'Credit review needed',
+                    severity: AerosRoutingSeverity.warn,
+                  ),
+                ),
+                AerosRoutingSignalBadge(
+                  signal: AerosRoutingSignal(
+                    kind: 'over_capacity',
+                    label: 'Over seller capacity',
+                    severity: AerosRoutingSeverity.error,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+
+            _section('Constraint error alert'),
+            const AerosConstraintErrorAlert(
+              messageByLocale: {
+                'en': 'Custom Pantone print requires GSM ≥ 250.',
+                'hi': 'कस्टम पैंटोन प्रिंट के लिए जीएसएम ≥ 250 चाहिए।',
+              },
+              locale: 'en',
+            ),
+            const SizedBox(height: 32),
+
+            _section('Price breakdown'),
+            const AerosPriceBreakdown(
+              initiallyExpanded: true,
+              data: AerosPriceBreakdownData(
+                currencySymbol: '₹',
+                quantity: 1000,
+                discountableSubtotal: 6500,
+                nonDiscountableSubtotal: 500,
+                total: 7000,
+                steps: [
+                  AerosBreakdownStep(
+                    name: 'Base price · 350ml',
+                    kind: 'BASE_PRICE',
+                    amount: 4.5,
+                    perUnit: true,
+                  ),
+                  AerosBreakdownStep(
+                    name: 'GSM 250',
+                    kind: 'ADD_PER_UNIT',
+                    amount: 0.6,
+                    perUnit: true,
+                    note: 'Heavier paper · +13%',
+                  ),
+                  AerosBreakdownStep(
+                    name: 'Printed',
+                    kind: 'ADD_PER_UNIT',
+                    amount: 1.4,
+                    perUnit: true,
+                  ),
+                  AerosBreakdownStep(
+                    name: 'Bulk discount · ≥500',
+                    kind: 'BULK_DISCOUNT',
+                    amount: -0,
+                    note: 'Discount built into per-unit lines',
+                  ),
+                  AerosBreakdownStep(
+                    name: 'Plate setup',
+                    kind: 'ADD_FLAT',
+                    amount: 500,
+                    discountable: false,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 64),
           ],
