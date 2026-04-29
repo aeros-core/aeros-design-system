@@ -1,0 +1,6 @@
+---
+alwaysApply: true
+---
+This repo's source of truth for AI agents is AGENTS.md and the memory/ directory.
+Read AGENTS.md before making changes. Treat its rules as binding.
+Workspace-wide context is at ../AGENTS.md (Aeros workspace memory).
