@@ -29,6 +29,16 @@ Each component ships in both `@aeros/react` and `aeros_design_system` (Flutter) 
 | Empty state | `EmptyState` | `AerosEmptyState` | |
 | TopNav | `TopNav*` | — | |
 | Sidebar | `Sidebar*` | — | |
+| Attribute selector | — | `AerosAttributeSelector` | Picks the right input from `(datatype, optionSource)` — see [configurable-mto.md](./configurable-mto.md) |
+| Enum dropdown | — | `AerosEnumDropdown` | Single-select dropdown over `AerosAttributeOption[]` |
+| Enum chips | — | `AerosEnumChips` | Single-select chip group with optional unit suffix and colour swatches |
+| Range slider | — | `AerosRangeSlider` | MEASUREMENT + RANGE attribute |
+| Measurement input | — | `AerosMeasurementInput` | Number field + unit dropdown |
+| File upload | — | `AerosFileUploadButton` | Empty-state and attached-file states; consumer manages the actual upload |
+| Variant picker | — | `AerosVariantPicker` | Chip or swatch style; in-stock badge from `stockQty` |
+| Price breakdown | — | `AerosPriceBreakdown` | Collapsible breakdown of `BreakdownStep[]` with discountable / non-discountable subtotal split |
+| Routing-signal badge | — | `AerosRoutingSignalBadge` | Pill for `requires_rfq`, `requires_credit_check`, …; severity-driven colour |
+| Constraint error alert | — | `AerosConstraintErrorAlert` | Locale-aware constraint violations from v1 literal or v2 JSONLogic constraints |
 
 ## Button
 
@@ -170,4 +180,106 @@ Two variants — `underline` (page-level navigation) and `pill` (dense, inline f
   description="When buyers submit requests, they'll show up here."
   action={<Button>Invite team</Button>}
 />
+```
+
+## Configurable-MTO components (Flutter)
+
+These ten components support the [configurable-MTO](./configurable-mto.md) listing
+mode shipped in the backend in April 2026. They are Flutter-only for v1 — both
+consumers (`aeros-mobile-marketplace-app` and `aeros-admin`) are Flutter. React
+parity will follow when the storefront frontend lands.
+
+### AerosAttributeSelector
+
+Routes to the right leaf input based on `(datatype, optionSource)`:
+
+```dart
+AerosAttributeSelector(
+  spec: AerosAttributeSpec(
+    key: 'cup_size',
+    label: 'Cup size',
+    datatype: AerosAttributeDatatype.enumValue,
+    optionSource: AerosAttributeOptionSource.enumOptions,
+    required: true,
+    options: [
+      AerosAttributeOption(id: '200ml', label: '200ml'),
+      AerosAttributeOption(id: '350ml', label: '350ml'),
+      AerosAttributeOption(id: '500ml', label: '500ml'),
+    ],
+  ),
+  value: AerosAttributeValue(enumValueId: '350ml'),
+  onChanged: (v) => /* persist v.enumValueId into your form state */,
+)
+```
+
+See [configurable-mto.md](./configurable-mto.md) for the full datatype × option-source
+matrix, leaf-input APIs, token tables, and integration recipes.
+
+### AerosVariantPicker
+
+Single-select picker over a list of `AerosVariantOption`. Out-of-stock and
+low-stock badges render automatically from `stockQty`:
+
+```dart
+AerosVariantPicker(
+  label: 'Colour',
+  selectedVariantId: state.variantId,
+  onChanged: (id) => state.setVariant(id),
+  style: AerosVariantPickerStyle.swatch, // or .chip
+  variants: [
+    AerosVariantOption(id: 'red', label: 'Crimson', swatchColor: 0xFFDC2626, stockQty: 1200),
+    AerosVariantOption(id: 'blu', label: 'Royal',   swatchColor: 0xFF2347D9, stockQty: 7),
+    AerosVariantOption(id: 'grn', label: 'Forest',  swatchColor: 0xFF15803D, stockQty: 0),
+  ],
+)
+```
+
+### AerosPriceBreakdown
+
+Collapsible card driven by the backend pricing-engine output. Renders the
+`discountable` / `non-discountable` subtotal split with `AerosPriceTone` colour
+tokens:
+
+```dart
+AerosPriceBreakdown(
+  data: AerosPriceBreakdownData(
+    currencySymbol: '₹',
+    discountableSubtotal: 6500,
+    nonDiscountableSubtotal: 500,
+    total: 7000,
+    steps: [
+      AerosBreakdownStep(name: 'Base price · 350ml', amount: 4.5, perUnit: true),
+      AerosBreakdownStep(name: 'GSM 250',            amount: 0.6, perUnit: true),
+      AerosBreakdownStep(name: 'Plate setup',        amount: 500, discountable: false),
+    ],
+  ),
+)
+```
+
+### AerosRoutingSignalBadge
+
+```dart
+AerosRoutingSignalBadge(
+  signal: AerosRoutingSignal(
+    kind: 'requires_rfq',
+    label: 'Send as RFQ',
+    severity: AerosRoutingSeverity.warn,
+  ),
+  onTap: () => showSheet(...),
+)
+```
+
+### AerosConstraintErrorAlert
+
+Locale-aware. The backend stores the message as a JSONB locale map; pass it
+directly:
+
+```dart
+AerosConstraintErrorAlert(
+  messageByLocale: {
+    'en': 'Custom Pantone print requires GSM ≥ 250.',
+    'hi': 'कस्टम पैंटोन प्रिंट के लिए जीएसएम ≥ 250 चाहिए।',
+  },
+  locale: appLocale,
+)
 ```
