@@ -45,6 +45,7 @@ export 'src/widgets/aeros_attribute_selector.dart';
 export 'src/widgets/aeros_enum_dropdown.dart';
 export 'src/widgets/aeros_enum_chips.dart';
 export 'src/widgets/aeros_range_slider.dart';
+export 'src/widgets/aeros_numeric_range_band.dart';
 export 'src/widgets/aeros_measurement_input.dart';
 export 'src/widgets/aeros_file_upload_button.dart';
 export 'src/widgets/aeros_variant_picker.dart';
