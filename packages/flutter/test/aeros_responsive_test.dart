@@ -3,6 +3,32 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/// Test helper: renders a widget that captures the resolved breakpoint
+/// so a test can assert on it.
+class _BreakpointProbe extends StatelessWidget {
+  const _BreakpointProbe({required this.onResolve});
+  final ValueChanged<AerosBreakpoint> onResolve;
+  @override
+  Widget build(BuildContext context) {
+    onResolve(AerosBreakpoints.of(context));
+    return const SizedBox.shrink();
+  }
+}
+
+class _ClampedMediaQuery extends StatelessWidget {
+  const _ClampedMediaQuery({required this.clampedWidth, required this.child});
+  final double clampedWidth;
+  final Widget child;
+  @override
+  Widget build(BuildContext context) {
+    final outer = MediaQuery.of(context);
+    return MediaQuery(
+      data: outer.copyWith(size: Size(clampedWidth, outer.size.height)),
+      child: child,
+    );
+  }
+}
+
 void main() {
   group('AerosBreakpoints.forWidth', () {
     test('classifies viewport widths', () {
@@ -75,6 +101,41 @@ void main() {
       final grid = tester.widget<GridView>(find.byType(GridView));
       final delegate = grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
       expect(delegate.crossAxisCount, 4);
+    });
+  });
+
+  group('AerosBreakpoints with AerosViewportScope', () {
+    testWidgets('resolves from scope width, ignoring inner MediaQuery clamp',
+        (tester) async {
+      AerosBreakpoint? observed;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AerosTheme.light(),
+          home: AerosViewportScope(
+            width: 1440, // real browser width
+            child: _ClampedMediaQuery(
+              clampedWidth: 480, // simulates AerosWebShell's ScreenUtil clamp
+              child: _BreakpointProbe(onResolve: (bp) => observed = bp),
+            ),
+          ),
+        ),
+      );
+      expect(observed, AerosBreakpoint.lg);
+    });
+
+    testWidgets('falls back to MediaQuery when no scope is present',
+        (tester) async {
+      tester.view.physicalSize = const Size(800, 600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      AerosBreakpoint? observed;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AerosTheme.light(),
+          home: _BreakpointProbe(onResolve: (bp) => observed = bp),
+        ),
+      );
+      expect(observed, AerosBreakpoint.sm);
     });
   });
 

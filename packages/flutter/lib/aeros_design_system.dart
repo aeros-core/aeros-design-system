@@ -11,6 +11,7 @@ export 'src/tokens/shadows.dart';
 export 'src/tokens/motion.dart';
 export 'src/tokens/states.dart';
 export 'src/tokens/breakpoints.dart';
+export 'src/tokens/aeros_viewport_scope.dart';
 
 export 'src/theme/aeros_theme.dart';
 export 'src/theme/aeros_theme_extension.dart';

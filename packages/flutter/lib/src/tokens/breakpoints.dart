@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+import 'aeros_viewport_scope.dart';
+
 /// Named viewport breakpoints for the Aeros DS.
 ///
 /// `xs` is phone, `sm` is tablet portrait, `md` is the desktop sidebar
@@ -16,14 +18,21 @@ class AerosBreakpoints {
   static const double lg = 1200;
   static const double xl = 1600;
 
-  /// Resolves the current breakpoint from `MediaQuery.of(context).size.width`.
+  /// Resolves the current breakpoint.
   ///
-  /// Inside the Aeros web shell's content panel the published width is
-  /// clamped (so `ScreenUtil` keeps phone scaling); screens that have
-  /// opted out via `AerosDesktopWrap` / `WebDesktopScope` see the real
-  /// viewport width and resolve to the right breakpoint here.
+  /// Reads the real viewport width from the nearest [AerosViewportScope]
+  /// ancestor — required when an app shell (e.g. `AerosWebShell`) clamps
+  /// `MediaQuery.size` to a phone width for `ScreenUtil` compatibility,
+  /// because `MediaQuery.of(context).size.width` then returns the clamped
+  /// value, not the real browser width.
+  ///
+  /// Falls back to `MediaQuery.of(context).size.width` when no
+  /// `AerosViewportScope` is in the tree (native mobile, tablet web
+  /// outside any web shell).
   static AerosBreakpoint of(BuildContext context) {
-    return forWidth(MediaQuery.of(context).size.width);
+    final scope = AerosViewportScope.of(context);
+    final width = scope?.width ?? MediaQuery.of(context).size.width;
+    return forWidth(width);
   }
 
   static AerosBreakpoint forWidth(double width) {
