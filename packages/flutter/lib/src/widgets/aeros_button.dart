@@ -7,7 +7,7 @@ import '../tokens/typography.dart';
 enum AerosButtonVariant { primary, secondary, ghost, danger, dark, link }
 enum AerosButtonSize { xs, sm, md, lg, xl }
 
-class AerosButton extends StatelessWidget {
+class AerosButton extends StatefulWidget {
   const AerosButton({
     super.key,
     required this.label,
@@ -41,8 +41,15 @@ class AerosButton extends StatelessWidget {
   final bool loading;
   final bool fullWidth;
 
+  @override
+  State<AerosButton> createState() => _AerosButtonState();
+}
+
+class _AerosButtonState extends State<AerosButton> {
+  bool _focused = false;
+
   EdgeInsets get _padding {
-    switch (size) {
+    switch (widget.size) {
       case AerosButtonSize.xs: return const EdgeInsets.symmetric(horizontal: 11, vertical: 5);
       case AerosButtonSize.sm: return const EdgeInsets.symmetric(horizontal: 14, vertical: 7);
       case AerosButtonSize.md: return const EdgeInsets.symmetric(horizontal: 18, vertical: 10);
@@ -52,7 +59,7 @@ class AerosButton extends StatelessWidget {
   }
 
   double get _fontSize {
-    switch (size) {
+    switch (widget.size) {
       case AerosButtonSize.xs: return 11;
       case AerosButtonSize.sm: return 12;
       case AerosButtonSize.md: return 14;
@@ -62,7 +69,7 @@ class AerosButton extends StatelessWidget {
   }
 
   BorderRadius get _radius {
-    switch (size) {
+    switch (widget.size) {
       case AerosButtonSize.xs:
       case AerosButtonSize.sm: return AerosRadii.brSm;
       case AerosButtonSize.md: return AerosRadii.brMd;
@@ -72,7 +79,7 @@ class AerosButton extends StatelessWidget {
   }
 
   ({Color bg, Color fg, Color? border}) _colors(AerosAliasColors a) {
-    switch (variant) {
+    switch (widget.variant) {
       case AerosButtonVariant.primary:
         return (bg: a.brandPrimary, fg: Colors.white, border: null);
       case AerosButtonVariant.secondary:
@@ -92,37 +99,46 @@ class AerosButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final a = context.aerosColors;
     final c = _colors(a);
-    final disabled = onPressed == null || loading;
+    final disabled = widget.onPressed == null || widget.loading;
 
     final content = Row(
-      mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
+      mainAxisSize: widget.fullWidth ? MainAxisSize.max : MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (loading)
+        if (widget.loading)
           SizedBox(
             width: _fontSize, height: _fontSize,
             child: CircularProgressIndicator(strokeWidth: 2, color: c.fg),
           )
-        else if (leading != null) ...[leading!, const SizedBox(width: 8)],
-        Text(label, style: AerosTypography.bodyMd(color: c.fg).copyWith(fontSize: _fontSize, fontWeight: FontWeight.w600)),
-        if (trailing != null) ...[const SizedBox(width: 8), trailing!],
+        else if (widget.leading != null) ...[widget.leading!, const SizedBox(width: 8)],
+        Text(widget.label, style: AerosTypography.bodyMd(color: c.fg).copyWith(fontSize: _fontSize, fontWeight: FontWeight.w600)),
+        if (widget.trailing != null) ...[const SizedBox(width: 8), widget.trailing!],
       ],
     );
 
+    // Visible focus ring: 2px brandPrimary outline (a.borderFocus) when
+    // the button is keyboard-focused. Native hover ripple from Material
+    // InkWell is preserved untouched so mouse interaction is unchanged.
     return Opacity(
       opacity: disabled ? 0.4 : 1,
       child: Material(
         color: c.bg,
         borderRadius: _radius,
         child: InkWell(
-          onTap: disabled ? null : onPressed,
+          onTap: disabled ? null : widget.onPressed,
           borderRadius: _radius,
-          splashColor: Colors.white.withOpacity(0.1),
-          child: Container(
+          splashColor: Colors.white.withValues(alpha: 0.1),
+          onFocusChange: (focused) {
+            if (_focused != focused) setState(() => _focused = focused);
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 80),
             padding: _padding,
             decoration: BoxDecoration(
               borderRadius: _radius,
-              border: c.border != null ? Border.all(color: c.border!) : null,
+              border: _focused
+                  ? Border.all(color: a.borderFocus, width: 2)
+                  : (c.border != null ? Border.all(color: c.border!) : null),
             ),
             child: content,
           ),
