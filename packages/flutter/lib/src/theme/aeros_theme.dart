@@ -106,7 +106,7 @@ class AerosTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AerosRadii.brMd,
-          borderSide: BorderSide(color: aliases.brandPrimary, width: 1.5),
+          borderSide: BorderSide(color: aliases.brandPrimary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AerosRadii.brMd,
@@ -114,7 +114,7 @@ class AerosTheme {
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AerosRadii.brMd,
-          borderSide: const BorderSide(color: AerosColors.danger, width: 1.5),
+          borderSide: const BorderSide(color: AerosColors.danger, width: 2),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
