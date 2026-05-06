@@ -39,6 +39,7 @@ Each component ships in both `@aeros/react` and `aeros_design_system` (Flutter) 
 | Price breakdown | — | `AerosPriceBreakdown` | Collapsible breakdown of `BreakdownStep[]` with discountable / non-discountable subtotal split |
 | Routing-signal badge | — | `AerosRoutingSignalBadge` | Pill for `requires_rfq`, `requires_credit_check`, …; severity-driven colour |
 | Constraint error alert | — | `AerosConstraintErrorAlert` | Locale-aware constraint violations from v1 literal or v2 JSONLogic constraints |
+| Wordmark | `aeros-logo` (CSS class) | `AerosWordmark` | Brand mark: Nunito Sans wdth-125, weight 800 |
 
 ## Button
 
@@ -180,6 +181,24 @@ Two variants — `underline` (page-level navigation) and `pill` (dense, inline f
   description="When buyers submit requests, they'll show up here."
   action={<Button>Invite team</Button>}
 />
+```
+
+## Wordmark
+
+The Aeros brand mark — Nunito Sans **wdth-125, weight 800** — matches the
+web's `aeros-logo` CSS class (`font-stretch: 125%`). Use it whenever the
+literal "Aeros" string is rendered as branding (auth screens, splash,
+walkthrough, web shell). Never `Text('Aeros')` with a default font.
+
+```dart
+// Default — 24px, fgPrimary from the active theme.
+const AerosWordmark()
+
+// Hero / splash.
+const AerosWordmark(size: 40)
+
+// Inverse on a brand-coloured surface.
+AerosWordmark(size: 32, color: Colors.white)
 ```
 
 ## Configurable-MTO components (Flutter)

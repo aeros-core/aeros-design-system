@@ -38,6 +38,7 @@ export 'src/widgets/aeros_form_field.dart';
 export 'src/widgets/aeros_page_header.dart';
 export 'src/widgets/aeros_confirm_dialog.dart';
 export 'src/widgets/aeros_data_table.dart';
+export 'src/widgets/aeros_wordmark.dart';
 
 // Configurable-MTO components.
 export 'src/widgets/aeros_attribute_models.dart';
