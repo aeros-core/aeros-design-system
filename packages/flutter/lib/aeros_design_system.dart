@@ -10,6 +10,7 @@ export 'src/tokens/radii.dart';
 export 'src/tokens/shadows.dart';
 export 'src/tokens/motion.dart';
 export 'src/tokens/states.dart';
+export 'src/tokens/breakpoints.dart';
 
 export 'src/theme/aeros_theme.dart';
 export 'src/theme/aeros_theme_extension.dart';
@@ -39,6 +40,12 @@ export 'src/widgets/aeros_page_header.dart';
 export 'src/widgets/aeros_confirm_dialog.dart';
 export 'src/widgets/aeros_data_table.dart';
 export 'src/widgets/aeros_wordmark.dart';
+
+// Responsive primitives.
+export 'src/widgets/aeros_responsive_value.dart';
+export 'src/widgets/aeros_responsive_grid.dart';
+export 'src/widgets/aeros_two_column.dart';
+export 'src/widgets/aeros_hoverable.dart';
 
 // Configurable-MTO components.
 export 'src/widgets/aeros_attribute_models.dart';
