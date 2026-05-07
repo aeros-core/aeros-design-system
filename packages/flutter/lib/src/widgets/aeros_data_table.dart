@@ -185,37 +185,55 @@ class AerosDataTable<T> extends StatelessWidget {
                 border: Border.all(color: a.borderDefault),
               ),
               clipBehavior: Clip.antiAlias,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Theme(
-                  data: Theme.of(context).copyWith(
-                    dataTableTheme: DataTableThemeData(
-                      headingRowColor:
-                          WidgetStateProperty.all(a.bgSubtle),
-                      headingTextStyle: AerosTypography.bodySm(
-                              color: a.fgSecondary)
-                          .copyWith(fontWeight: FontWeight.w600),
-                      dataTextStyle:
-                          AerosTypography.bodyMd(color: a.fgPrimary),
-                      dividerThickness: 1,
-                      headingRowHeight: 44,
-                      dataRowMinHeight: 48,
-                      dataRowMaxHeight: 56,
-                      horizontalMargin: AerosSpacing.s4,
-                      columnSpacing: AerosSpacing.s5,
+              // LayoutBuilder so the inner DataTable can be forced to at
+              // least the parent's width — Material's DataTable is
+              // intrinsic-sized by default, which leaves a sea of empty
+              // whitespace on the right when the table renders inside a
+              // wide column (e.g. AerosDesktopWrap.full at 1400px). The
+              // horizontal SingleChildScrollView still engages when
+              // content needs more than parent width.
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minWidth: constraints.maxWidth.isFinite
+                            ? constraints.maxWidth
+                            : 0,
+                      ),
+                      child: Theme(
+                        data: Theme.of(context).copyWith(
+                          dataTableTheme: DataTableThemeData(
+                            headingRowColor:
+                                WidgetStateProperty.all(a.bgSubtle),
+                            headingTextStyle: AerosTypography.bodySm(
+                                    color: a.fgSecondary)
+                                .copyWith(fontWeight: FontWeight.w600),
+                            dataTextStyle: AerosTypography.bodyMd(
+                                color: a.fgPrimary),
+                            dividerThickness: 1,
+                            headingRowHeight: 44,
+                            dataRowMinHeight: 48,
+                            dataRowMaxHeight: 56,
+                            horizontalMargin: AerosSpacing.s4,
+                            columnSpacing: AerosSpacing.s5,
+                          ),
+                        ),
+                        child: DataTable(
+                          columns: tableColumns,
+                          rows: dataRows,
+                          showCheckboxColumn: _hasSelection,
+                          sortColumnIndex: sort?.columnIndex,
+                          sortAscending: sort?.ascending ?? true,
+                          onSelectAll: _hasSelection
+                              ? (v) => _toggleAll(v ?? false)
+                              : null,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: DataTable(
-                    columns: tableColumns,
-                    rows: dataRows,
-                    showCheckboxColumn: _hasSelection,
-                    sortColumnIndex: sort?.columnIndex,
-                    sortAscending: sort?.ascending ?? true,
-                    onSelectAll: _hasSelection
-                        ? (v) => _toggleAll(v ?? false)
-                        : null,
-                  ),
-                ),
+                  );
+                },
               ),
             ),
             if (footer != null) ...[
