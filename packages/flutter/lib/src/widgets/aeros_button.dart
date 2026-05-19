@@ -81,7 +81,7 @@ class _AerosButtonState extends State<AerosButton> {
   ({Color bg, Color fg, Color? border}) _colors(AerosAliasColors a) {
     switch (widget.variant) {
       case AerosButtonVariant.primary:
-        return (bg: a.brandPrimary, fg: Colors.white, border: null);
+        return (bg: a.brandPrimary, fg: a.fgInverse, border: null);
       case AerosButtonVariant.secondary:
         return (bg: a.bgSurface, fg: a.fgPrimary, border: a.borderDefault);
       case AerosButtonVariant.ghost:
@@ -101,19 +101,26 @@ class _AerosButtonState extends State<AerosButton> {
     final c = _colors(a);
     final disabled = widget.onPressed == null || widget.loading;
 
-    final content = Row(
-      mainAxisSize: widget.fullWidth ? MainAxisSize.max : MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (widget.loading)
-          SizedBox(
-            width: _fontSize, height: _fontSize,
-            child: CircularProgressIndicator(strokeWidth: 2, color: c.fg),
-          )
-        else if (widget.leading != null) ...[widget.leading!, const SizedBox(width: 8)],
-        Text(widget.label, style: AerosTypography.bodyMd(color: c.fg).copyWith(fontSize: _fontSize, fontWeight: FontWeight.w600)),
-        if (widget.trailing != null) ...[const SizedBox(width: 8), widget.trailing!],
-      ],
+    // IconTheme makes leading/trailing icons inherit the resolved foreground
+    // color (c.fg) by default. Callers passing `Icon(..., color: X)` still
+    // win — the wrap only fills in a sane default for icons that don't set
+    // their own color, so downstream sites can drop hardcoded colors.
+    final content = IconTheme(
+      data: IconThemeData(color: c.fg, size: _fontSize),
+      child: Row(
+        mainAxisSize: widget.fullWidth ? MainAxisSize.max : MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (widget.loading)
+            SizedBox(
+              width: _fontSize, height: _fontSize,
+              child: CircularProgressIndicator(strokeWidth: 2, color: c.fg),
+            )
+          else if (widget.leading != null) ...[widget.leading!, const SizedBox(width: 8)],
+          Text(widget.label, style: AerosTypography.bodyMd(color: c.fg).copyWith(fontSize: _fontSize, fontWeight: FontWeight.w600)),
+          if (widget.trailing != null) ...[const SizedBox(width: 8), widget.trailing!],
+        ],
+      ),
     );
 
     // Visible focus ring: 2px brandPrimary outline (a.borderFocus) when

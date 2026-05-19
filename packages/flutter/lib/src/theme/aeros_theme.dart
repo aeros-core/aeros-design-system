@@ -28,7 +28,7 @@ class AerosTheme {
     final colorScheme = ColorScheme(
       brightness: brightness,
       primary: aliases.brandPrimary,
-      onPrimary: Colors.white,
+      onPrimary: aliases.fgInverse,
       primaryContainer: aliases.brandPrimaryMuted,
       onPrimaryContainer: aliases.fgPrimary,
       secondary: AerosColors.ink600,
@@ -120,10 +120,10 @@ class AerosTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: aliases.brandPrimary,
-          foregroundColor: Colors.white,
+          foregroundColor: aliases.fgInverse,
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
           minimumSize: const Size(0, 40),
-          textStyle: AerosTypography.bodyMd(color: Colors.white).copyWith(fontWeight: FontWeight.w600),
+          textStyle: AerosTypography.bodyMd(color: aliases.fgInverse).copyWith(fontWeight: FontWeight.w600),
           shape: const RoundedRectangleBorder(borderRadius: AerosRadii.brMd),
         ),
       ),
