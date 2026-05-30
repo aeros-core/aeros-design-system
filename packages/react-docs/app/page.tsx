@@ -148,8 +148,8 @@ const SEMANTIC_COLORS: Array<{ token: string; cssVar: string; hex: string }> = [
   { token: "fg-muted",        cssVar: "--color-fg-muted",      hex: "#6B6B6B" },
   { token: "border-default",  cssVar: "--color-border-default",hex: "#E5E5E5" },
   { token: "border-strong",   cssVar: "--color-border-strong", hex: "#C2C2C2" },
-  { token: "accent",          cssVar: "--color-accent",        hex: "#2347D9" },
-  { token: "accent-muted",    cssVar: "--color-accent-muted",  hex: "#EEF1FD" },
+  { token: "accent",          cssVar: "--color-accent",        hex: "#0A0A0A" },
+  { token: "accent-muted",    cssVar: "--color-accent-muted",  hex: "#F5F5F5" },
 ];
 
 const STATUS_COLORS: Array<{ token: string; hex: string; cls: string }> = [
@@ -159,8 +159,8 @@ const STATUS_COLORS: Array<{ token: string; hex: string; cls: string }> = [
   { token: "warning-bg",   hex: "#FEF3C7", cls: "bg-warning-bg" },
   { token: "danger",       hex: "#DC2626", cls: "bg-danger" },
   { token: "danger-bg",    hex: "#FEE2E2", cls: "bg-danger-bg" },
-  { token: "info",         hex: "#2347D9", cls: "bg-info" },
-  { token: "info-bg",      hex: "#EEF1FD", cls: "bg-info-bg" },
+  { token: "info",         hex: "#404040", cls: "bg-info" },
+  { token: "info-bg",      hex: "#F5F5F5", cls: "bg-info-bg" },
 ];
 
 const RAMPS: Array<{ name: string; shades: Array<{ k: string; hex: string }> }> = [
@@ -174,18 +174,6 @@ const RAMPS: Array<{ name: string; shades: Array<{ k: string; hex: string }> }> 
       { k: "600", hex: "#404040" },
       { k: "800", hex: "#1A1A1A" },
       { k: "900", hex: "#0A0A0A" },
-    ],
-  },
-  {
-    name: "royal",
-    shades: [
-      { k: "50", hex: "#EEF1FD" },
-      { k: "100", hex: "#C5CEFA" },
-      { k: "200", hex: "#9DAAED" },
-      { k: "400", hex: "#5B78E8" },
-      { k: "600", hex: "#2347D9" },
-      { k: "800", hex: "#1A2F8A" },
-      { k: "900", hex: "#0B1B6B" },
     ],
   },
 ];
@@ -338,7 +326,7 @@ export default function Playground() {
         {/* HERO */}
         <div className="mb-16">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-border-default bg-bg-subtle px-3 py-1 mb-5">
-            <span className="h-1.5 w-1.5 rounded-full bg-royal-600 animate-pulse" />
+            <span className="h-1.5 w-1.5 rounded-full bg-ink-900 animate-pulse" />
             <span className="text-[11px] font-mono font-medium uppercase tracking-wider text-fg-secondary">
               Aeros DS · React playground
             </span>
@@ -676,7 +664,6 @@ export default function Playground() {
           <Row label="Tones">
             <Avatar tone="ink" fallback="IK" />
             <Avatar tone="dark" fallback="DK" />
-            <Avatar tone="royal" fallback="RO" />
             <Avatar tone="green" fallback="GR" />
             <Avatar tone="amber" fallback="AM" />
           </Row>

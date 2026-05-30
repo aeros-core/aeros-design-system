@@ -81,7 +81,7 @@ class AerosTabs extends StatelessWidget {
                 color: active ? a.bgSurface : Colors.transparent,
                 borderRadius: AerosRadii.brMd,
                 boxShadow: active
-                    ? const [BoxShadow(color: Color(0x120A0F2E), blurRadius: 3, offset: Offset(0, 1))]
+                    ? const [BoxShadow(color: Color(0x12000000), blurRadius: 3, offset: Offset(0, 1))]
                     : null,
               ),
               child: Text(

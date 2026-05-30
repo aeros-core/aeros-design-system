@@ -247,7 +247,7 @@ AerosVariantPicker(
   style: AerosVariantPickerStyle.swatch, // or .chip
   variants: [
     AerosVariantOption(id: 'red', label: 'Crimson', swatchColor: 0xFFDC2626, stockQty: 1200),
-    AerosVariantOption(id: 'blu', label: 'Royal',   swatchColor: 0xFF2347D9, stockQty: 7),
+    AerosVariantOption(id: 'chr', label: 'Charcoal', swatchColor: 0xFF404040, stockQty: 7),
     AerosVariantOption(id: 'grn', label: 'Forest',  swatchColor: 0xFF15803D, stockQty: 0),
   ],
 )

@@ -18,9 +18,9 @@ Headings are **ExtraBold**, with negative letter-spacing. Numbers are **Semibold
 
 Anything a computer produced — IDs, timestamps, currency, counts, tokens — goes in **IBM Plex Mono**. This is a visual promise: if it's in mono, it's canonical. If it's in Jakarta, it's written by a person.
 
-## 5. Black and white, with a whisper of blue
+## 5. Black and white
 
-The system is **black on white**. That's the brand. Primary buttons are black, selected states are black, focus rings are black. **Royal Blue `#2347D9`** exists — but only as a whisper: the "info" badge, the blue tag, the occasional alert. If you're reaching for blue to make something pop, stop and reach for weight or size instead.
+The system is **black on white** — full stop. Primary buttons are black, selected states are black, focus rings are black. No accent hue, no whisper of colour. If you're reaching for colour to make something pop, stop and reach for weight or size instead.
 
 Semantic colors (green/amber/red) only where an operator needs to act.
 

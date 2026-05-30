@@ -17,7 +17,7 @@ The source lives in [`src/tokens.json`](./src/tokens.json) — edit there, rebui
 
 ## Token categories
 
-- **Color ramps** — `royal`, `ink`, `slate` (each with 7 stops)
+- **Color ramps** — `ink` (7 stops). `royal` and `slate` are legacy aliases that resolve to `ink`
 - **Semantic** — `success`, `warning`, `danger`, `info` with `base`/`bg`/`text`/`border`
 - **Aliases** — theme-aware tokens like `bg.surface`, `fg.primary`, `border.default`, `brand.primary` — defined for light and dark
 - **Typography** — `display-xl` … `mono-xs` (17 named scales)

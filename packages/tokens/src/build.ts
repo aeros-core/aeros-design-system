@@ -55,7 +55,7 @@ function buildCss(): string {
   lines.push("");
   lines.push("[data-theme='dark'] {");
   for (const [k, v] of Object.entries(ALIAS_DARK)) lines.push(`  --aeros-${k}: ${v};`);
-  lines.push("  --aeros-shadow-sm: 0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px rgba(30,37,64,0.8);");
+  lines.push("  --aeros-shadow-sm: 0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px rgba(26,26,26,0.8);");
   lines.push("  --aeros-shadow-md: 0 4px 12px rgba(0,0,0,0.5);");
   lines.push("  --aeros-shadow-lg: 0 4px 16px rgba(0,0,0,0.55);");
   lines.push("  --aeros-shadow-xl: 0 20px 40px rgba(0,0,0,0.65);");

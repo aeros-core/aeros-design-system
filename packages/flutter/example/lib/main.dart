@@ -329,10 +329,10 @@ class _GalleryState extends State<Gallery> {
                     stockQty: 1200,
                   ),
                   AerosVariantOption(
-                    id: 'blue',
-                    label: 'Royal',
-                    sku: 'PC-12-BLU',
-                    swatchColor: 0xFF2347D9,
+                    id: 'charcoal',
+                    label: 'Charcoal',
+                    sku: 'PC-12-CHR',
+                    swatchColor: 0xFF404040,
                     stockQty: 7,
                   ),
                   AerosVariantOption(
