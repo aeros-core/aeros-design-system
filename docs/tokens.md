@@ -4,26 +4,18 @@ All tokens live in [`packages/tokens/src/tokens.json`](../packages/tokens/src/to
 
 ## Color ramps
 
-### Royal (brand)
+### Ink (the only ramp)
 | Stop | Hex | Use |
 |---|---|---|
-| 50  | `#EEF1FD` | Subtle tint, hover states |
-| 100 | `#C5CEFA` | Ghost button border |
-| 200 | `#9DAAED` | Decorative |
-| 400 | `#5B78E8` | Focus ring, dark-mode brand |
-| **600** ★ | **`#2347D9`** | **Primary — default brand** |
-| 800 | `#1A2F8A` | Primary hover, mono text |
-| 900 | `#0B1B6B` | Max contrast brand |
+| 50  | `#F5F5F5` | Subtle tint, hover states |
+| 100 | `#E5E5E5` | Borders, ghost button border |
+| 200 | `#C2C2C2` | Placeholder text |
+| 400 | `#737373` | Muted / secondary text |
+| 600 | `#404040` | Body text, primary hover |
+| 800 | `#1A1A1A` | Headings |
+| **900** ★ | **`#0A0A0A`** | **Primary — default brand, primary CTA** |
 
-### Ink (pure grey)
-| 50 | 100 | 200 | 400 | 600 | 800 | 900 |
-|---|---|---|---|---|---|---|
-| `#F5F5F5` | `#E5E5E5` | `#C2C2C2` | `#737373` | `#404040` | `#1A1A1A` | `#0A0A0A` |
-
-### Slate (blue-grey)
-| 50 | 100 | 200 | 400 | 600 | 800 | 900 |
-|---|---|---|---|---|---|---|
-| `#F5F6FA` | `#E2E5F0` | `#BCC2D8` | `#7A85A8` | `#4A5278` | `#1E2540` | `#0A0F2E` |
+> `royal` and `slate` ramps remain as legacy aliases for backwards compatibility — every stop resolves to the matching `ink` stop. New code should reach for `ink` directly.
 
 ### Semantic
 | Role | Base | Bg | Text | Border |
@@ -31,7 +23,7 @@ All tokens live in [`packages/tokens/src/tokens.json`](../packages/tokens/src/to
 | success | `#16A34A` | `#DCFCE7` | `#15803D` | `#BBF7D0` |
 | warning | `#D97706` | `#FEF3C7` | `#B45309` | `#FDE68A` |
 | danger  | `#DC2626` | `#FEE2E2` | `#B91C1C` | `#FECACA` |
-| info    | `#2347D9` | `#EEF1FD` | `#1A2F8A` | `#C5CEFA` |
+| info    | `#404040` | `#F5F5F5` | `#1A1A1A` | `#E5E5E5` |
 
 ## Alias tokens (theme-aware)
 
@@ -53,10 +45,10 @@ Use these in components — they switch with theme.
 | `brand.primary` | ink-900 | white |
 | `brand.primary-hover` | ink-600 | ink-100 |
 | `brand.primary-muted` | ink-50 | ink-800 |
-| `accent` | royal-600 | royal-400 |
-| `accent-muted` | royal-50 | royal-800 |
+| `accent` | ink-900 | white |
+| `accent-muted` | ink-50 | ink-800 |
 
-> **Brand is black.** Royal Blue lives in `accent` / `accent-muted` tokens and in the `blue` variants of Badge, Tag, and Alert — nowhere else. Reach for it only for the tiniest bit of emphasis.
+> **Brand is black and white — full stop.** No blue, no accent hue. Reach for weight, size, or contrast for emphasis, not colour.
 
 ## Typography
 

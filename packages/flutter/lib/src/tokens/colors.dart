@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 class AerosColors {
   AerosColors._();
 
-  // ─── Royal (brand) ───
-  static const Color royal50  = Color(0xFFEEF1FD);
-  static const Color royal100 = Color(0xFFC5CEFA);
-  static const Color royal200 = Color(0xFF9DAAED);
-  static const Color royal400 = Color(0xFF5B78E8);
-  static const Color royal600 = Color(0xFF2347D9);
-  static const Color royal800 = Color(0xFF1A2F8A);
-  static const Color royal900 = Color(0xFF0B1B6B);
+  // ─── Royal (legacy alias — now neutral grey) ───
+  static const Color royal50  = Color(0xFFF5F5F5);
+  static const Color royal100 = Color(0xFFE5E5E5);
+  static const Color royal200 = Color(0xFFC2C2C2);
+  static const Color royal400 = Color(0xFF737373);
+  static const Color royal600 = Color(0xFF404040);
+  static const Color royal800 = Color(0xFF1A1A1A);
+  static const Color royal900 = Color(0xFF0A0A0A);
 
   // ─── Ink (pure grey) ───
   static const Color ink50  = Color(0xFFF5F5F5);
@@ -23,14 +23,14 @@ class AerosColors {
   static const Color ink800 = Color(0xFF1A1A1A);
   static const Color ink900 = Color(0xFF0A0A0A);
 
-  // ─── Slate (blue-grey) ───
-  static const Color slate50  = Color(0xFFF5F6FA);
-  static const Color slate100 = Color(0xFFE2E5F0);
-  static const Color slate200 = Color(0xFFBCC2D8);
-  static const Color slate400 = Color(0xFF7A85A8);
-  static const Color slate600 = Color(0xFF4A5278);
-  static const Color slate800 = Color(0xFF1E2540);
-  static const Color slate900 = Color(0xFF0A0F2E);
+  // ─── Slate (legacy alias — now neutral grey) ───
+  static const Color slate50  = Color(0xFFF5F5F5);
+  static const Color slate100 = Color(0xFFE5E5E5);
+  static const Color slate200 = Color(0xFFC2C2C2);
+  static const Color slate400 = Color(0xFF737373);
+  static const Color slate600 = Color(0xFF404040);
+  static const Color slate800 = Color(0xFF1A1A1A);
+  static const Color slate900 = Color(0xFF0A0A0A);
 
   // ─── Semantic ───
   static const Color success       = Color(0xFF16A34A);

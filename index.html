@@ -17,14 +17,14 @@
   --mono:        'IBM Plex Mono', monospace;
   --logo:        'Nunito Sans', 'Plus Jakarta Sans', sans-serif;
 
-  /* Royal Blue */
-  --royal-50:    #EEF1FD;
-  --royal-100:   #C5CEFA;
-  --royal-200:   #9DAAED;
-  --royal-400:   #5B78E8;
-  --royal-600:   #2347D9;
-  --royal-800:   #1A2F8A;
-  --royal-900:   #0B1B6B;
+  /* Royal (legacy alias — now neutral grey) */
+  --royal-50:    #F5F5F5;
+  --royal-100:   #E5E5E5;
+  --royal-200:   #C2C2C2;
+  --royal-400:   #737373;
+  --royal-600:   #404040;
+  --royal-800:   #1A1A1A;
+  --royal-900:   #0A0A0A;
 
   /* Ink — pure grey */
   --ink-50:      #F5F5F5;
@@ -35,12 +35,12 @@
   --ink-800:     #1A1A1A;
   --ink-900:     #0A0A0A;
 
-  /* Slate — blue-grey */
-  --slate-50:    #F5F6FA;
-  --slate-100:   #E2E5F0;
-  --slate-200:   #BCC2D8;
-  --slate-400:   #7A85A8;
-  --slate-600:   #4A5278;
+  /* Slate (legacy alias — now neutral grey) */
+  --slate-50:    #F5F5F5;
+  --slate-100:   #E5E5E5;
+  --slate-200:   #C2C2C2;
+  --slate-400:   #737373;
+  --slate-600:   #404040;
   --slate-800:   #1A1A1A;
   --slate-900:   #0A0A0A;
 
@@ -375,7 +375,7 @@ textarea.input   { height: auto; padding: 11px 13px; resize: vertical; line-heig
 
 select.input {
   appearance: none; cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%237A85A8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23737373' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 13px center;
   padding-right: 34px;
@@ -394,7 +394,7 @@ select.input {
 }
 
 /* Search input */
-.search-input { padding-left: 40px; background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='6' cy='6' r='4.5' stroke='%237A85A8' stroke-width='1.3'/%3E%3Cpath d='M9.5 9.5L12 12' stroke='%237A85A8' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 13px center; }
+.search-input { padding-left: 40px; background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='6' cy='6' r='4.5' stroke='%23737373' stroke-width='1.3'/%3E%3Cpath d='M9.5 9.5L12 12' stroke='%23737373' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 13px center; }
 
 /* ─────────────────────────────────────────
    BADGES + TAGS
@@ -758,7 +758,7 @@ tbody tr:hover td { background: var(--slate-50); }
 .menu {
   background: #fff; border: 1px solid var(--slate-100);
   border-radius: var(--r-lg); padding: 5px;
-  box-shadow: 0 4px 16px rgba(10,15,46,0.1);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   width: 200px;
 }
 .menu-item {
@@ -777,7 +777,7 @@ tbody tr:hover td { background: var(--slate-50); }
    MODAL
 ───────────────────────────────────────── */
 .modal-scrim {
-  background: rgba(10,15,46,0.5);
+  background: rgba(0,0,0,0.5);
   border-radius: var(--r-xl); padding: 32px;
   display: flex; align-items: center; justify-content: center;
   min-height: 280px;
@@ -785,7 +785,7 @@ tbody tr:hover td { background: var(--slate-50); }
 .modal {
   background: #fff; border-radius: var(--r-xl);
   width: 100%; max-width: 420px;
-  box-shadow: 0 20px 40px rgba(10,15,46,0.2);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
   overflow: hidden;
 }
 .modal-header { padding: 20px 22px 16px; border-bottom: 1px solid var(--slate-100); }
@@ -881,18 +881,7 @@ tbody tr:hover td { background: var(--slate-50); }
   <div class="section" id="colours">
     <div class="section-eyebrow">01 — Foundation</div>
     <div class="section-title">Colour palette</div>
-    <div class="section-desc">Three ramps — Ink (brand), Slate (surfaces), and Royal (kept for a whisper of blue in info states) — plus four semantic colours.</div>
-
-    <div class="comp-label">Royal blue — accent only</div>
-    <div class="swatch-row">
-      <div class="sw"><div class="sw-color" style="background:#EEF1FD;border:1px solid #DDE3F9;"></div><div class="sw-meta"><div class="sw-stop">50</div><div class="sw-hex">#EEF1FD</div></div></div>
-      <div class="sw"><div class="sw-color" style="background:#C5CEFA;"></div><div class="sw-meta"><div class="sw-stop">100</div><div class="sw-hex">#C5CEFA</div></div></div>
-      <div class="sw"><div class="sw-color" style="background:#9DAAED;"></div><div class="sw-meta"><div class="sw-stop">200</div><div class="sw-hex">#9DAAED</div></div></div>
-      <div class="sw"><div class="sw-color" style="background:#5B78E8;"></div><div class="sw-meta"><div class="sw-stop">400</div><div class="sw-hex">#5B78E8</div></div></div>
-      <div class="sw"><div class="sw-color" style="background:#2347D9;"></div><div class="sw-meta"><div class="sw-stop">600</div><div class="sw-hex">#2347D9</div></div></div>
-      <div class="sw"><div class="sw-color" style="background:#1A2F8A;"></div><div class="sw-meta"><div class="sw-stop">800</div><div class="sw-hex">#1A2F8A</div></div></div>
-      <div class="sw"><div class="sw-color" style="background:#0B1B6B;"></div><div class="sw-meta"><div class="sw-stop">900</div><div class="sw-hex">#0B1B6B</div></div></div>
-    </div>
+    <div class="section-desc">One ramp — Ink — covers brand, surfaces, and accents. Pure black and white, plus three semantic colours for state.</div>
 
     <div class="comp-label">Ink — pure grey</div>
     <div class="swatch-row">
@@ -905,23 +894,12 @@ tbody tr:hover td { background: var(--slate-50); }
       <div class="sw"><div class="sw-color" style="background:#0A0A0A;"></div><div class="sw-meta"><div class="sw-stop">900 ★</div><div class="sw-hex">#0A0A0A</div></div></div>
     </div>
 
-    <div class="comp-label">Slate — blue-shifted grey</div>
-    <div class="swatch-row">
-      <div class="sw"><div class="sw-color" style="background:#F5F6FA;border:1px solid #E2E5F0;"></div><div class="sw-meta"><div class="sw-stop">50</div><div class="sw-hex">#F5F6FA</div></div></div>
-      <div class="sw"><div class="sw-color" style="background:#E2E5F0;"></div><div class="sw-meta"><div class="sw-stop">100</div><div class="sw-hex">#E2E5F0</div></div></div>
-      <div class="sw"><div class="sw-color" style="background:#BCC2D8;"></div><div class="sw-meta"><div class="sw-stop">200</div><div class="sw-hex">#BCC2D8</div></div></div>
-      <div class="sw"><div class="sw-color" style="background:#7A85A8;"></div><div class="sw-meta"><div class="sw-stop">400</div><div class="sw-hex">#7A85A8</div></div></div>
-      <div class="sw"><div class="sw-color" style="background:#4A5278;"></div><div class="sw-meta"><div class="sw-stop">600</div><div class="sw-hex">#4A5278</div></div></div>
-      <div class="sw"><div class="sw-color" style="background:#1A1A1A;"></div><div class="sw-meta"><div class="sw-stop">800</div><div class="sw-hex">#1A1A1A</div></div></div>
-      <div class="sw"><div class="sw-color" style="background:#0A0A0A;"></div><div class="sw-meta"><div class="sw-stop">900</div><div class="sw-hex">#0A0A0A</div></div></div>
-    </div>
-
     <div class="comp-label">Semantic</div>
     <div class="sem-grid">
       <div class="sem-card"><div class="sem-bar" style="background:#16A34A;"></div><div class="sem-body"><div class="sem-name">Success</div><div class="sem-vals">#16A34A<br>#DCFCE7</div></div></div>
       <div class="sem-card"><div class="sem-bar" style="background:#D97706;"></div><div class="sem-body"><div class="sem-name">Warning</div><div class="sem-vals">#D97706<br>#FEF3C7</div></div></div>
       <div class="sem-card"><div class="sem-bar" style="background:#DC2626;"></div><div class="sem-body"><div class="sem-name">Danger</div><div class="sem-vals">#DC2626<br>#FEE2E2</div></div></div>
-      <div class="sem-card"><div class="sem-bar" style="background:#2347D9;"></div><div class="sem-body"><div class="sem-name">Info</div><div class="sem-vals">#2347D9<br>#EEF1FD</div></div></div>
+      <div class="sem-card"><div class="sem-bar" style="background:#404040;"></div><div class="sem-body"><div class="sem-name">Info</div><div class="sem-vals">#404040<br>#F5F5F5</div></div></div>
     </div>
   </div>
 
@@ -982,7 +960,7 @@ tbody tr:hover td { background: var(--slate-50); }
     </div>
     <div class="type-row">
       <div class="type-spec">11px · 400 · muted</div>
-      <div class="type-sample" style="font-family:var(--mono);font-size:11px;color:var(--ink-400);">--royal-600: #2347D9 · --slate-900:   #0A0A0A</div>
+      <div class="type-sample" style="font-family:var(--mono);font-size:11px;color:var(--ink-400);">--ink-600: #404040 · --ink-900:   #0A0A0A</div>
     </div>
 
     <div class="comp-label" style="margin-top:24px;">Font pairing in context</div>
@@ -1511,7 +1489,7 @@ tbody tr:hover td { background: var(--slate-50); }
     <div class="section-desc">Inline feedback — informational, success, warning, and danger. Titles at 700 weight so the key message lands before the body is read.</div>
 
     <div class="alert alert-blue">
-      <div class="alert-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#2347D9" stroke-width="1.3"/><path d="M8 7v4M8 5.5v.5" stroke="#2347D9" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="alert-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#404040" stroke-width="1.3"/><path d="M8 7v4M8 5.5v.5" stroke="#404040" stroke-width="1.5" stroke-linecap="round"/></svg></div>
       <div><div class="alert-title">3 RFQs require your approval</div><div class="alert-body">Review and approve pending purchase requests to avoid production delays on Line 2 and Line 3.</div></div>
     </div>
     <div class="alert alert-green">
@@ -1690,38 +1668,22 @@ tbody tr:hover td { background: var(--slate-50); }
 <span class="t-key">textSm</span>:        <span class="t-val">12px / 500 / 0</span>
 <span class="t-key">textLabel</span>:     <span class="t-val">11px / 600 / 0.08em uppercase</span>
 
-<span class="t-comment">// Royal Blue</span>
-<span class="t-key">royal50</span>:   <span class="t-val">#EEF1FD</span>
-<span class="t-key">royal100</span>:  <span class="t-val">#C5CEFA</span>
-<span class="t-key">royal200</span>:  <span class="t-val">#9DAAED</span>
-<span class="t-key">royal400</span>:  <span class="t-val">#5B78E8</span>
-<span class="t-key">royal600</span>:  <span class="t-val">#2347D9</span>    <span class="t-comment">// accent only — info badge/tag/alert</span>
-<span class="t-key">royal800</span>:  <span class="t-val">#1A2F8A</span>    <span class="t-comment">// accent text on royal-50</span>
-<span class="t-key">royal900</span>:  <span class="t-val">#0B1B6B</span>
-
-<span class="t-comment">// Ink — pure grey</span>
-<span class="t-key">ink50</span>:     <span class="t-val">#F5F5F5</span>
-<span class="t-key">ink100</span>:    <span class="t-val">#E5E5E5</span>
+<span class="t-comment">// Ink — pure grey (the only ramp)</span>
+<span class="t-key">ink50</span>:     <span class="t-val">#F5F5F5</span>    <span class="t-comment">// subtle surface</span>
+<span class="t-key">ink100</span>:    <span class="t-val">#E5E5E5</span>    <span class="t-comment">// borders</span>
 <span class="t-key">ink200</span>:    <span class="t-val">#C2C2C2</span>    <span class="t-comment">// placeholder text</span>
 <span class="t-key">ink400</span>:    <span class="t-val">#737373</span>    <span class="t-comment">// muted / secondary text</span>
 <span class="t-key">ink600</span>:    <span class="t-val">#404040</span>    <span class="t-comment">// body text</span>
 <span class="t-key">ink800</span>:    <span class="t-val">#1A1A1A</span>    <span class="t-comment">// headings</span>
 <span class="t-key">ink900</span>:    <span class="t-val">#0A0A0A</span>    <span class="t-comment">// primary text + brand / primary CTA</span>
 
-<span class="t-comment">// Slate — blue-shifted grey</span>
-<span class="t-key">slate50</span>:   <span class="t-val">#F5F6FA</span>    <span class="t-comment">// page background</span>
-<span class="t-key">slate100</span>:  <span class="t-val">#E2E5F0</span>    <span class="t-comment">// card borders</span>
-<span class="t-key">slate200</span>:  <span class="t-val">#BCC2D8</span>
-<span class="t-key">slate400</span>:  <span class="t-val">#7A85A8</span>    <span class="t-comment">// table headers, labels</span>
-<span class="t-key">slate600</span>:  <span class="t-val">#4A5278</span>
-<span class="t-key">slate800</span>:  <span class="t-val">#1A1A1A</span>    <span class="t-comment">// elevated dark surfaces</span>
-<span class="t-key">slate900</span>:  <span class="t-val">#0A0A0A</span>    <span class="t-comment">// nav bar / sidebar / brand</span>
+<span class="t-comment">// royal / slate — kept as legacy aliases, all resolve to ink</span>
 
 <span class="t-comment">// Semantic</span>
 <span class="t-key">success</span>:   <span class="t-val">#16A34A</span>  /  <span class="t-val">#DCFCE7</span>
 <span class="t-key">warning</span>:   <span class="t-val">#D97706</span>  /  <span class="t-val">#FEF3C7</span>
 <span class="t-key">danger</span>:    <span class="t-val">#DC2626</span>  /  <span class="t-val">#FEE2E2</span>
-<span class="t-key">info</span>:      <span class="t-val">#2347D9</span>  /  <span class="t-val">#EEF1FD</span>
+<span class="t-key">info</span>:      <span class="t-val">#404040</span>  /  <span class="t-val">#F5F5F5</span>
 
 <span class="t-comment">// Radius</span>
 <span class="t-key">radiusSm</span>:  <span class="t-val">6px</span>

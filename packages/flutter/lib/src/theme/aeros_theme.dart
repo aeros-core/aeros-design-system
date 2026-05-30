@@ -55,7 +55,7 @@ class AerosTheme {
       onInverseSurface: aliases.fgInverse,
       inversePrimary: AerosColors.ink200,
       scrim: Colors.black54,
-      shadow: const Color(0xFF0A0F2E),
+      shadow: const Color(0xFF000000),
     );
 
     final textTheme = AerosTypography.textTheme(

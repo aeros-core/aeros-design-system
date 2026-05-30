@@ -54,11 +54,11 @@ class AerosTypography {
   static TextStyle bodySm({Color? color}) => _sans(size: 13, weight: FontWeight.w500, height: 1.55, color: color ?? const Color(0xFF0A0A0A));
   static TextStyle caption({Color? color}) => _sans(size: 12, weight: FontWeight.w500, height: 1.5, color: color ?? const Color(0xFF404040));
   static TextStyle overline({Color? color}) =>
-      _sans(size: 11, weight: FontWeight.w600, height: 1.3, letterSpacing: 0.88, color: color ?? const Color(0xFF7A85A8));
+      _sans(size: 11, weight: FontWeight.w600, height: 1.3, letterSpacing: 0.88, color: color ?? const Color(0xFF737373));
 
   // ─── Mono ───
   static TextStyle monoLg({Color? color}) => _mono(size: 22, weight: FontWeight.w500, height: 1.2, letterSpacing: -0.22, color: color ?? const Color(0xFF0A0A0A));
-  static TextStyle monoMd({Color? color}) => _mono(size: 14, weight: FontWeight.w500, height: 1.5, color: color ?? const Color(0xFF1A2F8A));
+  static TextStyle monoMd({Color? color}) => _mono(size: 14, weight: FontWeight.w500, height: 1.5, color: color ?? const Color(0xFF1A1A1A));
   static TextStyle monoSm({Color? color}) => _mono(size: 12, weight: FontWeight.w400, height: 1.5, color: color ?? const Color(0xFF737373));
   static TextStyle monoXs({Color? color}) => _mono(size: 11, weight: FontWeight.w400, height: 1.5, color: color ?? const Color(0xFF737373));
 
