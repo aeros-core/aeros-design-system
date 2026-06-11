@@ -14,7 +14,7 @@ class AerosScaffold extends StatelessWidget {
     this.sidenav,
     this.floatingActionButton,
     this.sidenavBreakpoint = 720,
-    this.sidenavWidth = 260,
+    this.sidenavWidth = 240,
     this.backgroundColor,
   });
 
@@ -145,7 +145,7 @@ class AerosSidenav extends StatelessWidget {
     required this.items,
     this.header,
     this.footer,
-    this.padding = const EdgeInsets.symmetric(vertical: AerosSpacing.s4),
+    this.padding = const EdgeInsets.symmetric(vertical: AerosSpacing.s2),
   });
 
   final List<AerosNavItem> items;
@@ -176,6 +176,11 @@ class AerosSidenav extends StatelessWidget {
   }
 }
 
+/// Dense nav label — bodySm tightened for single-line nav rows.
+TextStyle _navLabel(Color color, {required FontWeight weight}) =>
+    AerosTypography.bodySm(color: color)
+        .copyWith(height: 1.4, fontWeight: weight);
+
 class _NavEntry extends StatefulWidget {
   const _NavEntry({required this.item, required this.depth});
 
@@ -192,7 +197,7 @@ class _NavEntryState extends State<_NavEntry> {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final indent = AerosSpacing.s4 + widget.depth * AerosSpacing.s5;
+    final indent = AerosSpacing.s4 + widget.depth * AerosSpacing.s4;
     final item = widget.item;
 
     if (!item.hasChildren) {
@@ -201,22 +206,26 @@ class _NavEntryState extends State<_NavEntry> {
         child: Container(
           padding: EdgeInsets.fromLTRB(
             indent,
-            AerosSpacing.s3,
+            AerosSpacing.s2,
             AerosSpacing.s4,
-            AerosSpacing.s3,
+            AerosSpacing.s2,
           ),
           color: item.selected ? a.brandPrimaryMuted : Colors.transparent,
           child: Row(
             children: [
               if (item.icon != null) ...[
-                Icon(item.icon, size: 18, color: a.fgPrimary),
-                const SizedBox(width: AerosSpacing.s3),
+                Icon(item.icon, size: 16, color: a.fgPrimary),
+                const SizedBox(width: AerosSpacing.s2),
               ],
               Expanded(
                 child: Text(
                   item.label,
-                  style: AerosTypography.bodyMd(color: a.fgPrimary).copyWith(
-                    fontWeight: item.selected ? FontWeight.w700 : FontWeight.w500,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: _navLabel(
+                    a.fgPrimary,
+                    weight:
+                        item.selected ? FontWeight.w600 : FontWeight.w500,
                   ),
                 ),
               ),
@@ -234,28 +243,28 @@ class _NavEntryState extends State<_NavEntry> {
           child: Container(
             padding: EdgeInsets.fromLTRB(
               indent,
-              AerosSpacing.s3,
+              AerosSpacing.s2,
               AerosSpacing.s4,
-              AerosSpacing.s3,
+              AerosSpacing.s2,
             ),
             child: Row(
               children: [
                 if (item.icon != null) ...[
-                  Icon(item.icon, size: 18, color: a.fgPrimary),
-                  const SizedBox(width: AerosSpacing.s3),
+                  Icon(item.icon, size: 16, color: a.fgPrimary),
+                  const SizedBox(width: AerosSpacing.s2),
                 ],
                 Expanded(
                   child: Text(
                     item.label,
-                    style: AerosTypography.bodyMd(color: a.fgPrimary).copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: _navLabel(a.fgPrimary, weight: FontWeight.w600),
                   ),
                 ),
                 Icon(
                   _expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                  size: 18,
-                  color: a.fgPrimary,
+                  size: 16,
+                  color: a.fgMuted,
                 ),
               ],
             ),
