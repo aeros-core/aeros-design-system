@@ -27,8 +27,8 @@ export function SidebarBrand({
   className?: string;
 }) {
   return (
-    <div className={cn("flex items-center gap-2.5 px-5 py-5 border-b border-white/5", className)}>
-      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-base font-extrabold text-ink-900">
+    <div className={cn("flex items-center gap-2.5 px-4 py-3.5 border-b border-white/5", className)}>
+      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-base font-extrabold text-ink-900">
         {mark}
       </div>
       <div className="min-w-0">
@@ -49,9 +49,9 @@ export function SidebarSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className={cn("px-3 pt-[18px] pb-1", className)}>
+    <div className={cn("px-3 pt-3 pb-1", className)}>
       {label && (
-        <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.08em] text-ink-400">
+        <div className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-[0.08em] text-ink-400">
           {label}
         </div>
       )}
@@ -70,7 +70,7 @@ export function SidebarItem({
   return (
     <a
       className={cn(
-        "flex items-center gap-2.5 rounded-md px-3 py-2 text-[13px] font-medium transition-colors",
+        "flex items-center gap-2.5 rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors",
         active
           ? "bg-white/10 text-white"
           : "text-white/50 hover:bg-white/5 hover:text-white/80",
