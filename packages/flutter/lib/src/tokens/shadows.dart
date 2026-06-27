@@ -30,4 +30,27 @@ class AerosShadows {
     BoxShadow(color: Color(0x120A0A0A), blurRadius: 16, offset: Offset(0, 8)),
     BoxShadow(color: Color(0x1F0A0A0A), blurRadius: 48, offset: Offset(0, 24)),
   ];
+
+  /// Soft focus ring (light). Use as a spread-only BoxShadow halo so focus
+  /// never shifts layout.
+  static const List<BoxShadow> focus = [
+    BoxShadow(color: Color(0x290A0A0A), blurRadius: 0, spreadRadius: 3),
+  ];
+
+  static const List<BoxShadow> focusDanger = [
+    BoxShadow(color: Color(0x2EDC2626), blurRadius: 0, spreadRadius: 3),
+  ];
+
+  /// A crisp 1px edge drawn as a shadow (no layout border).
+  static const List<BoxShadow> hairline = [
+    BoxShadow(color: Color(0x100A0A0A), blurRadius: 0, spreadRadius: 1),
+  ];
+
+  // ─── Brightness-aware intents ───
+  // Light mode floats surfaces with shadow; dark mode carries elevation via
+  // the lighter surface fills (bgSurface -> bgElevated), so shadows are off.
+  static List<BoxShadow> card(bool isDark) => isDark ? const [] : sm;
+  static List<BoxShadow> menu(bool isDark) => isDark ? const [] : lg;
+  static List<BoxShadow> dialog(bool isDark) => isDark ? const [] : xl;
+  static List<BoxShadow> popover(bool isDark) => isDark ? const [] : md;
 }

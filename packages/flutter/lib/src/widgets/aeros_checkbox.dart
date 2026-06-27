@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 
 class AerosCheckbox extends StatelessWidget {
   const AerosCheckbox({super.key, required this.value, required this.onChanged, this.tristate = false});
@@ -18,8 +17,8 @@ class AerosCheckbox extends StatelessWidget {
         value: value,
         tristate: tristate,
         onChanged: onChanged,
-        activeColor: AerosColors.ink900,
-        checkColor: Colors.white,
+        activeColor: a.brandPrimary,
+        checkColor: a.fgInverse,
         side: BorderSide(color: a.borderStrong, width: 1.5),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
         visualDensity: VisualDensity.compact,

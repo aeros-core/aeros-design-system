@@ -38,7 +38,7 @@ class AerosTag extends StatelessWidget {
         borderRadius: AerosRadii.brMd,
         border: border != null ? Border.all(color: border) : null,
       ),
-      child: Text(label, style: AerosTypography.caption(color: fg).copyWith(fontSize: 11, fontWeight: FontWeight.w600)),
+      child: Text(label, style: AerosTypography.labelXs(color: fg)),
     );
   }
 }

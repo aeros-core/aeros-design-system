@@ -47,14 +47,27 @@ class AerosButton extends StatefulWidget {
 
 class _AerosButtonState extends State<AerosButton> {
   bool _focused = false;
+  bool _hovered = false;
 
   EdgeInsets get _padding {
     switch (widget.size) {
       case AerosButtonSize.xs: return const EdgeInsets.symmetric(horizontal: 11, vertical: 5);
       case AerosButtonSize.sm: return const EdgeInsets.symmetric(horizontal: 14, vertical: 7);
-      case AerosButtonSize.md: return const EdgeInsets.symmetric(horizontal: 18, vertical: 10);
-      case AerosButtonSize.lg: return const EdgeInsets.symmetric(horizontal: 26, vertical: 13);
-      case AerosButtonSize.xl: return const EdgeInsets.symmetric(horizontal: 32, vertical: 16);
+      case AerosButtonSize.md: return const EdgeInsets.symmetric(horizontal: 18, vertical: 9);
+      case AerosButtonSize.lg: return const EdgeInsets.symmetric(horizontal: 26, vertical: 12);
+      case AerosButtonSize.xl: return const EdgeInsets.symmetric(horizontal: 32, vertical: 15);
+    }
+  }
+
+  /// Consistent min-heights so buttons share a vertical rhythm; md+ clears the
+  /// 44px comfortable tap target.
+  double get _minHeight {
+    switch (widget.size) {
+      case AerosButtonSize.xs: return 28;
+      case AerosButtonSize.sm: return 32;
+      case AerosButtonSize.md: return 40;
+      case AerosButtonSize.lg: return 46;
+      case AerosButtonSize.xl: return 52;
     }
   }
 
@@ -78,20 +91,19 @@ class _AerosButtonState extends State<AerosButton> {
     }
   }
 
-  ({Color bg, Color fg, Color? border}) _colors(AerosAliasColors a) {
+  ({Color bg, Color bgHover, Color fg, Color? border}) _colors(AerosAliasColors a) {
     switch (widget.variant) {
       case AerosButtonVariant.primary:
-        return (bg: a.brandPrimary, fg: a.fgInverse, border: null);
-      case AerosButtonVariant.secondary:
-        return (bg: a.bgSurface, fg: a.fgPrimary, border: a.borderDefault);
-      case AerosButtonVariant.ghost:
-        return (bg: Colors.transparent, fg: a.fgPrimary, border: a.borderDefault);
-      case AerosButtonVariant.danger:
-        return (bg: AerosColors.dangerBg, fg: AerosColors.dangerText, border: AerosColors.dangerBorder);
       case AerosButtonVariant.dark:
-        return (bg: a.brandPrimary, fg: a.fgInverse, border: null);
+        return (bg: a.brandPrimary, bgHover: a.brandPrimaryHover, fg: a.fgInverse, border: null);
+      case AerosButtonVariant.secondary:
+        return (bg: a.bgSurface, bgHover: a.bgSubtle, fg: a.fgPrimary, border: a.borderDefault);
+      case AerosButtonVariant.ghost:
+        return (bg: Colors.transparent, bgHover: a.bgSubtle, fg: a.fgPrimary, border: a.borderDefault);
+      case AerosButtonVariant.danger:
+        return (bg: AerosColors.dangerBg, bgHover: AerosColors.dangerBorder, fg: AerosColors.dangerText, border: AerosColors.dangerBorder);
       case AerosButtonVariant.link:
-        return (bg: Colors.transparent, fg: a.brandPrimary, border: null);
+        return (bg: Colors.transparent, bgHover: Colors.transparent, fg: a.brandPrimary, border: null);
     }
   }
 
@@ -117,35 +129,45 @@ class _AerosButtonState extends State<AerosButton> {
               child: CircularProgressIndicator(strokeWidth: 2, color: c.fg),
             )
           else if (widget.leading != null) ...[widget.leading!, const SizedBox(width: 8)],
-          Text(widget.label, style: AerosTypography.bodyMd(color: c.fg).copyWith(fontSize: _fontSize, fontWeight: FontWeight.w500)),
+          Text(widget.label, style: AerosTypography.labelMd(color: c.fg).copyWith(fontSize: _fontSize)),
           if (widget.trailing != null) ...[const SizedBox(width: 8), widget.trailing!],
         ],
       ),
     );
 
-    // Visible focus ring: 2px brandPrimary outline (a.borderFocus) when
-    // the button is keyboard-focused. Native hover ripple from Material
-    // InkWell is preserved untouched so mouse interaction is unchanged.
+    // Hover shifts the fill (brandPrimaryHover / bgSubtle); keyboard focus
+    // draws a soft ring as an OUTER spread shadow so it never shifts layout
+    // (the variant border stays constant).
+    final bg = (!disabled && _hovered) ? c.bgHover : c.bg;
+
     return Opacity(
       opacity: disabled ? 0.4 : 1,
       child: Material(
-        color: c.bg,
+        color: bg,
         borderRadius: _radius,
+        clipBehavior: Clip.none,
         child: InkWell(
           onTap: disabled ? null : widget.onPressed,
           borderRadius: _radius,
-          splashColor: Colors.white.withValues(alpha: 0.1),
+          hoverColor: Colors.transparent,
+          splashColor: c.fg.withValues(alpha: 0.12),
+          onHover: (h) {
+            if (_hovered != h) setState(() => _hovered = h);
+          },
           onFocusChange: (focused) {
             if (_focused != focused) setState(() => _focused = focused);
           },
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 80),
+            duration: const Duration(milliseconds: 120),
+            curve: Curves.easeOut,
+            constraints: BoxConstraints(minHeight: _minHeight),
             padding: _padding,
             decoration: BoxDecoration(
               borderRadius: _radius,
-              border: _focused
-                  ? Border.all(color: a.borderFocus, width: 2)
-                  : (c.border != null ? Border.all(color: c.border!) : null),
+              border: c.border != null ? Border.all(color: c.border!) : null,
+              boxShadow: _focused
+                  ? [BoxShadow(color: a.focusRing.withValues(alpha: 0.30), spreadRadius: 3)]
+                  : null,
             ),
             child: content,
           ),
