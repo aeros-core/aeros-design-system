@@ -1,13 +1,13 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wdth,wght@6..12,75..125,200..1000&display=swap");
 
-@import "@aeros/tokens/css";
+@import "@aeros-core/tokens/css";
 
 @import "tailwindcss";
 
 /* Tailwind v4 scans files relative to this stylesheet. Point it at the
    component source tree explicitly so every class used inside
-   @aeros/react (Button, Input, Card, Sidebar, …) gets generated when
-   consumers import "@aeros/react/styles.css" — including in monorepo
+   @aeros-core/react (Button, Input, Card, Sidebar, …) gets generated when
+   consumers import "@aeros-core/react/styles.css" — including in monorepo
    consumers where transpilePackages compiles these from source. */
 @source "./components/**/*.{ts,tsx}";
 @source "./*.{ts,tsx}";

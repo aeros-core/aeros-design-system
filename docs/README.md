@@ -8,13 +8,13 @@
 ## Getting started — Next.js (aeros-x.com)
 
 ```bash
-pnpm add @aeros/react @aeros/tokens
+pnpm add @aeros-core/react @aeros-core/tokens
 ```
 
 Add to your app root (`app/layout.tsx`):
 
 ```tsx
-import "@aeros/react/styles.css";
+import "@aeros-core/react/styles.css";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 Use a component:
 
 ```tsx
-import { Button, Card, CardHeader, CardTitle, CardBody, StatCard } from "@aeros/react";
+import { Button, Card, CardHeader, CardTitle, CardBody, StatCard } from "@aeros-core/react";
 
 export default function Page() {
   return (

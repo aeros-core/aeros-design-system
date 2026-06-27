@@ -1,15 +1,15 @@
-# @aeros/react-docs
+# @aeros-core/react-docs
 
-Live playground for `@aeros/react`. One Next.js app that renders every component with its props, on a single scrollable page — the React equivalent of the repo's `index.html` reference kit.
+Live playground for `@aeros-core/react`. One Next.js app that renders every component with its props, on a single scrollable page — the React equivalent of the repo's `index.html` reference kit.
 
 ## Run it
 
 ```bash
 # from the monorepo root
 pnpm install
-pnpm --filter @aeros/tokens build
-pnpm --filter @aeros/react build
-pnpm --filter @aeros/react-docs dev
+pnpm --filter @aeros-core/tokens build
+pnpm --filter @aeros-core/react build
+pnpm --filter @aeros-core/react-docs dev
 ```
 
 Opens at **http://localhost:3000**.

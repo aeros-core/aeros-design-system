@@ -18,7 +18,7 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: "Aeros DS — Playground",
-  description: "Live preview of every @aeros/react component.",
+  description: "Live preview of every @aeros-core/react component.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

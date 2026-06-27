@@ -1,5 +1,5 @@
 {
-  "name": "@aeros/tokens",
+  "name": "@aeros-core/tokens",
   "version": "1.0.0",
   "description": "Aeros design tokens — source of truth.",
   "type": "module",
@@ -19,6 +19,15 @@
     "./source": "./src/tokens.json"
   },
   "files": ["dist", "src"],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aeros-core/aeros-design-system.git",
+    "directory": "packages/tokens"
+  },
   "scripts": {
     "build": "tsx src/build.ts",
     "dev": "tsx watch src/build.ts"

@@ -1,4 +1,4 @@
-@import "@aeros/react/styles.css";
+@import "@aeros-core/react/styles.css";
 
 html { scroll-behavior: smooth; }
 body { overflow-x: hidden; }
