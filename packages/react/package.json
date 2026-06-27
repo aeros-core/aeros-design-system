@@ -1,6 +1,6 @@
 {
   "name": "@aeros-core/react",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Aeros React component library — built for Next.js.",
   "type": "module",
   "main": "./dist/index.js",
@@ -12,7 +12,10 @@
     },
     "./styles.css": "./src/styles.css"
   },
-  "files": ["dist", "src/styles.css"],
+  "files": [
+    "dist",
+    "src/styles.css"
+  ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "restricted"
