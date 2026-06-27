@@ -8,7 +8,7 @@ export interface ProgressProps extends React.ComponentPropsWithoutRef<typeof RP.
 }
 
 const colorMap: Record<NonNullable<ProgressProps["color"]>, string> = {
-  royal:   "bg-ink-900",
+  royal:   "bg-brand-primary",
   success: "bg-success",
   warning: "bg-warning",
   danger:  "bg-danger"
@@ -18,7 +18,7 @@ export const Progress = React.forwardRef<React.ElementRef<typeof RP.Root>, Progr
   ({ className, value = 0, color = "royal", ...props }, ref) => (
     <RP.Root
       ref={ref}
-      className={cn("relative h-1.5 w-full overflow-hidden rounded-full bg-ink-100", className)}
+      className={cn("relative h-1.5 w-full overflow-hidden rounded-full bg-bg-subtle", className)}
       value={value}
       {...props}
     >

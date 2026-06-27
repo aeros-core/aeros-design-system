@@ -89,7 +89,7 @@ class _AerosButtonState extends State<AerosButton> {
       case AerosButtonVariant.danger:
         return (bg: AerosColors.dangerBg, fg: AerosColors.dangerText, border: AerosColors.dangerBorder);
       case AerosButtonVariant.dark:
-        return (bg: AerosColors.ink900, fg: Colors.white, border: null);
+        return (bg: a.brandPrimary, fg: a.fgInverse, border: null);
       case AerosButtonVariant.link:
         return (bg: Colors.transparent, fg: a.brandPrimary, border: null);
     }
@@ -117,7 +117,7 @@ class _AerosButtonState extends State<AerosButton> {
               child: CircularProgressIndicator(strokeWidth: 2, color: c.fg),
             )
           else if (widget.leading != null) ...[widget.leading!, const SizedBox(width: 8)],
-          Text(widget.label, style: AerosTypography.bodyMd(color: c.fg).copyWith(fontSize: _fontSize, fontWeight: FontWeight.w600)),
+          Text(widget.label, style: AerosTypography.bodyMd(color: c.fg).copyWith(fontSize: _fontSize, fontWeight: FontWeight.w500)),
           if (widget.trailing != null) ...[const SizedBox(width: 8), widget.trailing!],
         ],
       ),

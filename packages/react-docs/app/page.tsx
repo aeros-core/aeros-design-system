@@ -101,7 +101,7 @@ function Section({
         <div className="mb-2 text-[10px] font-mono font-bold uppercase tracking-[0.1em] text-fg-muted">
           {eyebrow}
         </div>
-        <h2 className="mb-2 text-[26px] font-extrabold tracking-[-0.03em] text-fg-primary leading-[1.1]">
+        <h2 className="mb-2 text-[26px] font-bold tracking-[-0.02em] text-fg-primary leading-[1.1]">
           {title}
         </h2>
         {description && (
@@ -140,16 +140,18 @@ function Row({
 // Foundations: colour swatches + type scale
 // ────────────────────────────────────────────────────────────────
 const SEMANTIC_COLORS: Array<{ token: string; cssVar: string; hex: string }> = [
-  { token: "bg-canvas",       cssVar: "--color-bg-canvas",     hex: "#FFFFFF" },
-  { token: "bg-subtle",       cssVar: "--color-bg-subtle",     hex: "#F5F5F5" },
-  { token: "bg-inverse",      cssVar: "--color-bg-inverse",    hex: "#0A0A0A" },
-  { token: "fg-primary",      cssVar: "--color-fg-primary",    hex: "#0A0A0A" },
-  { token: "fg-secondary",    cssVar: "--color-fg-secondary",  hex: "#404040" },
-  { token: "fg-muted",        cssVar: "--color-fg-muted",      hex: "#6B6B6B" },
-  { token: "border-default",  cssVar: "--color-border-default",hex: "#E5E5E5" },
-  { token: "border-strong",   cssVar: "--color-border-strong", hex: "#C2C2C2" },
-  { token: "accent",          cssVar: "--color-accent",        hex: "#0A0A0A" },
-  { token: "accent-muted",    cssVar: "--color-accent-muted",  hex: "#F5F5F5" },
+  { token: "bg-canvas",       cssVar: "--color-bg-canvas",      hex: "#FAFAF9" },
+  { token: "bg-surface",      cssVar: "--color-bg-surface",     hex: "#FFFFFF" },
+  { token: "bg-elevated",     cssVar: "--color-bg-elevated",    hex: "#FFFFFF" },
+  { token: "bg-subtle",       cssVar: "--color-bg-subtle",      hex: "#F4F4F2" },
+  { token: "bg-inverse",      cssVar: "--color-bg-inverse",     hex: "#1A1916" },
+  { token: "fg-primary",      cssVar: "--color-fg-primary",     hex: "#1A1916" },
+  { token: "fg-secondary",    cssVar: "--color-fg-secondary",   hex: "#57554F" },
+  { token: "fg-muted",        cssVar: "--color-fg-muted",       hex: "#6E6C66" },
+  { token: "border-default",  cssVar: "--color-border-default", hex: "#E7E6E2" },
+  { token: "border-strong",   cssVar: "--color-border-strong",  hex: "#D6D4CF" },
+  { token: "border-subtle",   cssVar: "--color-border-subtle",  hex: "#F4F4F2" },
+  { token: "focus-ring",      cssVar: "--color-focus-ring",     hex: "#1A1916" },
 ];
 
 const STATUS_COLORS: Array<{ token: string; hex: string; cls: string }> = [
@@ -159,21 +161,26 @@ const STATUS_COLORS: Array<{ token: string; hex: string; cls: string }> = [
   { token: "warning-bg",   hex: "#FEF3C7", cls: "bg-warning-bg" },
   { token: "danger",       hex: "#DC2626", cls: "bg-danger" },
   { token: "danger-bg",    hex: "#FEE2E2", cls: "bg-danger-bg" },
-  { token: "info",         hex: "#404040", cls: "bg-info" },
-  { token: "info-bg",      hex: "#F5F5F5", cls: "bg-info-bg" },
+  { token: "info",         hex: "#57554F", cls: "bg-info" },
+  { token: "info-bg",      hex: "#F4F4F2", cls: "bg-info-bg" },
 ];
 
 const RAMPS: Array<{ name: string; shades: Array<{ k: string; hex: string }> }> = [
   {
     name: "ink",
     shades: [
-      { k: "50", hex: "#F5F5F5" },
-      { k: "100", hex: "#E5E5E5" },
-      { k: "200", hex: "#C2C2C2" },
-      { k: "400", hex: "#737373" },
-      { k: "600", hex: "#404040" },
-      { k: "800", hex: "#1A1A1A" },
-      { k: "900", hex: "#0A0A0A" },
+      { k: "0",   hex: "#FFFFFF" },
+      { k: "50",  hex: "#FAFAF9" },
+      { k: "100", hex: "#F4F4F2" },
+      { k: "200", hex: "#E7E6E2" },
+      { k: "300", hex: "#D6D4CF" },
+      { k: "400", hex: "#A8A6A0" },
+      { k: "500", hex: "#7C7A74" },
+      { k: "600", hex: "#57554F" },
+      { k: "700", hex: "#403E39" },
+      { k: "800", hex: "#272622" },
+      { k: "900", hex: "#1A1916" },
+      { k: "950", hex: "#121110" },
     ],
   },
 ];
@@ -331,7 +338,7 @@ export default function Playground() {
               Aeros DS · React playground
             </span>
           </div>
-          <h1 className="text-[42px] font-extrabold tracking-[-0.04em] text-fg-primary leading-[1.0]">
+          <h1 className="text-[42px] font-bold tracking-[-0.025em] text-fg-primary leading-[1.0]">
             Run everything.
           </h1>
           <p className="mt-4 max-w-xl text-base text-fg-muted leading-relaxed">
@@ -357,7 +364,7 @@ export default function Playground() {
                   hex={c.hex}
                   token={c.token}
                   bgStyle={{ backgroundColor: `var(${c.cssVar})` }}
-                  withBorder={c.hex.toUpperCase() === "#FFFFFF" || c.hex.toUpperCase() === "#F5F5F5"}
+                  withBorder={["#FFFFFF", "#FAFAF9", "#F4F4F2"].includes(c.hex.toUpperCase())}
                 />
               ))}
             </div>

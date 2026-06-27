@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 class AerosRadii {
   AerosRadii._();
 
+  static const double xs = 4;
   static const double sm = 6;
   static const double md = 8;
   static const double lg = 12;
@@ -10,6 +11,7 @@ class AerosRadii {
   static const double xl2 = 20;
   static const double full = 9999;
 
+  static const BorderRadius brXs = BorderRadius.all(Radius.circular(xs));
   static const BorderRadius brSm = BorderRadius.all(Radius.circular(sm));
   static const BorderRadius brMd = BorderRadius.all(Radius.circular(md));
   static const BorderRadius brLg = BorderRadius.all(Radius.circular(lg));

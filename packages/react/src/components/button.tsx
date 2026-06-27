@@ -4,29 +4,31 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../lib/cn";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap select-none " +
-  "transition-[background-color,border-color,color,transform,box-shadow] duration-[120ms] " +
-  "active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none " +
-  "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ink-100",
+  "inline-flex items-center justify-center gap-2 font-medium whitespace-nowrap select-none " +
+  "transition-[background-color,border-color,color,transform,box-shadow] duration-[120ms] ease-[cubic-bezier(0.2,0,0,1)] " +
+  "active:scale-[0.985] disabled:opacity-40 disabled:pointer-events-none " +
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas",
   {
     variants: {
       variant: {
-        primary:   "bg-ink-900 text-white hover:bg-ink-800",
-        secondary: "bg-bg-surface text-fg-primary border border-border-default hover:bg-ink-50 hover:border-border-strong",
-        ghost:     "bg-transparent text-fg-primary border border-border-default hover:bg-ink-50",
-        danger:    "bg-danger-bg text-danger-text border border-[#FECACA] hover:bg-[#FEE2E2]",
-        dark:      "bg-ink-900 text-white hover:bg-ink-800",
+        // brand-primary / fg-inverse are theme-aware: dark button + light text in light mode,
+        // light button + dark text in dark mode. Subtle rest→hover lift, grounded on press.
+        primary:   "bg-brand-primary text-fg-inverse shadow-sm hover:bg-brand-primary-hover hover:shadow-md hover:-translate-y-px active:translate-y-0 active:shadow-sm",
+        secondary: "bg-bg-surface text-fg-primary border border-border-default shadow-xs hover:bg-bg-subtle hover:border-border-strong hover:shadow-sm hover:-translate-y-px active:translate-y-0",
+        ghost:     "bg-transparent text-fg-secondary hover:bg-bg-subtle hover:text-fg-primary",
+        danger:    "bg-danger-bg text-danger-text border border-[#FECACA] shadow-xs hover:bg-[#FECACA] hover:shadow-sm",
+        dark:      "bg-brand-primary text-fg-inverse shadow-sm hover:bg-brand-primary-hover hover:shadow-md hover:-translate-y-px active:translate-y-0 active:shadow-sm",
         link:      "bg-transparent text-fg-primary underline-offset-4 hover:underline px-0 py-0 h-auto"
       },
       size: {
-        xs: "h-7 px-3 text-[11px] rounded-md",
-        sm: "h-8 px-[14px] text-xs rounded-md",
-        md: "h-10 px-[18px] text-sm rounded-md",
-        lg: "h-11 px-[26px] text-[15px] rounded-lg",
-        xl: "h-[52px] px-8 text-base rounded-lg",
+        xs: "h-7 px-2.5 gap-1.5 text-[11px] rounded-md",
+        sm: "h-8 px-3 gap-1.5 text-[13px] rounded-md",
+        md: "h-9 px-4 text-sm rounded-md",
+        lg: "h-10 px-5 text-sm rounded-md",
+        xl: "h-12 px-6 text-[15px] rounded-lg",
         "icon-sm": "h-8 w-8 rounded-md",
-        "icon-md": "h-10 w-10 rounded-md",
-        "icon-lg": "h-11 w-11 rounded-lg"
+        "icon-md": "h-9 w-9 rounded-md",
+        "icon-lg": "h-10 w-10 rounded-md"
       }
     },
     defaultVariants: { variant: "primary", size: "md" }

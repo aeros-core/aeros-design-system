@@ -55,15 +55,38 @@ function buildCss(): string {
   lines.push("");
   lines.push("[data-theme='dark'] {");
   for (const [k, v] of Object.entries(ALIAS_DARK)) lines.push(`  --aeros-${k}: ${v};`);
-  lines.push("  --aeros-shadow-sm: 0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px rgba(26,26,26,0.8);");
-  lines.push("  --aeros-shadow-md: 0 4px 12px rgba(0,0,0,0.5);");
-  lines.push("  --aeros-shadow-lg: 0 4px 16px rgba(0,0,0,0.55);");
-  lines.push("  --aeros-shadow-xl: 0 20px 40px rgba(0,0,0,0.65);");
+  // In dark mode rgba-black shadows vanish on near-black surfaces, so elevation
+  // is carried by a deeper key + a faint light hairline ring for separation.
+  lines.push("  --aeros-shadow-xs: 0 1px 2px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.05);");
+  lines.push("  --aeros-shadow-sm: 0 1px 2px rgba(0,0,0,0.45), 0 2px 4px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06);");
+  lines.push("  --aeros-shadow-md: 0 2px 6px rgba(0,0,0,0.45), 0 6px 14px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.06);");
+  lines.push("  --aeros-shadow-lg: 0 4px 12px rgba(0,0,0,0.50), 0 12px 28px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.07);");
+  lines.push("  --aeros-shadow-xl: 0 8px 20px rgba(0,0,0,0.55), 0 20px 48px rgba(0,0,0,0.50), 0 0 0 1px rgba(255,255,255,0.08);");
   lines.push("}");
   lines.push("");
   lines.push("@media (prefers-reduced-motion: reduce) {");
   lines.push("  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }");
   lines.push("}");
+  return lines.join("\n") + "\n" + buildTextCss();
+}
+
+// ── Type scale (CSS utility classes) ──────────────────────
+const fontFamilyVar = (fam?: string) => (fam === "mono" ? "var(--aeros-font-mono)" : "var(--aeros-font-sans)");
+
+function buildTextCss(): string {
+  const lines: string[] = [];
+  lines.push("");
+  lines.push("/* Type scale — utility classes (.aeros-text-<role>) */");
+  for (const [name, s] of Object.entries(tokens.text as Record<string, any>)) {
+    lines.push(`.aeros-text-${name} {`);
+    lines.push(`  font-family: ${fontFamilyVar(s.family)};`);
+    lines.push(`  font-size: ${s.size}px;`);
+    lines.push(`  font-weight: ${s.weight};`);
+    lines.push(`  line-height: ${s.lineHeight};`);
+    lines.push(`  letter-spacing: ${s.tracking};`);
+    if (s.transform) lines.push(`  text-transform: ${s.transform};`);
+    lines.push("}");
+  }
   return lines.join("\n") + "\n";
 }
 
@@ -130,6 +153,21 @@ function hexToDartColor(hex: string): string {
   return `Color(0xFF${h.toUpperCase()})`;
 }
 
+// Flutter's FontWeight only has w100..w900; round non-standard weights (e.g. book 450) down.
+function dartFontWeight(w: number): string {
+  const hundred = Math.min(900, Math.max(100, Math.floor(w / 100) * 100));
+  return `FontWeight.w${hundred}`;
+}
+
+// CSS tracking is in em; Flutter letterSpacing is logical px = em × fontSize.
+function trackingToLetterSpacing(tracking: string, size: number): number {
+  if (!tracking || tracking === "0") return 0;
+  const em = parseFloat(String(tracking).replace("em", ""));
+  return Math.round(em * size * 100) / 100;
+}
+
+const camel = (s: string) => s.replace(/-([a-z0-9])/g, (_m, c) => String(c).toUpperCase());
+
 function buildDart(): string {
   const lines: string[] = [];
   lines.push("// Aeros Design Tokens — generated. Do not edit.");
@@ -169,6 +207,24 @@ function buildDart(): string {
   lines.push("  // ─── Font families ───");
   lines.push(`  static const String fontSans = 'Plus Jakarta Sans';`);
   lines.push(`  static const String fontMono = 'IBM Plex Mono';`);
+  lines.push("}");
+  lines.push("");
+  lines.push("/// Type scale — mirrors the `text` block in tokens.json.");
+  lines.push("/// `overline` is uppercased by the consumer (TextStyle has no transform).");
+  lines.push("class AerosTextStyles {");
+  lines.push("  AerosTextStyles._();");
+  lines.push("");
+  for (const [name, s] of Object.entries(tokens.text as Record<string, any>)) {
+    const fam = s.family === "mono" ? "IBM Plex Mono" : "Plus Jakarta Sans";
+    const ls = trackingToLetterSpacing(s.tracking, s.size);
+    lines.push(`  static const TextStyle ${camel(name)} = TextStyle(`);
+    lines.push(`    fontFamily: '${fam}',`);
+    lines.push(`    fontSize: ${Number(s.size).toFixed(1)},`);
+    lines.push(`    fontWeight: ${dartFontWeight(s.weight)},`);
+    lines.push(`    height: ${Number(s.lineHeight).toFixed(2)},`);
+    lines.push(`    letterSpacing: ${ls.toFixed(2)},`);
+    lines.push(`  );`);
+  }
   lines.push("}");
   return lines.join("\n") + "\n";
 }

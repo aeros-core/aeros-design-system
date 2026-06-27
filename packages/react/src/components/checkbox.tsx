@@ -13,10 +13,10 @@ export const Checkbox = React.forwardRef<
     className={cn(
       "peer h-[18px] w-[18px] shrink-0 rounded-[5px] border-[1.5px] border-border-strong bg-bg-surface",
       "transition-colors duration-[120ms]",
-      "hover:border-ink-900",
-      "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ink-100",
-      "data-[state=checked]:bg-ink-900 data-[state=checked]:border-ink-900 data-[state=checked]:text-white",
-      "data-[state=indeterminate]:bg-ink-900 data-[state=indeterminate]:border-ink-900 data-[state=indeterminate]:text-white",
+      "hover:border-border-focus",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas",
+      "data-[state=checked]:bg-brand-primary data-[state=checked]:border-brand-primary data-[state=checked]:text-fg-inverse",
+      "data-[state=indeterminate]:bg-brand-primary data-[state=indeterminate]:border-brand-primary data-[state=indeterminate]:text-fg-inverse",
       "disabled:opacity-40 disabled:cursor-not-allowed",
       className
     )}

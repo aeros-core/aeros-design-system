@@ -48,11 +48,11 @@ export const TabsTrigger = React.forwardRef<
     <RT.Trigger
       ref={ref}
       className={cn(
-        "text-sm font-medium text-fg-muted transition-colors whitespace-nowrap",
-        "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ink-100",
+        "text-sm font-medium text-fg-muted transition-colors duration-[120ms] whitespace-nowrap rounded-sm",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas",
         variant === "underline"
-          ? "px-4 py-2.5 border-b-2 border-transparent -mb-px hover:text-fg-primary data-[state=active]:text-fg-primary data-[state=active]:border-ink-900 data-[state=active]:font-semibold"
-          : "rounded-md px-3.5 py-1.5 data-[state=active]:bg-bg-surface data-[state=active]:text-fg-primary data-[state=active]:font-semibold data-[state=active]:shadow-sm",
+          ? "px-4 py-2.5 border-b-2 border-transparent -mb-px hover:text-fg-primary data-[state=active]:text-fg-primary data-[state=active]:border-fg-primary data-[state=active]:font-semibold"
+          : "rounded-md px-3.5 py-1.5 hover:text-fg-secondary data-[state=active]:bg-bg-surface data-[state=active]:text-fg-primary data-[state=active]:font-semibold data-[state=active]:shadow-sm",
         className
       )}
       {...props}
@@ -79,7 +79,7 @@ export function TabCount({ children, active }: { children: React.ReactNode; acti
     <span
       className={cn(
         "ml-1.5 inline-flex items-center rounded-full px-1.5 py-px text-[10px] font-bold",
-        active ? "bg-ink-900 text-white" : "bg-ink-100 text-ink-600"
+        active ? "bg-brand-primary text-fg-inverse" : "bg-bg-subtle text-fg-secondary"
       )}
     >
       {children}

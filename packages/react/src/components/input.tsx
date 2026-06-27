@@ -11,16 +11,16 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
 }
 
 const base =
-  "w-full h-10 px-3.5 text-sm font-medium rounded-md border bg-bg-surface text-fg-primary " +
-  "placeholder:text-ink-200 placeholder:font-normal " +
+  "w-full h-9 px-3.5 text-sm font-medium rounded-md border bg-bg-surface text-fg-primary " +
+  "placeholder:text-ink-400 placeholder:font-normal " +
   "transition-[border-color,box-shadow] duration-[120ms] " +
   "disabled:opacity-50 disabled:cursor-not-allowed " +
   "focus:outline-none focus-visible:outline-none";
 
 const stateClasses: Record<InputState, string> = {
-  default: "border-border-default hover:border-border-strong focus:border-ink-900 focus:shadow-[0_0_0_3px_var(--aeros-focus-ring)]",
-  error:   "border-danger focus:shadow-[0_0_0_3px_rgba(220,38,38,0.15)]",
-  success: "border-success focus:shadow-[0_0_0_3px_rgba(22,163,74,0.15)]"
+  default: "border-border-default hover:border-border-strong focus:border-border-focus focus:shadow-[var(--aeros-shadow-focus)]",
+  error:   "border-danger focus:shadow-[var(--aeros-shadow-focus-danger)]",
+  success: "border-success focus:shadow-[0_0_0_3px_rgba(22,163,74,0.18)]"
 };
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -72,7 +72,7 @@ export function Field({ label, hint, error, htmlFor, required, className, childr
   return (
     <div className={cn("mb-4", className)}>
       {label && (
-        <label htmlFor={htmlFor} className="mb-1.5 block text-[13px] font-semibold text-ink-800">
+        <label htmlFor={htmlFor} className="mb-1.5 block text-[13px] font-medium text-ink-800">
           {label}
           {required && <span className="text-danger ml-0.5">*</span>}
         </label>

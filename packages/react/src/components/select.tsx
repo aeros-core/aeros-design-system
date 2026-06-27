@@ -15,9 +15,9 @@ export const SelectTrigger = React.forwardRef<
   <RS.Trigger
     ref={ref}
     className={cn(
-      "flex h-10 w-full items-center justify-between rounded-md border border-border-default bg-bg-surface px-3.5 text-sm font-medium text-fg-primary",
-      "hover:border-border-strong focus:outline-none focus:border-ink-900 focus:shadow-[0_0_0_3px_var(--aeros-focus-ring)]",
-      "data-[placeholder]:text-ink-200 disabled:opacity-50",
+      "flex h-9 w-full items-center justify-between rounded-md border border-border-default bg-bg-surface px-3.5 text-sm font-medium text-fg-primary",
+      "hover:border-border-strong focus:outline-none focus:border-border-focus focus:shadow-[var(--aeros-shadow-focus)]",
+      "data-[placeholder]:text-ink-400 disabled:opacity-50",
       className
     )}
     {...props}
@@ -40,8 +40,8 @@ export const SelectContent = React.forwardRef<
       position={position}
       sideOffset={4}
       className={cn(
-        "z-[1500] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-lg border border-border-default bg-bg-surface p-1.5 shadow-md",
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "z-[1500] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-lg border border-border-default bg-bg-elevated p-1.5 shadow-lg",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-1 data-[side=top]:slide-in-from-bottom-1 data-[state=open]:duration-150 data-[state=open]:ease-[cubic-bezier(0.16,1,0.3,1)]",
         className
       )}
       {...props}
@@ -60,7 +60,7 @@ export const SelectItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-pointer select-none items-center rounded-md py-2 pl-8 pr-2.5 text-sm font-medium text-fg-secondary",
-      "focus:bg-ink-50 focus:text-fg-primary focus:outline-none data-[state=checked]:text-fg-primary data-[state=checked]:font-semibold",
+      "focus:bg-bg-subtle focus:text-fg-primary focus:outline-none data-[state=checked]:text-fg-primary data-[state=checked]:font-semibold",
       className
     )}
     {...props}

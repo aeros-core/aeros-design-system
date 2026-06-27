@@ -8,11 +8,11 @@ Our users aren't shopping. They're deciding. Interfaces should be read like a da
 
 ## 2. Clarity over decoration
 
-No gradients. No textures. No shadows unless they carry signal (a modal lifted from the page, a focus ring earning attention). When in doubt, remove it.
+No gradients. No textures. Depth comes from a **layered surface system** — an off-white canvas beneath white surfaces beneath elevated popovers — and **soft, multi-layer shadows**, never a single heavy drop shadow. A shadow must carry signal: a lifted card, a modal, a focus ring earning attention. In dark mode, elevation is carried by *lighter* fills since shadows vanish on near-black. When in doubt, remove it.
 
 ## 3. Authority through weight
 
-Headings are **ExtraBold**, with negative letter-spacing. Numbers are **Semibold or Bold**. Buttons are Semibold. Aeros speaks with confidence — its type shows it.
+Headings are **Bold (700)** with gently negative letter-spacing. Numbers are **Semibold or Bold**. Buttons are Medium. Hierarchy comes from the weight *contrast* between headings and body — Aeros speaks with confidence without shouting.
 
 ## 4. Monospace for data
 
@@ -20,18 +20,20 @@ Anything a computer produced — IDs, timestamps, currency, counts, tokens — g
 
 ## 5. Black and white
 
-The system is **black on white** — full stop. Primary buttons are black, selected states are black, focus rings are black. No accent hue, no whisper of colour. If you're reaching for colour to make something pop, stop and reach for weight or size instead.
+The system is **black on white** — full stop. Primary buttons, selected states, and focus rings are near-black. No accent hue, no whisper of colour. If you're reaching for colour to make something pop, stop and reach for weight, depth, or size instead.
+
+The neutral ramp carries a **faint warmth** (a barely-there warm-gray, never beige) so large surfaces read calm rather than clinical — the same move ChatGPT and Linear make. It stays strictly monochrome: warmth is not an accent.
 
 Semantic colors (green/amber/red) only where an operator needs to act.
 
-## 6. One grid, four radii
+## 6. One grid, layered surfaces
 
-Spacing is a 4-based scale. Radii are `6, 8, 12, 16, 20` — small for controls, medium for cards, large for modals. No freestyle values.
+Spacing is a 4-based scale. Radii are `4, 6, 8, 12, 16, 20` (plus `24/32` for the largest surfaces) — `xs/sm` for chips and controls, `16` for cards, modals relate to cards. The neutral ramp is **12 even stops** (`0 → 950`) and surfaces layer in tiers: `canvas → surface → elevated → subtle`. No freestyle values.
 
 ## 7. Accessible by default
 
-- Minimum 4.5:1 contrast on all foreground/background pairs (WCAG AA).
-- Every interactive element has `:focus-visible` state.
+- Minimum 4.5:1 contrast on all foreground/background pairs (WCAG AA), verified by `pnpm check:contrast`.
+- Every interactive element has a visible `:focus-visible` ring — a high-contrast ring with a surface-coloured offset (filled-dark controls invert it).
 - All Radix primitives keep keyboard and screen reader behavior.
 - Respect `prefers-reduced-motion`.
 

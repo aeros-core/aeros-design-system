@@ -35,15 +35,15 @@ export const DialogContent = React.forwardRef<
       ref={ref}
       className={cn(
         "fixed left-1/2 top-1/2 z-[1400] w-full max-w-[420px] -translate-x-1/2 -translate-y-1/2",
-        "rounded-3xl border border-border-default bg-bg-surface shadow-xl overflow-hidden",
+        "rounded-xl border border-border-default bg-bg-elevated shadow-xl overflow-hidden",
         "focus-visible:outline-none",
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=open]:duration-200 data-[state=open]:ease-[cubic-bezier(0.16,1,0.3,1)]",
         className
       )}
       {...props}
     >
       {children}
-      <RD.Close className="absolute right-3 top-3 rounded-md p-1 text-fg-muted hover:bg-bg-subtle focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ink-100">
+      <RD.Close className="absolute right-3 top-3 rounded-md p-1 text-fg-muted hover:bg-bg-subtle hover:text-fg-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-elevated">
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </RD.Close>
@@ -53,7 +53,7 @@ export const DialogContent = React.forwardRef<
 DialogContent.displayName = "DialogContent";
 
 export function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("px-[22px] pt-5 pb-4 border-b border-border-default", className)} {...props} />;
+  return <div className={cn("px-5 pt-5 pb-4 border-b border-border-default", className)} {...props} />;
 }
 
 export const DialogTitle = React.forwardRef<
@@ -62,7 +62,7 @@ export const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <RD.Title
     ref={ref}
-    className={cn("text-base font-bold tracking-[-0.01em] text-fg-primary", className)}
+    className={cn("text-lg font-semibold tracking-[-0.01em] text-fg-primary", className)}
     {...props}
   />
 ));
@@ -81,14 +81,14 @@ export const DialogDescription = React.forwardRef<
 DialogDescription.displayName = "DialogDescription";
 
 export function DialogBody({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("px-[22px] py-[18px]", className)} {...props} />;
+  return <div className={cn("px-5 py-[18px]", className)} {...props} />;
 }
 
 export function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "flex justify-end gap-2 px-[22px] py-3.5 bg-bg-subtle border-t border-border-default",
+        "flex justify-end gap-2 px-5 py-3.5 bg-bg-subtle border-t border-border-default",
         className
       )}
       {...props}

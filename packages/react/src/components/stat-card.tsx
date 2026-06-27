@@ -13,17 +13,17 @@ export function StatCard({ label, value, mono, delta, className, ...props }: Sta
   return (
     <div
       className={cn(
-        "rounded-3xl border border-border-default bg-bg-surface p-[22px]",
+        "rounded-xl border border-border-default bg-bg-surface shadow-sm p-5",
         className
       )}
       {...props}
     >
-      <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-muted mb-2">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-fg-muted mb-2">
         {label}
       </div>
       <div
         className={cn(
-          "text-[28px] font-extrabold tracking-[-0.03em] text-fg-primary leading-none",
+          "text-[28px] font-bold tracking-[-0.02em] text-fg-primary leading-none",
           mono && "font-mono font-medium text-[26px] text-fg-primary"
         )}
       >
