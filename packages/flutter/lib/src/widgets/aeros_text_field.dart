@@ -18,6 +18,10 @@ class AerosTextField extends StatelessWidget {
     this.enabled = true,
     this.keyboardType,
     this.required = false,
+    this.minLines,
+    this.maxLines = 1,
+    this.textInputAction,
+    this.onSubmitted,
   });
 
   final String? label;
@@ -32,6 +36,10 @@ class AerosTextField extends StatelessWidget {
   final bool enabled;
   final TextInputType? keyboardType;
   final bool required;
+  final int? minLines;
+  final int? maxLines;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onSubmitted;
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +63,13 @@ class AerosTextField extends StatelessWidget {
         TextField(
           controller: controller,
           onChanged: onChanged,
+          onSubmitted: onSubmitted,
           obscureText: obscureText,
           enabled: enabled,
           keyboardType: keyboardType,
+          minLines: minLines,
+          maxLines: obscureText ? 1 : maxLines,
+          textInputAction: textInputAction,
           style: AerosTypography.bodyMd(color: a.fgPrimary),
           decoration: InputDecoration(
             hintText: hint,

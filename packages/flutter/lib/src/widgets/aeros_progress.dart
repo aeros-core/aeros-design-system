@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 import '../tokens/typography.dart';
 
 class AerosProgress extends StatelessWidget {
@@ -8,16 +7,19 @@ class AerosProgress extends StatelessWidget {
     super.key,
     required this.value,
     this.label,
-    this.color = AerosColors.ink900,
+    this.color,
   });
 
   final double value; // 0..1
   final String? label;
-  final Color color;
+
+  /// Fill colour. Defaults to the theme brand colour so it inverts in dark mode.
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
+    final fill = color ?? a.brandPrimary;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
@@ -37,8 +39,8 @@ class AerosProgress extends StatelessWidget {
           child: LinearProgressIndicator(
             value: value.clamp(0, 1),
             minHeight: 6,
-            backgroundColor: AerosColors.ink100,
-            valueColor: AlwaysStoppedAnimation(color),
+            backgroundColor: a.borderDefault,
+            valueColor: AlwaysStoppedAnimation(fill),
           ),
         ),
       ],

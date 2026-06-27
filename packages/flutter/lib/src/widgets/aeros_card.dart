@@ -4,7 +4,7 @@ import '../tokens/radii.dart';
 import '../tokens/typography.dart';
 
 class AerosCard extends StatelessWidget {
-  const AerosCard({super.key, this.title, this.subtitle, this.header, this.footer, this.trailing, required this.child, this.padding});
+  const AerosCard({super.key, this.title, this.subtitle, this.header, this.footer, this.trailing, required this.child, this.padding, this.onTap, this.color});
 
   final String? title;
   final String? subtitle;
@@ -14,12 +14,18 @@ class AerosCard extends StatelessWidget {
   final Widget child;
   final EdgeInsets? padding;
 
+  /// When set, the whole card becomes tappable with a ripple.
+  final VoidCallback? onTap;
+
+  /// Surface colour override (defaults to the theme surface).
+  final Color? color;
+
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    return Container(
+    final card = Container(
       decoration: BoxDecoration(
-        color: a.bgSurface,
+        color: color ?? a.bgSurface,
         borderRadius: AerosRadii.brXl,
         border: Border.all(color: a.borderDefault),
       ),
@@ -67,6 +73,15 @@ class AerosCard extends StatelessWidget {
               child: footer,
             ),
         ],
+      ),
+    );
+    if (onTap == null) return card;
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        borderRadius: AerosRadii.brXl,
+        onTap: onTap,
+        child: card,
       ),
     );
   }
