@@ -12,7 +12,7 @@ export function EmptyState({ icon, title, description, action, className, ...pro
   return (
     <div
       className={cn(
-        "text-center px-6 py-[52px] border-[1.5px] border-dashed border-border-strong rounded-3xl",
+        "text-center px-6 py-[52px] border-[1.5px] border-dashed border-border-strong rounded-xl",
         className
       )}
       {...props}
@@ -22,7 +22,7 @@ export function EmptyState({ icon, title, description, action, className, ...pro
           {icon}
         </div>
       )}
-      <div className="text-[15px] font-bold tracking-[-0.01em] text-fg-secondary mb-1">{title}</div>
+      <div className="text-[15px] font-semibold tracking-[-0.01em] text-fg-secondary mb-1">{title}</div>
       {description && (
         <p className="mx-auto max-w-[280px] text-[13px] text-fg-muted leading-relaxed mb-4">{description}</p>
       )}

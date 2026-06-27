@@ -5,7 +5,7 @@ export function Sidebar({ className, children, ...props }: React.HTMLAttributes<
   return (
     <aside
       className={cn(
-        "w-[228px] shrink-0 h-screen sticky top-0 overflow-y-auto bg-ink-900 text-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        "w-[228px] shrink-0 h-screen sticky top-0 overflow-y-auto bg-ink-950 text-white border-r border-ink-800 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         className
       )}
       {...props}
@@ -51,7 +51,7 @@ export function SidebarSection({
   return (
     <div className={cn("px-3 pt-3 pb-1", className)}>
       {label && (
-        <div className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-[0.08em] text-ink-400">
+        <div className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.06em] text-ink-400">
           {label}
         </div>
       )}
@@ -70,10 +70,10 @@ export function SidebarItem({
   return (
     <a
       className={cn(
-        "flex items-center gap-2.5 rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors",
+        "flex items-center gap-2.5 rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors duration-[90ms]",
         active
-          ? "bg-white/10 text-white"
-          : "text-white/50 hover:bg-white/5 hover:text-white/80",
+          ? "bg-white/[0.08] text-white"
+          : "font-normal text-white/55 hover:bg-white/[0.05] hover:text-white/90",
         className
       )}
       {...props}

@@ -75,7 +75,7 @@ class AerosTheme {
       splashFactory: InkRipple.splashFactory,
       visualDensity: VisualDensity.standard,
       appBarTheme: AppBarTheme(
-        backgroundColor: AerosColors.ink900,
+        backgroundColor: AerosColors.ink950,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
@@ -94,7 +94,7 @@ class AerosTheme {
         filled: true,
         fillColor: aliases.bgSurface,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        hintStyle: AerosTypography.bodyMd(color: AerosColors.ink200),
+        hintStyle: AerosTypography.bodyMd(color: AerosColors.ink400),
         labelStyle: AerosTypography.bodySm(color: aliases.fgSecondary).copyWith(fontWeight: FontWeight.w600),
         border: OutlineInputBorder(
           borderRadius: AerosRadii.brMd,
@@ -121,9 +121,9 @@ class AerosTheme {
         style: FilledButton.styleFrom(
           backgroundColor: aliases.brandPrimary,
           foregroundColor: aliases.fgInverse,
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
-          minimumSize: const Size(0, 40),
-          textStyle: AerosTypography.bodyMd(color: aliases.fgInverse).copyWith(fontWeight: FontWeight.w600),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+          minimumSize: const Size(0, 36),
+          textStyle: AerosTypography.labelMd(color: aliases.fgInverse),
           shape: const RoundedRectangleBorder(borderRadius: AerosRadii.brMd),
         ),
       ),
@@ -131,27 +131,27 @@ class AerosTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: aliases.fgPrimary,
           side: BorderSide(color: aliases.borderDefault),
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
-          minimumSize: const Size(0, 40),
-          textStyle: AerosTypography.bodyMd(color: aliases.fgPrimary).copyWith(fontWeight: FontWeight.w600),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+          minimumSize: const Size(0, 36),
+          textStyle: AerosTypography.labelMd(color: aliases.fgPrimary),
           shape: const RoundedRectangleBorder(borderRadius: AerosRadii.brMd),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: aliases.brandPrimary,
-          textStyle: AerosTypography.bodyMd(color: aliases.brandPrimary).copyWith(fontWeight: FontWeight.w600),
+          textStyle: AerosTypography.labelMd(color: aliases.brandPrimary),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
           minimumSize: const Size(0, 36),
           shape: const RoundedRectangleBorder(borderRadius: AerosRadii.brMd),
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: aliases.bgSurface,
+        backgroundColor: aliases.bgElevated,
         surfaceTintColor: Colors.transparent,
         elevation: 20,
         shape: const RoundedRectangleBorder(borderRadius: AerosRadii.brXl),
-        titleTextStyle: AerosTypography.h4(color: aliases.fgPrimary),
+        titleTextStyle: AerosTypography.titleLg(color: aliases.fgPrimary),
         contentTextStyle: AerosTypography.bodyMd(color: aliases.fgSecondary),
       ),
       snackBarTheme: SnackBarThemeData(
@@ -162,10 +162,10 @@ class AerosTheme {
       ),
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: AerosColors.ink900,
+          color: aliases.bgInverse,
           borderRadius: AerosRadii.brMd,
         ),
-        textStyle: AerosTypography.caption(color: Colors.white),
+        textStyle: AerosTypography.caption(color: aliases.fgInverse),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       ),
       extensions: [extension],

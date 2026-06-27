@@ -32,14 +32,14 @@ export function Tbody(props: React.HTMLAttributes<HTMLTableSectionElement>) {
 }
 
 export function Tr({ className, ...props }: React.HTMLAttributes<HTMLTableRowElement>) {
-  return <tr className={cn("hover:[&>td]:bg-bg-subtle transition-colors", className)} {...props} />;
+  return <tr className={cn("hover:[&>td]:bg-bg-subtle [&>td]:transition-colors [&>td]:duration-[90ms]", className)} {...props} />;
 }
 
 export function Th({ className, ...props }: React.ThHTMLAttributes<HTMLTableCellElement>) {
   return (
     <th
       className={cn(
-        "text-[11px] font-bold uppercase tracking-[0.07em] text-fg-muted text-left px-4 py-2.5 border-b border-border-default whitespace-nowrap",
+        "text-[11px] font-semibold uppercase tracking-[0.06em] text-fg-muted text-left px-4 py-2.5 border-b border-border-default whitespace-nowrap",
         className
       )}
       {...props}
@@ -51,7 +51,7 @@ export function Td({ className, ...props }: React.TdHTMLAttributes<HTMLTableCell
   return (
     <td
       className={cn(
-        "text-[13px] text-fg-secondary font-normal px-4 py-3 border-b border-ink-50 last:[tr:last-child_&]:border-b-0",
+        "text-[13px] text-fg-secondary font-normal px-4 py-3 border-b border-border-subtle last:[tr:last-child_&]:border-b-0",
         className
       )}
       {...props}

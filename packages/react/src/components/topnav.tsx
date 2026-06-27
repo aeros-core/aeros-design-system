@@ -5,7 +5,7 @@ export function TopNav({ className, children, ...props }: React.HTMLAttributes<H
   return (
     <header
       className={cn(
-        "h-14 flex items-center gap-2.5 px-5 rounded-lg bg-ink-900 text-white",
+        "h-14 flex items-center gap-2.5 px-5 rounded-lg bg-ink-950 text-white",
         className
       )}
       {...props}
@@ -47,7 +47,7 @@ export function TopNavLink({
     <a
       className={cn(
         "text-[13px] font-medium px-2.5 py-1 rounded-md transition-colors",
-        active ? "bg-white/10 text-white font-semibold" : "text-white/40 hover:text-white/70",
+        active ? "bg-white/10 text-white font-semibold" : "text-white/55 hover:bg-white/[0.05] hover:text-white/90",
         className
       )}
       {...props}
