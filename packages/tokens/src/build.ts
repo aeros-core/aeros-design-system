@@ -1,7 +1,7 @@
 /**
  * Aeros token builder — zero-dep.
  * Reads tokens.json, emits CSS vars, TypeScript, Tailwind v4 preset, Dart constants.
- * Run: `pnpm --filter @aeros/tokens build`
+ * Run: `pnpm --filter @aeros-core/tokens build`
  */
 import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";

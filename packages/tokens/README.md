@@ -1,16 +1,16 @@
-# @aeros/tokens
+# @aeros-core/tokens
 
 Single source of truth for the Aeros design language.
 
 ## What you get
 
-Run `pnpm build` (or `pnpm --filter @aeros/tokens build`) and this package emits:
+Run `pnpm build` (or `pnpm --filter @aeros-core/tokens build`) and this package emits:
 
 | Output | Path | For |
 |---|---|---|
 | CSS custom properties | `dist/css/tokens.css` | Any web app |
 | TypeScript constants | `dist/js/tokens.js` + `.d.ts` | JS/TS consumers |
-| Tailwind v4 preset | `dist/tailwind/preset.js` | `@aeros/react` & Next.js |
+| Tailwind v4 preset | `dist/tailwind/preset.js` | `@aeros-core/react` & Next.js |
 | Dart constants | `dist/dart/aeros_tokens.dart` | Flutter package |
 
 The source lives in [`src/tokens.json`](./src/tokens.json) — edit there, rebuild, everything flows.
@@ -30,7 +30,7 @@ The source lives in [`src/tokens.json`](./src/tokens.json) — edit there, rebui
 ## CSS usage
 
 ```css
-@import "@aeros/tokens/css";
+@import "@aeros-core/tokens/css";
 
 .card {
   background: var(--aeros-bg-surface);
@@ -47,7 +47,7 @@ Dark mode: set `data-theme="dark"` on `<html>`.
 
 ```ts
 // tailwind.config.ts
-import aeros from "@aeros/tokens/tailwind";
+import aeros from "@aeros-core/tokens/tailwind";
 export default { presets: [aeros], content: ["./app/**/*.{ts,tsx}"] };
 ```
 

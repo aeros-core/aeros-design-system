@@ -1,6 +1,6 @@
 # Components
 
-Each component ships in both `@aeros/react` and `aeros_design_system` (Flutter) with matching API intent. Where Flutter uses Material behaviors (ripple, focus), we style them to match the web component.
+Each component ships in both `@aeros-core/react` and `aeros_design_system` (Flutter) with matching API intent. Where Flutter uses Material behaviors (ripple, focus), we style them to match the web component.
 
 ## Inventory
 

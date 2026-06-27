@@ -8,21 +8,29 @@ Single source of truth for Aeros' visual language across **web (Next.js)** and *
 
 | Package | What it is | For |
 |---|---|---|
-| [`@aeros/tokens`](./packages/tokens) | W3C design tokens → CSS vars, TypeScript, Tailwind preset, Dart constants | Everyone |
-| [`@aeros/react`](./packages/react) | React 18+ components built with Radix primitives, Tailwind v4, CVA | Next.js website (aeros-x.com) |
+| [`@aeros-core/tokens`](./packages/tokens) | W3C design tokens → CSS vars, TypeScript, Tailwind preset, Dart constants | Everyone |
+| [`@aeros-core/react`](./packages/react) | React 18+ components built with Radix primitives, Tailwind v4, CVA | Next.js website (aeros-x.com) |
 | [`aeros_design_system`](./packages/flutter) | Flutter theme + widgets with `ThemeExtension` | Aeros mobile apps |
 
 ## Quick start
 
 ### Next.js
 
+The `@aeros-core` packages are published to **GitHub Packages**, so add an `.npmrc` first (see [docs/consuming.md](./docs/consuming.md) for auth):
+
+```ini
+# .npmrc
+@aeros-core:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+```
+
 ```bash
-pnpm add @aeros/react @aeros/tokens
+pnpm add @aeros-core/react @aeros-core/tokens
 ```
 
 ```tsx
 // app/layout.tsx
-import "@aeros/react/styles.css";
+import "@aeros-core/react/styles.css";
 
 export default function RootLayout({ children }) {
   return <html lang="en" data-theme="light">{children}</html>;
@@ -30,7 +38,7 @@ export default function RootLayout({ children }) {
 ```
 
 ```tsx
-import { Button, Card, StatCard } from "@aeros/react";
+import { Button, Card, StatCard } from "@aeros-core/react";
 
 <Button variant="primary" size="md">Create RFQ</Button>
 ```
@@ -70,7 +78,7 @@ See [`docs/`](./docs) for the full reference.
 ```
 packages/
   tokens/   → source of truth, generates CSS/TS/Tailwind/Dart
-  react/    → @aeros/react
+  react/    → @aeros-core/react
   flutter/  → aeros_design_system
 docs/       → tokens, components, principles, migration
 index.html  → original v2 visual reference (kept for parity)

@@ -171,7 +171,7 @@ AerosFileUploadButton(
 ## Out of scope for v1
 
 - **React parity** — the storefront frontend hasn't shipped yet. When it
-  does, it'll need React versions of these components; the `@aeros/react`
+  does, it'll need React versions of these components; the `@aeros-core/react`
   package will then add `AttributeSelector`, `VariantPicker`, etc. with the
   same intent.
 - **Production-ready PDF export** of a configured spec sheet (per the plan

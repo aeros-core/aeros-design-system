@@ -1,5 +1,5 @@
 {
-  "name": "@aeros/react-docs",
+  "name": "@aeros-core/react-docs",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -8,8 +8,8 @@
     "start": "next start"
   },
   "dependencies": {
-    "@aeros/react": "workspace:*",
-    "@aeros/tokens": "workspace:*",
+    "@aeros-core/react": "workspace:*",
+    "@aeros-core/tokens": "workspace:*",
     "lucide-react": "^0.460.0",
     "next": "^15.0.0",
     "react": "^19.0.0",

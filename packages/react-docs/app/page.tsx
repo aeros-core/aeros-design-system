@@ -68,7 +68,7 @@ import {
   SidebarSection,
   SidebarItem,
   DotMatrix,
-} from "@aeros/react";
+} from "@aeros-core/react";
 import {
   Inbox,
   Search,
@@ -342,7 +342,7 @@ export default function Playground() {
             Run everything.
           </h1>
           <p className="mt-4 max-w-xl text-base text-fg-muted leading-relaxed">
-            Every <code className="font-mono text-sm text-fg-primary">@aeros/react</code> component
+            Every <code className="font-mono text-sm text-fg-primary">@aeros-core/react</code> component
             rendered with live props. Edit{" "}
             <code className="font-mono text-sm text-fg-primary">packages/react-docs/app/page.tsx</code>{" "}
             to extend this gallery.
@@ -904,7 +904,7 @@ export default function Playground() {
 
         <div className="mt-24 pt-8 border-t border-border-default">
           <p className="text-xs text-fg-muted font-mono">
-            @aeros/react · Made for operators.
+            @aeros-core/react · Made for operators.
           </p>
         </div>
       </main>
