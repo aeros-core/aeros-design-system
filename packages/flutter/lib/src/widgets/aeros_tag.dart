@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../tokens/colors.dart';
+import '../theme/aeros_theme_extension.dart';
 import '../tokens/radii.dart';
 import '../tokens/typography.dart';
 
@@ -13,14 +13,23 @@ class AerosTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color bg, fg; Color? border;
+    final a = context.aerosColors;
+    Color bg, fg;
+    Color? border;
     switch (tone) {
       case AerosTagTone.blue:
-        bg = AerosColors.royal50; fg = AerosColors.royal800; break;
+        bg = a.brandPrimaryMuted;
+        fg = a.fgPrimary;
+        break;
       case AerosTagTone.grey:
-        bg = AerosColors.ink50; fg = AerosColors.ink600; border = AerosColors.ink100; break;
+        bg = a.bgSubtle;
+        fg = a.fgSecondary;
+        border = a.borderDefault;
+        break;
       case AerosTagTone.dark:
-        bg = AerosColors.ink900; fg = AerosColors.ink100; break;
+        bg = a.bgInverse;
+        fg = a.fgInverse;
+        break;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),

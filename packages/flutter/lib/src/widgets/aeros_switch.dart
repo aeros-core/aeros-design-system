@@ -12,7 +12,7 @@ class AerosSwitch extends StatelessWidget {
     return Switch.adaptive(
       value: value,
       onChanged: onChanged,
-      activeColor: Colors.white,
+      activeThumbColor: Colors.white,
       activeTrackColor: AerosColors.ink900,
       inactiveThumbColor: Colors.white,
       inactiveTrackColor: AerosColors.ink200,
