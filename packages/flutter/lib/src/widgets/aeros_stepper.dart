@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 import '../tokens/typography.dart';
 
 /// Horizontal step indicator. Shows the current step out of `total` steps with
@@ -11,14 +10,14 @@ class AerosStepper extends StatelessWidget {
     required this.currentStep,
     required this.totalSteps,
     this.label,
-    this.color = AerosColors.ink900,
+    this.color,
   })  : assert(currentStep >= 0),
         assert(totalSteps >= 1);
 
   final int currentStep;
   final int totalSteps;
   final String? label;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +45,8 @@ class AerosStepper extends StatelessWidget {
           child: LinearProgressIndicator(
             value: progress,
             minHeight: 6,
-            backgroundColor: AerosColors.ink100,
-            valueColor: AlwaysStoppedAnimation(color),
+            backgroundColor: a.bgSubtle,
+            valueColor: AlwaysStoppedAnimation(color ?? a.brandPrimary),
           ),
         ),
       ],

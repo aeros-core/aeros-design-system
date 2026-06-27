@@ -1,10 +1,29 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
 import '../tokens/radii.dart';
+import '../tokens/shadows.dart';
 import '../tokens/typography.dart';
 
+/// How the card separates from the canvas.
+/// - [flat]: hairline border only (default — lists, dense grids).
+/// - [raised]: border + soft shadow in light, lighter fill carries it in dark
+///   (dashboard stat cards, anything floating over the canvas).
+enum AerosCardVariant { flat, raised }
+
 class AerosCard extends StatelessWidget {
-  const AerosCard({super.key, this.title, this.subtitle, this.header, this.footer, this.trailing, required this.child, this.padding, this.onTap, this.color});
+  const AerosCard({
+    super.key,
+    this.title,
+    this.subtitle,
+    this.header,
+    this.footer,
+    this.trailing,
+    required this.child,
+    this.padding,
+    this.onTap,
+    this.color,
+    this.variant = AerosCardVariant.flat,
+  });
 
   final String? title;
   final String? subtitle;
@@ -20,14 +39,19 @@ class AerosCard extends StatelessWidget {
   /// Surface colour override (defaults to the theme surface).
   final Color? color;
 
+  /// Elevation treatment — see [AerosCardVariant].
+  final AerosCardVariant variant;
+
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
+    final isDark = context.aeros.isDark;
     final card = Container(
       decoration: BoxDecoration(
         color: color ?? a.bgSurface,
         borderRadius: AerosRadii.brXl,
         border: Border.all(color: a.borderDefault),
+        boxShadow: variant == AerosCardVariant.raised ? AerosShadows.card(isDark) : null,
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -36,9 +60,9 @@ class AerosCard extends StatelessWidget {
         children: [
           if (header != null || title != null)
             Container(
-              padding: const EdgeInsets.fromLTRB(22, 18, 22, 12),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: a.borderDefault)),
+                border: Border(bottom: BorderSide(color: a.borderSubtle)),
               ),
               child: header ??
                   Row(
@@ -47,7 +71,7 @@ class AerosCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(title!, style: AerosTypography.h4(color: a.fgPrimary).copyWith(fontSize: 15)),
+                            Text(title!, style: AerosTypography.h4(color: a.fgPrimary)),
                             if (subtitle != null) ...[
                               const SizedBox(height: 2),
                               Text(subtitle!, style: AerosTypography.caption(color: a.fgMuted)),
@@ -60,15 +84,15 @@ class AerosCard extends StatelessWidget {
                   ),
             ),
           Padding(
-            padding: padding ?? const EdgeInsets.fromLTRB(22, 18, 22, 18),
+            padding: padding ?? const EdgeInsets.fromLTRB(20, 16, 20, 16),
             child: child,
           ),
           if (footer != null)
             Container(
-              padding: const EdgeInsets.fromLTRB(22, 12, 22, 12),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
               decoration: BoxDecoration(
                 color: a.bgSubtle,
-                border: Border(top: BorderSide(color: a.borderDefault)),
+                border: Border(top: BorderSide(color: a.borderSubtle)),
               ),
               child: footer,
             ),

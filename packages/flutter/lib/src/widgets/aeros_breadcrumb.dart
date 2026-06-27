@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 import '../tokens/typography.dart';
 
 class AerosBreadcrumbItem {
@@ -32,7 +31,7 @@ class AerosBreadcrumb extends StatelessWidget {
       );
       if (!last) {
         children.add(const SizedBox(width: 4));
-        children.add(Icon(Icons.chevron_right, size: 14, color: AerosColors.ink200));
+        children.add(Icon(Icons.chevron_right, size: 14, color: a.fgMuted));
         children.add(const SizedBox(width: 4));
       }
     }

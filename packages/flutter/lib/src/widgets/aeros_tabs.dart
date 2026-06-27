@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 import '../tokens/radii.dart';
 import '../tokens/typography.dart';
 
@@ -41,7 +40,7 @@ class AerosTabs extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
-                        color: active ? AerosColors.ink900 : Colors.transparent,
+                        color: active ? a.fgPrimary : Colors.transparent,
                         width: 2,
                       ),
                     ),

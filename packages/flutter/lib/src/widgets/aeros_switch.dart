@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../tokens/colors.dart';
+import '../theme/aeros_theme_extension.dart';
 
 class AerosSwitch extends StatelessWidget {
   const AerosSwitch({super.key, required this.value, required this.onChanged});
@@ -9,14 +9,15 @@ class AerosSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final a = context.aerosColors;
     return Switch.adaptive(
       value: value,
       onChanged: onChanged,
-      activeThumbColor: Colors.white,
-      activeTrackColor: AerosColors.ink900,
-      inactiveThumbColor: Colors.white,
-      inactiveTrackColor: AerosColors.ink200,
-      trackOutlineColor: WidgetStateProperty.resolveWith((_) => Colors.transparent),
+      activeThumbColor: a.fgInverse,
+      activeTrackColor: a.brandPrimary,
+      inactiveThumbColor: a.fgMuted,
+      inactiveTrackColor: a.bgSubtle,
+      trackOutlineColor: WidgetStateProperty.resolveWith((_) => a.borderStrong),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }

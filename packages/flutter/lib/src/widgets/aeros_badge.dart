@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/aeros_theme_extension.dart';
 import '../tokens/colors.dart';
 import '../tokens/typography.dart';
 
@@ -11,20 +12,23 @@ class AerosBadge extends StatelessWidget {
   final AerosBadgeTone tone;
   final bool showDot;
 
-  ({Color bg, Color fg, Color dot}) _palette() {
+  /// Semantic tones (green/amber/red) stay fixed across themes — a status is a
+  /// status. Neutral tones (blue/grey/dark) resolve from the theme so they read
+  /// correctly on both light and dark surfaces.
+  ({Color bg, Color fg, Color dot}) _palette(AerosAliasColors a) {
     switch (tone) {
       case AerosBadgeTone.green: return (bg: AerosColors.successBg, fg: AerosColors.successText, dot: AerosColors.success);
       case AerosBadgeTone.amber: return (bg: AerosColors.warningBg, fg: AerosColors.warningText, dot: AerosColors.warning);
       case AerosBadgeTone.red:   return (bg: AerosColors.dangerBg,  fg: AerosColors.dangerText,  dot: AerosColors.danger);
-      case AerosBadgeTone.blue:  return (bg: AerosColors.royal50,   fg: AerosColors.royal800,    dot: AerosColors.royal600);
-      case AerosBadgeTone.grey:  return (bg: AerosColors.ink50,     fg: AerosColors.ink600,      dot: AerosColors.ink400);
-      case AerosBadgeTone.dark:  return (bg: AerosColors.ink900,    fg: AerosColors.ink100,      dot: AerosColors.ink400);
+      case AerosBadgeTone.blue:  return (bg: a.brandPrimaryMuted,   fg: a.fgPrimary,             dot: a.fgSecondary);
+      case AerosBadgeTone.grey:  return (bg: a.bgSubtle,            fg: a.fgSecondary,           dot: a.fgMuted);
+      case AerosBadgeTone.dark:  return (bg: a.brandPrimary,        fg: a.fgInverse,             dot: a.fgInverse);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final p = _palette();
+    final p = _palette(context.aerosColors);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(color: p.bg, borderRadius: BorderRadius.circular(999)),
@@ -35,7 +39,7 @@ class AerosBadge extends StatelessWidget {
             Container(width: 5, height: 5, decoration: BoxDecoration(color: p.dot, shape: BoxShape.circle)),
             const SizedBox(width: 6),
           ],
-          Text(label, style: AerosTypography.caption(color: p.fg).copyWith(fontSize: 11, fontWeight: FontWeight.w600, height: 1)),
+          Text(label, style: AerosTypography.labelXs(color: p.fg)),
         ],
       ),
     );

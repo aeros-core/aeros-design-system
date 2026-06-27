@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/aeros_theme_extension.dart';
 import '../tokens/colors.dart';
 import '../tokens/typography.dart';
 
@@ -35,11 +36,13 @@ class AerosAvatar extends StatelessWidget {
         AerosAvatarSize.xl => 20,
       };
 
-  ({Color bg, Color fg, Color border}) _palette() {
+  // Neutral tones (ink/dark/royal) resolve from the theme; green/amber stay
+  // fixed semantics.
+  ({Color bg, Color fg, Color border}) _palette(AerosAliasColors a) {
     switch (tone) {
-      case AerosAvatarTone.ink:   return (bg: AerosColors.ink50,    fg: AerosColors.ink900,   border: AerosColors.ink100);
-      case AerosAvatarTone.dark:  return (bg: AerosColors.ink900,   fg: Colors.white,         border: AerosColors.ink900);
-      case AerosAvatarTone.royal: return (bg: AerosColors.royal50,  fg: AerosColors.royal800, border: AerosColors.royal100);
+      case AerosAvatarTone.ink:   return (bg: a.bgSubtle,          fg: a.fgPrimary,            border: a.borderDefault);
+      case AerosAvatarTone.dark:  return (bg: a.brandPrimary,      fg: a.fgInverse,            border: a.brandPrimary);
+      case AerosAvatarTone.royal: return (bg: a.brandPrimaryMuted, fg: a.fgPrimary,            border: a.borderDefault);
       case AerosAvatarTone.green: return (bg: AerosColors.successBg, fg: AerosColors.successText, border: AerosColors.successBorder);
       case AerosAvatarTone.amber: return (bg: AerosColors.warningBg, fg: AerosColors.warningText, border: AerosColors.warningBorder);
     }
@@ -47,7 +50,7 @@ class AerosAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final p = _palette();
+    final p = _palette(context.aerosColors);
     return Container(
       width: _dim,
       height: _dim,
@@ -61,7 +64,7 @@ class AerosAvatar extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: imageUrl == null && initials != null
-          ? Text(initials!, style: AerosTypography.bodyMd(color: p.fg).copyWith(fontSize: _font, fontWeight: FontWeight.w700))
+          ? Text(initials!, style: AerosTypography.labelMd(color: p.fg).copyWith(fontSize: _font))
           : null,
     );
   }

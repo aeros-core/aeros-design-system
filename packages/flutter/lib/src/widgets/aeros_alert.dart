@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/aeros_theme_extension.dart';
 import '../tokens/colors.dart';
 import '../tokens/radii.dart';
 import '../tokens/typography.dart';
@@ -13,10 +14,12 @@ class AerosAlert extends StatelessWidget {
   final String body;
   final IconData? icon;
 
-  ({Color bg, Color border, Color title, Color body, IconData icon}) _p() {
+  // Neutral "blue"/info tone resolves from the theme; green/amber/red stay
+  // fixed semantics.
+  ({Color bg, Color border, Color title, Color body, IconData icon}) _p(AerosAliasColors a) {
     switch (tone) {
       case AerosAlertTone.blue:
-        return (bg: AerosColors.royal50, border: AerosColors.royal100, title: AerosColors.royal800, body: AerosColors.royal600, icon: Icons.info_outline);
+        return (bg: a.brandPrimaryMuted, border: a.borderDefault, title: a.fgPrimary, body: a.fgSecondary, icon: Icons.info_outline);
       case AerosAlertTone.green:
         return (bg: AerosColors.successBg, border: AerosColors.successBorder, title: AerosColors.successText, body: AerosColors.success, icon: Icons.check_circle_outline);
       case AerosAlertTone.amber:
@@ -28,7 +31,7 @@ class AerosAlert extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final p = _p();
+    final p = _p(context.aerosColors);
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       decoration: BoxDecoration(
@@ -47,7 +50,7 @@ class AerosAlert extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (title != null) ...[
-                  Text(title!, style: AerosTypography.bodySm(color: p.title).copyWith(fontWeight: FontWeight.w700)),
+                  Text(title!, style: AerosTypography.labelMd(color: p.title)),
                   const SizedBox(height: 3),
                 ],
                 Text(body, style: AerosTypography.caption(color: p.body)),
