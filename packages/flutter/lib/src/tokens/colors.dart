@@ -114,7 +114,7 @@ class AerosAliasColors {
     bgInverse: Color(0xFF1A1916),
     fgPrimary: Color(0xFF1A1916),
     fgSecondary: Color(0xFF57554F),
-    fgMuted: Color(0xFF73716B),
+    fgMuted: Color(0xFF6C6A63),
     fgInverse: Color(0xFFFFFFFF),
     fgBrand: Color(0xFF1A1916),
     borderDefault: Color(0xFFE4E2DD),
