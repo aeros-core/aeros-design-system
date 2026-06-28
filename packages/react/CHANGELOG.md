@@ -1,5 +1,16 @@
 # @aeros-core/react
 
+## 1.2.0
+
+### Minor Changes
+
+- 6065a07: Apple-level design refresh (matches Flutter DS v1.3.0): switch the UI typeface to **Inter** (loaded via the stylesheet; `--font-sans` updated), warm layered neutrals with real elevation in both light and dark, sturdier interactive type weights (labels/buttons → 600, display → 800, overline → 700), and a new `label-xs` text token. Light `fg-muted` darkened slightly to clear WCAG AA on the subtle fill.
+
+### Patch Changes
+
+- Updated dependencies [6065a07]
+  - @aeros-core/tokens@1.2.0
+
 ## 1.1.0
 
 ### Minor Changes
