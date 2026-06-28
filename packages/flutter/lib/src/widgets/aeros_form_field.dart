@@ -50,8 +50,7 @@ class AerosFormField extends StatelessWidget {
                 child: RichText(
                   text: TextSpan(
                     text: label!,
-                    style: AerosTypography.bodySm(color: a.fgSecondary)
-                        .copyWith(fontWeight: FontWeight.w600),
+                    style: AerosTypography.labelSm(color: a.fgSecondary),
                     children: [
                       if (required)
                         const TextSpan(

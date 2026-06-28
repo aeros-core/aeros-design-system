@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
 import '../tokens/colors.dart';
 import '../tokens/radii.dart';
+import '../tokens/shadows.dart';
 import '../tokens/typography.dart';
 
 enum AerosDelta { up, down, flat }
@@ -36,11 +37,12 @@ class AerosStatCard extends StatelessWidget {
       AerosDelta.flat => Icons.remove_rounded,
     };
     return Container(
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: a.bgSurface,
         borderRadius: AerosRadii.brXl,
         border: Border.all(color: a.borderDefault),
+        boxShadow: AerosShadows.card(context.aeros.isDark),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
