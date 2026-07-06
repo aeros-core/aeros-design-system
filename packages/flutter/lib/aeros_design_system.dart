@@ -17,9 +17,12 @@ export 'src/theme/aeros_theme.dart';
 export 'src/theme/aeros_theme_extension.dart';
 
 export 'src/widgets/aeros_button.dart';
+export 'src/widgets/aeros_field_size.dart';
 export 'src/widgets/aeros_text_field.dart';
+export 'src/widgets/aeros_search_field.dart';
 export 'src/widgets/aeros_badge.dart';
 export 'src/widgets/aeros_tag.dart';
+export 'src/widgets/aeros_tag_field.dart';
 export 'src/widgets/aeros_card.dart';
 export 'src/widgets/aeros_stat_card.dart';
 export 'src/widgets/aeros_alert.dart';
