@@ -41,6 +41,7 @@ class _GalleryState extends State<Gallery> {
   bool _switch = true;
   String _radio = 'a';
   double _progress = 0.64;
+  List<String> _tags = ['launch', 'q3'];
 
   // Configurable-MTO gallery state.
   AerosAttributeValue _cupSize = const AerosAttributeValue(enumValueId: '350ml');
@@ -167,6 +168,46 @@ class _GalleryState extends State<Gallery> {
                     const SizedBox(width: 12),
                     Text('Enable notifications', style: AerosTypography.bodySm(color: a.fgSecondary)),
                   ]),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            _section('Fields & search'),
+            AerosCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Field ↔ button rhythm: a field and a button of the same size
+                  // are the same height.
+                  Row(children: [
+                    const Expanded(
+                        child: AerosTextField(
+                            hint: 'md field (40)', size: AerosFieldSize.md)),
+                    const SizedBox(width: 8),
+                    AerosButton(
+                        label: 'md', onPressed: () {}, size: AerosButtonSize.md),
+                  ]),
+                  const SizedBox(height: 12),
+                  Row(children: [
+                    const Expanded(
+                        child: AerosTextField(
+                            hint: 'sm field (32)', size: AerosFieldSize.sm)),
+                    const SizedBox(width: 8),
+                    AerosButton(
+                        label: 'sm', onPressed: () {}, size: AerosButtonSize.sm),
+                  ]),
+                  const SizedBox(height: 16),
+                  const AerosSearchField(hint: 'Search notes'),
+                  const SizedBox(height: 12),
+                  const AerosSearchField(
+                      hint: 'Search the graph', size: AerosFieldSize.sm),
+                  const SizedBox(height: 16),
+                  AerosTagField(
+                    label: 'Tags',
+                    tags: _tags,
+                    onChanged: (next) => setState(() => _tags = next),
+                  ),
                 ],
               ),
             ),

@@ -6,16 +6,29 @@ import '../tokens/typography.dart';
 enum AerosTagTone { blue, grey, dark }
 
 class AerosTag extends StatelessWidget {
-  const AerosTag({super.key, required this.label, this.tone = AerosTagTone.grey});
+  const AerosTag({
+    super.key,
+    required this.label,
+    this.tone = AerosTagTone.grey,
+    this.onRemove,
+    this.pill = false,
+  });
 
   final String label;
   final AerosTagTone tone;
+
+  /// When non-null the chip renders a trailing close affix and the whole chip
+  /// becomes tappable to remove it (used by [AerosTagField]).
+  final VoidCallback? onRemove;
+
+  /// Fully-rounded ("pill") shape instead of the default [AerosRadii.brMd].
+  final bool pill;
 
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
     Color bg, fg;
-    Color? border;
+    Color? borderColor;
     switch (tone) {
       case AerosTagTone.blue:
         bg = a.brandPrimaryMuted;
@@ -24,21 +37,41 @@ class AerosTag extends StatelessWidget {
       case AerosTagTone.grey:
         bg = a.bgSubtle;
         fg = a.fgSecondary;
-        border = a.borderDefault;
+        borderColor = a.borderDefault;
         break;
       case AerosTagTone.dark:
         bg = a.bgInverse;
         fg = a.fgInverse;
         break;
     }
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+
+    final removable = onRemove != null;
+    final child = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(label, style: AerosTypography.labelXs(color: fg)),
+        if (removable) ...[
+          const SizedBox(width: 4),
+          Icon(Icons.close, size: 12, color: fg.withValues(alpha: 0.7)),
+        ],
+      ],
+    );
+
+    final container = Container(
+      padding: EdgeInsets.fromLTRB(pill ? 9 : 8, 2, removable ? 6 : (pill ? 9 : 8), 2),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: AerosRadii.brMd,
-        border: border != null ? Border.all(color: border) : null,
+        borderRadius: pill ? AerosRadii.brFull : AerosRadii.brMd,
+        border: borderColor != null ? Border.all(color: borderColor) : null,
       ),
-      child: Text(label, style: AerosTypography.labelXs(color: fg)),
+      child: child,
+    );
+
+    if (!removable) return container;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onRemove,
+      child: container,
     );
   }
 }
