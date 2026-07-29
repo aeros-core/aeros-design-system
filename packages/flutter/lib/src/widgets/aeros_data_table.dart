@@ -245,7 +245,11 @@ class AerosDataTable<T> extends StatelessWidget {
         if (loading)
           Positioned.fill(
             child: ColoredBox(
-              color: Colors.white.withValues(alpha: 0.6),
+              // bgSurface, not Colors.white — the scrim must veil the table in
+              // the surface's own colour. In light bgSurface IS #FFFFFF, so
+              // this is a no-op there; in dark a white veil turned the table
+              // into a bright grey flash and washed the spinner out to 2.2:1.
+              color: a.bgSurface.withValues(alpha: 0.6),
               child: const Center(child: CircularProgressIndicator()),
             ),
           ),
