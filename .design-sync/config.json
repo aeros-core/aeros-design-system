@@ -1,0 +1,20 @@
+{
+  "projectId": "197959a9-805d-4474-9c4d-dfd37d196817",
+  "shape": "package",
+  "pkg": "@aeros-core/react",
+  "globalName": "Aeros",
+  "buildCmd": "pnpm build:tokens && pnpm build:react && node .design-sync/compile-css.mjs",
+  "cssEntry": "dist/aeros.css",
+  "tokensPkg": "@aeros-core/tokens",
+  "readmeHeader": ".design-sync/conventions.md",
+  "guidelinesGlob": ["../../docs/principles.md", "../../docs/components.md", "../../docs/tokens.md"],
+  "overrides": {
+    "Dialog": { "cardMode": "single", "viewport": "580x460" },
+    "DropdownMenu": { "cardMode": "single", "viewport": "360x360" },
+    "Tooltip": { "cardMode": "single", "viewport": "380x180" },
+    "Select": { "cardMode": "single", "viewport": "320x360" },
+    "TopNav": { "cardMode": "column" },
+    "Sidebar": { "cardMode": "single", "viewport": "300x480" },
+    "Tabs": { "cardMode": "column" }
+  }
+}
