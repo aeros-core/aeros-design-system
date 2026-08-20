@@ -3,26 +3,28 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Info, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import { cn } from "../lib/cn";
 
+// Body copy uses the `-text` shade (WCAG 4.5:1 on the tinted bg); only the
+// icon may use the brighter base color (3:1 non-text minimum).
 const alertVariants = cva(
   "flex gap-3 rounded-lg border px-4 py-3.5",
   {
     variants: {
       variant: {
-        blue:  "bg-royal-50 border-royal-100 text-royal-600 [&_.aeros-alert-title]:text-royal-800",
-        green: "bg-success-bg border-[#BBF7D0] text-success [&_.aeros-alert-title]:text-success-text",
-        amber: "bg-warning-bg border-[#FDE68A] text-warning [&_.aeros-alert-title]:text-warning-text",
-        red:   "bg-danger-bg border-[#FECACA] text-danger [&_.aeros-alert-title]:text-danger-text"
+        info:    "bg-info-bg border-info-border text-info-text [&_.aeros-alert-icon]:text-info",
+        success: "bg-success-bg border-success-border text-success-text [&_.aeros-alert-icon]:text-success",
+        warning: "bg-warning-bg border-warning-border text-warning-text [&_.aeros-alert-icon]:text-warning",
+        danger:  "bg-danger-bg border-danger-border text-danger-text [&_.aeros-alert-icon]:text-danger"
       }
     },
-    defaultVariants: { variant: "blue" }
+    defaultVariants: { variant: "info" }
   }
 );
 
 const iconMap = {
-  blue:  Info,
-  green: CheckCircle2,
-  amber: AlertTriangle,
-  red:   XCircle
+  info:    Info,
+  success: CheckCircle2,
+  warning: AlertTriangle,
+  danger:  XCircle
 };
 
 export interface AlertProps
@@ -32,17 +34,30 @@ export interface AlertProps
   icon?: React.ReactNode;
 }
 
-export function Alert({ className, variant = "blue", title, icon, children, ...props }: AlertProps) {
-  const Icon = iconMap[variant!];
-  return (
-    <div role="alert" className={cn(alertVariants({ variant }), className)} {...props}>
-      <div className="shrink-0 mt-0.5">
-        {icon ?? <Icon className="h-[18px] w-[18px]" />}
+export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
+  ({ className, variant = "info", title, icon, role, children, ...props }, ref) => {
+    const Icon = iconMap[variant!];
+    return (
+      <div
+        ref={ref}
+        // Only danger interrupts assistive tech; everything else is a polite
+        // status region. Pass role explicitly to override (e.g. role={undefined}
+        // for purely static content).
+        role={role !== undefined ? role : variant === "danger" ? "alert" : "status"}
+        className={cn(alertVariants({ variant }), className)}
+        {...props}
+      >
+        <div className="aeros-alert-icon shrink-0 mt-0.5">
+          {icon ?? <Icon className="h-[18px] w-[18px]" />}
+        </div>
+        <div className="flex-1 min-w-0">
+          {title && <div className="text-[13px] font-bold mb-0.5">{title}</div>}
+          <div className="text-xs leading-relaxed">{children}</div>
+        </div>
       </div>
-      <div className="flex-1 min-w-0">
-        {title && <div className="aeros-alert-title text-[13px] font-bold mb-0.5">{title}</div>}
-        <div className="text-xs leading-relaxed">{children}</div>
-      </div>
-    </div>
-  );
-}
+    );
+  }
+);
+Alert.displayName = "Alert";
+
+export { alertVariants };

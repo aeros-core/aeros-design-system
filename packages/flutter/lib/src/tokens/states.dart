@@ -32,27 +32,30 @@ class AerosSeverityPalette {
   final Color border;
   final IconData icon;
 
-  static AerosSeverityPalette of(AerosSeverity severity) {
+  /// Pass `isDark: context.aeros.isDark` so status chips keep contrast on
+  /// dark surfaces (defaults to the light set).
+  static AerosSeverityPalette of(AerosSeverity severity, {bool isDark = false}) {
+    final s = AerosSemanticColors.resolve(isDark);
     switch (severity) {
       case AerosSeverity.info:
-        return const AerosSeverityPalette(
-          background: AerosColors.infoBg,
-          foreground: AerosColors.infoText,
-          border: AerosColors.infoBorder,
+        return AerosSeverityPalette(
+          background: s.infoBg,
+          foreground: s.infoText,
+          border: s.infoBorder,
           icon: Icons.info_outline,
         );
       case AerosSeverity.warn:
-        return const AerosSeverityPalette(
-          background: AerosColors.warningBg,
-          foreground: AerosColors.warningText,
-          border: AerosColors.warningBorder,
+        return AerosSeverityPalette(
+          background: s.warningBg,
+          foreground: s.warningText,
+          border: s.warningBorder,
           icon: Icons.warning_amber_outlined,
         );
       case AerosSeverity.error:
-        return const AerosSeverityPalette(
-          background: AerosColors.dangerBg,
-          foreground: AerosColors.dangerText,
-          border: AerosColors.dangerBorder,
+        return AerosSeverityPalette(
+          background: s.dangerBg,
+          foreground: s.dangerText,
+          border: s.dangerBorder,
           icon: Icons.error_outline,
         );
     }
@@ -125,6 +128,8 @@ class AerosSelectionPalette {
           iconOverlay: Icons.lock_outline,
         );
       case AerosSelectionState.requiredButMissing:
+        // NOTE: light-set constants; resolve() has no isDark input yet — the
+        // configurable-MTO surfaces are light-only today (audit A-17).
         return const AerosSelectionPalette(
           background: AerosColors.dangerBg,
           foreground: AerosColors.dangerText,
@@ -161,7 +166,7 @@ class AerosPricePalette {
         return AerosPricePalette(foreground: a.fgPrimary, label: null);
       case AerosPriceTone.nonDiscountable:
         return AerosPricePalette(
-          foreground: AerosColors.slate600,
+          foreground: a.fgMuted,
           label: 'fixed',
         );
       case AerosPriceTone.discount:

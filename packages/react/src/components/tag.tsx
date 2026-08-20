@@ -7,12 +7,12 @@ const tagVariants = cva(
   {
     variants: {
       variant: {
-        blue:  "bg-royal-50 text-royal-800",
-        grey:  "bg-ink-50 text-ink-600 border border-ink-100",
-        dark: "bg-ink-900 text-ink-100"
+        info:    "bg-info-bg text-info-text",
+        neutral: "bg-bg-subtle text-fg-secondary border border-border-default",
+        inverse: "bg-bg-inverse text-fg-inverse"
       }
     },
-    defaultVariants: { variant: "grey" }
+    defaultVariants: { variant: "neutral" }
   }
 );
 
@@ -26,3 +26,5 @@ export const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
   )
 );
 Tag.displayName = "Tag";
+
+export { tagVariants };

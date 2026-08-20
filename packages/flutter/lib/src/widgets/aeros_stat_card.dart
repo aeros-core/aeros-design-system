@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 import '../tokens/radii.dart';
 import '../tokens/shadows.dart';
 import '../tokens/typography.dart';
@@ -26,9 +25,12 @@ class AerosStatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
+    final s = context.aerosSemantic;
+    // `-text` shades: delta copy is 12px text and needs WCAG 4.5:1 on the
+    // card surface (the base status colors only clear the 3:1 icon minimum).
     final deltaColor = switch (deltaDirection) {
-      AerosDelta.up => AerosColors.success,
-      AerosDelta.down => AerosColors.danger,
+      AerosDelta.up => s.successText,
+      AerosDelta.down => s.dangerText,
       AerosDelta.flat => a.fgMuted,
     };
     final deltaIcon = switch (deltaDirection) {

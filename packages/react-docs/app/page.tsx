@@ -157,7 +157,7 @@ const SEMANTIC_COLORS: Array<{ token: string; cssVar: string; hex: string }> = [
 const STATUS_COLORS: Array<{ token: string; hex: string; cls: string }> = [
   { token: "success",      hex: "#16A34A", cls: "bg-success" },
   { token: "success-bg",   hex: "#DCFCE7", cls: "bg-success-bg" },
-  { token: "warning",      hex: "#D97706", cls: "bg-warning" },
+  { token: "warning",      hex: "#CC6D04", cls: "bg-warning" },
   { token: "warning-bg",   hex: "#FEF3C7", cls: "bg-warning-bg" },
   { token: "danger",       hex: "#DC2626", cls: "bg-danger" },
   { token: "danger-bg",    hex: "#FEE2E2", cls: "bg-danger-bg" },
@@ -303,6 +303,26 @@ function useActiveSection(defaultId: string): string {
   return active;
 }
 
+// Floating light/dark toggle — the playground doubles as the dark-mode QA
+// surface, so every component must be inspectable in both themes.
+function ThemeToggle() {
+  const [dark, setDark] = React.useState(false);
+  React.useEffect(() => {
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+  }, [dark]);
+  return (
+    <button
+      type="button"
+      aria-pressed={dark}
+      onClick={() => setDark((d) => !d)}
+      className="fixed right-5 top-5 z-(--aeros-z-sticky) inline-flex items-center gap-2 rounded-full border border-border-default bg-bg-elevated px-3.5 py-1.5 text-[12px] font-semibold text-fg-primary shadow-sm hover:border-border-strong"
+    >
+      <span className="h-2 w-2 rounded-full bg-fg-primary" aria-hidden />
+      {dark ? "Dark" : "Light"}
+    </button>
+  );
+}
+
 export default function Playground() {
   const [checked, setChecked] = React.useState<boolean>(true);
   const [switched, setSwitched] = React.useState(true);
@@ -310,6 +330,7 @@ export default function Playground() {
 
   return (
     <div className="flex min-h-screen">
+      <ThemeToggle />
       {/* ── SIDEBAR ─────────────────────────────────────── */}
       <Sidebar>
         <SidebarBrand mark="A" name="Aeros" sub="React docs" />
@@ -408,7 +429,7 @@ export default function Playground() {
           id="typography"
           eyebrow="02 — Foundations"
           title="Typography"
-          description="Plus Jakarta Sans for UI. IBM Plex Mono for data. Nunito Sans (wdth 125) is reserved for the wordmark."
+          description="Inter for UI. IBM Plex Mono for data. Nunito Sans (wdth 125) is reserved for the wordmark."
         >
           <div className="space-y-5">
             {TYPE_SCALE.map((t) => (
@@ -425,13 +446,12 @@ export default function Playground() {
         </Section>
 
         {/* BUTTONS */}
-        <Section id="buttons" eyebrow="03 — Components" title="Buttons" description="Six variants. Five sizes. Loading, icons, asChild polymorphism.">
+        <Section id="buttons" eyebrow="03 — Components" title="Buttons" description="Five variants. Five sizes. Loading, icons, asChild polymorphism.">
           <Row label="Variants">
             <Button variant="primary">Primary</Button>
             <Button variant="secondary">Secondary</Button>
             <Button variant="ghost">Ghost</Button>
             <Button variant="danger">Danger</Button>
-            <Button variant="dark">Dark</Button>
             <Button variant="link">Link</Button>
           </Row>
           <Row label="Sizes">
@@ -515,29 +535,29 @@ export default function Playground() {
         {/* BADGES */}
         <Section id="badges" eyebrow="06 — Components" title="Badges &amp; tags">
           <Row label="Badges">
-            <Badge variant="green" dot>
+            <Badge variant="success" dot>
               Active
             </Badge>
-            <Badge variant="amber" dot>
+            <Badge variant="warning" dot>
               Pending
             </Badge>
-            <Badge variant="red" dot>
+            <Badge variant="danger" dot>
               Failed
             </Badge>
-            <Badge variant="blue" dot>
+            <Badge variant="info" dot>
               Info
             </Badge>
-            <Badge variant="grey" dot>
+            <Badge variant="neutral" dot>
               Neutral
             </Badge>
-            <Badge variant="dark" dot>
+            <Badge variant="inverse" dot>
               Dark
             </Badge>
           </Row>
           <Row label="Tags">
-            <Tag variant="grey">v1.0.0</Tag>
-            <Tag variant="blue">beta</Tag>
-            <Tag variant="dark">internal</Tag>
+            <Tag variant="neutral">v1.0.0</Tag>
+            <Tag variant="info">beta</Tag>
+            <Tag variant="inverse">internal</Tag>
           </Row>
         </Section>
 
@@ -550,12 +570,12 @@ export default function Playground() {
                   <CardTitle>Today's production</CardTitle>
                   <CardSubtitle>Line 3 · updated 3 min ago</CardSubtitle>
                 </div>
-                <Badge variant="green" dot>
+                <Badge variant="success" dot>
                   Live
                 </Badge>
               </CardHeader>
               <CardBody>
-                <Progress value={64} />
+                <Progress value={64} aria-label="Progress" />
                 <p className="mt-3 text-xs text-fg-muted font-mono">
                   4,820 units · 8% above yesterday
                 </p>
@@ -617,16 +637,16 @@ export default function Playground() {
         {/* ALERTS */}
         <Section id="alerts" eyebrow="09 — Components" title="Alerts">
           <div className="grid max-w-xl gap-2">
-            <Alert variant="blue" title="Heads up">
+            <Alert variant="info" title="Heads up">
               A new RFQ is available for review.
             </Alert>
-            <Alert variant="green" title="Approved">
+            <Alert variant="success" title="Approved">
               Order passed QC. Ready for dispatch.
             </Alert>
-            <Alert variant="amber" title="Delayed">
+            <Alert variant="warning" title="Delayed">
               Shipment running 2 hours behind schedule.
             </Alert>
-            <Alert variant="red" title="Failed">
+            <Alert variant="danger" title="Failed">
               Line 4 halted — check sensor 2.
             </Alert>
           </div>
@@ -640,21 +660,21 @@ export default function Playground() {
                 <span className="text-fg-secondary font-medium">Line 1</span>
                 <span className="text-fg-muted font-mono">64%</span>
               </div>
-              <Progress value={64} />
+              <Progress value={64} aria-label="Progress" />
             </div>
             <div>
               <div className="mb-1.5 flex justify-between text-xs">
                 <span className="text-fg-secondary font-medium">Line 2 · warning</span>
                 <span className="text-fg-muted font-mono">42%</span>
               </div>
-              <Progress value={42} color="warning" />
+              <Progress value={42} variant="warning" aria-label="Warning progress" />
             </div>
             <div>
               <div className="mb-1.5 flex justify-between text-xs">
                 <span className="text-fg-secondary font-medium">Line 3 · danger</span>
                 <span className="text-fg-muted font-mono">22%</span>
               </div>
-              <Progress value={22} color="danger" />
+              <Progress value={22} variant="danger" aria-label="Danger progress" />
             </div>
           </div>
         </Section>
@@ -669,17 +689,17 @@ export default function Playground() {
             <Avatar size="xl" fallback="PS" />
           </Row>
           <Row label="Tones">
-            <Avatar tone="ink" fallback="IK" />
-            <Avatar tone="dark" fallback="DK" />
-            <Avatar tone="green" fallback="GR" />
-            <Avatar tone="amber" fallback="AM" />
+            <Avatar variant="neutral" fallback="IK" />
+            <Avatar variant="inverse" fallback="DK" />
+            <Avatar variant="success" fallback="GR" />
+            <Avatar variant="warning" fallback="AM" />
           </Row>
           <Row label="Stack">
             <AvatarStack>
               <Avatar size="sm" fallback="PS" />
-              <Avatar size="sm" tone="dark" fallback="RK" />
-              <Avatar size="sm" tone="green" fallback="MN" />
-              <Avatar size="sm" tone="amber" fallback="AA" />
+              <Avatar size="sm" variant="inverse" fallback="RK" />
+              <Avatar size="sm" variant="success" fallback="MN" />
+              <Avatar size="sm" variant="warning" fallback="AA" />
             </AvatarStack>
           </Row>
         </Section>
@@ -713,6 +733,9 @@ export default function Playground() {
                 <TabsTrigger value="week">Week</TabsTrigger>
                 <TabsTrigger value="month">Month</TabsTrigger>
               </TabsList>
+              <TabsContent value="day" className="sr-only">Day range selected.</TabsContent>
+              <TabsContent value="week" className="sr-only">Week range selected.</TabsContent>
+              <TabsContent value="month" className="sr-only">Month range selected.</TabsContent>
             </Tabs>
           </div>
         </Section>
@@ -818,7 +841,7 @@ export default function Playground() {
                   <TdMono>₹1,24,000</TdMono>
                 </Td>
                 <Td>
-                  <Badge variant="green" dot>
+                  <Badge variant="success" dot>
                     Approved
                   </Badge>
                 </Td>
@@ -834,7 +857,7 @@ export default function Playground() {
                   <TdMono>₹68,500</TdMono>
                 </Td>
                 <Td>
-                  <Badge variant="amber" dot>
+                  <Badge variant="warning" dot>
                     Pending
                   </Badge>
                 </Td>
@@ -850,7 +873,7 @@ export default function Playground() {
                   <TdMono>₹2,10,000</TdMono>
                 </Td>
                 <Td>
-                  <Badge variant="red" dot>
+                  <Badge variant="danger" dot>
                     Rejected
                   </Badge>
                 </Td>
@@ -897,7 +920,7 @@ export default function Playground() {
               <TopNavLink>AI</TopNavLink>
             </TopNavLinks>
             <TopNavRight>
-              <Avatar size="sm" tone="dark" fallback="PS" />
+              <Avatar size="sm" variant="inverse" fallback="PS" />
             </TopNavRight>
           </TopNav>
         </Section>

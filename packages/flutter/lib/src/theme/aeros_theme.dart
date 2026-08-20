@@ -25,6 +25,7 @@ class AerosTheme {
     required AerosAliasColors aliases,
     required AerosThemeExtension extension,
   }) {
+    final semantic = AerosSemanticColors.resolve(brightness == Brightness.dark);
     final colorScheme = ColorScheme(
       brightness: brightness,
       primary: aliases.brandPrimary,
@@ -37,10 +38,10 @@ class AerosTheme {
       onSecondaryContainer: aliases.fgPrimary,
       tertiary: AerosColors.ink600,
       onTertiary: Colors.white,
-      error: AerosColors.danger,
+      error: semantic.danger,
       onError: Colors.white,
-      errorContainer: AerosColors.dangerBg,
-      onErrorContainer: AerosColors.dangerText,
+      errorContainer: semantic.dangerBg,
+      onErrorContainer: semantic.dangerText,
       surface: aliases.bgSurface,
       onSurface: aliases.fgPrimary,
       surfaceContainerLowest: aliases.bgSurface,
@@ -113,11 +114,11 @@ class AerosTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AerosRadii.brMd,
-          borderSide: const BorderSide(color: AerosColors.danger),
+          borderSide: BorderSide(color: semantic.danger),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AerosRadii.brMd,
-          borderSide: const BorderSide(color: AerosColors.danger, width: 2),
+          borderSide: BorderSide(color: semantic.danger, width: 2),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(

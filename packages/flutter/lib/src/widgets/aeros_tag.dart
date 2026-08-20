@@ -3,13 +3,14 @@ import '../theme/aeros_theme_extension.dart';
 import '../tokens/radii.dart';
 import '../tokens/typography.dart';
 
-enum AerosTagTone { blue, grey, dark }
+/// 2.0: tones renamed to intent (was blue/grey/dark).
+enum AerosTagTone { info, neutral, inverse }
 
 class AerosTag extends StatelessWidget {
   const AerosTag({
     super.key,
     required this.label,
-    this.tone = AerosTagTone.grey,
+    this.tone = AerosTagTone.neutral,
     this.onRemove,
     this.pill = false,
   });
@@ -30,16 +31,16 @@ class AerosTag extends StatelessWidget {
     Color bg, fg;
     Color? borderColor;
     switch (tone) {
-      case AerosTagTone.blue:
+      case AerosTagTone.info:
         bg = a.brandPrimaryMuted;
         fg = a.fgPrimary;
         break;
-      case AerosTagTone.grey:
+      case AerosTagTone.neutral:
         bg = a.bgSubtle;
         fg = a.fgSecondary;
         borderColor = a.borderDefault;
         break;
-      case AerosTagTone.dark:
+      case AerosTagTone.inverse:
         bg = a.bgInverse;
         fg = a.fgInverse;
         break;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/aeros_theme_extension.dart';
 import '../tokens/radii.dart';
 import '../tokens/spacing.dart';
 import '../tokens/states.dart';
@@ -66,7 +67,7 @@ class AerosConstraintErrorAlert extends StatelessWidget {
   Widget build(BuildContext context) {
     final body = _resolve();
     if (body.isEmpty) return const SizedBox.shrink();
-    final palette = AerosSeverityPalette.of(severity);
+    final palette = AerosSeverityPalette.of(severity, isDark: context.aeros.isDark);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(

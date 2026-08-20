@@ -62,19 +62,9 @@
 }
 
 @theme {
-  --color-royal-0: #FFFFFF;
-  --color-royal-50: #FAFAF9;
-  --color-royal-100: #F4F4F2;
-  --color-royal-200: #E7E6E2;
-  --color-royal-300: #D6D4CF;
-  --color-royal-400: #A8A6A0;
-  --color-royal-500: #7C7A74;
-  --color-royal-600: #57554F;
-  --color-royal-700: #403E39;
-  --color-royal-800: #272622;
-  --color-royal-900: #1A1916;
-  --color-royal-950: #121110;
-
+  /* Static neutral ramp — deliberate fixed chrome (e.g. Sidebar/TopNav stay dark
+     in both themes). Everything theme-aware must use the alias/semantic classes
+     below, never raw ink stops. */
   --color-ink-0: #FFFFFF;
   --color-ink-50: #FAFAF9;
   --color-ink-100: #F4F4F2;
@@ -88,31 +78,23 @@
   --color-ink-900: #1A1916;
   --color-ink-950: #121110;
 
-  --color-slate-0: #FFFFFF;
-  --color-slate-50: #FAFAF9;
-  --color-slate-100: #F4F4F2;
-  --color-slate-200: #E7E6E2;
-  --color-slate-300: #D6D4CF;
-  --color-slate-400: #A8A6A0;
-  --color-slate-500: #7C7A74;
-  --color-slate-600: #57554F;
-  --color-slate-700: #403E39;
-  --color-slate-800: #272622;
-  --color-slate-900: #1A1916;
-  --color-slate-950: #121110;
-
-  --color-success: #16A34A;
-  --color-success-bg: #DCFCE7;
-  --color-success-text: #15803D;
-  --color-warning: #D97706;
-  --color-warning-bg: #FEF3C7;
-  --color-warning-text: #B45309;
-  --color-danger: #DC2626;
-  --color-danger-bg: #FEE2E2;
-  --color-danger-text: #B91C1C;
-  --color-info: #57554F;
-  --color-info-bg: #F4F4F2;
-  --color-info-text: #272622;
+  /* Status colors route through tokens.css vars so [data-theme="dark"] flips them. */
+  --color-success: var(--aeros-color-semantic-success);
+  --color-success-bg: var(--aeros-color-semantic-success-bg);
+  --color-success-text: var(--aeros-color-semantic-success-text);
+  --color-success-border: var(--aeros-color-semantic-success-border);
+  --color-warning: var(--aeros-color-semantic-warning);
+  --color-warning-bg: var(--aeros-color-semantic-warning-bg);
+  --color-warning-text: var(--aeros-color-semantic-warning-text);
+  --color-warning-border: var(--aeros-color-semantic-warning-border);
+  --color-danger: var(--aeros-color-semantic-danger);
+  --color-danger-bg: var(--aeros-color-semantic-danger-bg);
+  --color-danger-text: var(--aeros-color-semantic-danger-text);
+  --color-danger-border: var(--aeros-color-semantic-danger-border);
+  --color-info: var(--aeros-color-semantic-info);
+  --color-info-bg: var(--aeros-color-semantic-info-bg);
+  --color-info-text: var(--aeros-color-semantic-info-text);
+  --color-info-border: var(--aeros-color-semantic-info-border);
 
   --color-bg-canvas: var(--aeros-bg-canvas);
   --color-bg-surface: var(--aeros-bg-surface);
@@ -137,6 +119,7 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
+  --radius-none: 0px;
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
@@ -145,11 +128,49 @@
   --radius-2xl: 20px;
   --radius-3xl: 24px;
   --radius-4xl: 32px;
+  --radius-full: 9999px;
 
-  --shadow-xs: 0 1px 2px rgba(10,10,10,0.04);
-  --shadow-sm: 0 1px 2px rgba(10,10,10,0.05), 0 1px 3px rgba(10,10,10,0.06);
-  --shadow-md: 0 2px 4px rgba(10,10,10,0.05), 0 4px 12px rgba(10,10,10,0.07);
-  --shadow-lg: 0 4px 8px rgba(10,10,10,0.06), 0 12px 24px rgba(10,10,10,0.09);
-  --shadow-xl: 0 8px 16px rgba(10,10,10,0.07), 0 24px 48px rgba(10,10,10,0.12);
-  --shadow-hairline: 0 0 0 1px rgba(10,10,10,0.06);
+  /* Shadows route through tokens.css vars so dark elevation overrides apply
+     to Tailwind's shadow-* utilities too. */
+  --shadow-xs: var(--aeros-shadow-xs);
+  --shadow-sm: var(--aeros-shadow-sm);
+  --shadow-md: var(--aeros-shadow-md);
+  --shadow-lg: var(--aeros-shadow-lg);
+  --shadow-xl: var(--aeros-shadow-xl);
+  --shadow-focus: var(--aeros-shadow-focus);
+  --shadow-focus-danger: var(--aeros-shadow-focus-danger);
+  --shadow-focus-success: var(--aeros-shadow-focus-success);
+  --shadow-hairline: var(--aeros-shadow-hairline);
+
+  /* Motion easings from tokens (durations are consumed via duration-(--aeros-duration-*)). */
+  --ease-standard: var(--aeros-ease-standard);
+  --ease-emphasized: var(--aeros-ease-emphasized);
+  --ease-decelerate: var(--aeros-ease-decelerate);
+  --ease-entrance: var(--aeros-ease-entrance);
+  --ease-spring: var(--aeros-ease-spring);
+}
+
+/* DotMatrix keyframes — hoisted here so instances don't each inject a <style> tag. */
+@keyframes aeros-dotmatrix-ripple {
+  0%, 100% { transform: scale(0.6); opacity: 0.55; }
+  50%      { transform: scale(1.2); opacity: 1; }
+}
+.aeros-dotmatrix circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-name: aeros-dotmatrix-ripple;
+  animation-duration: var(--aeros-dotmatrix-dur);
+  animation-timing-function: var(--aeros-ease-standard);
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+.aeros-dotmatrix[data-variant="pulse"] circle {
+  animation-delay: 0ms !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aeros-dotmatrix circle {
+    animation: none !important;
+    transform: scale(1);
+    opacity: 1;
+  }
 }

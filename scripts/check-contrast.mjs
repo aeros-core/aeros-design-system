@@ -29,19 +29,38 @@ const pairs = [
   ["fg-muted", "bg-surface"],
   ["fg-primary", "bg-canvas"],
   ["fg-muted", "bg-subtle"],
-  ["brand-primary", "bg-surface"]
+  ["brand-primary", "bg-surface"],
+  // Button primary label — must stay readable in both themes.
+  ["fg-inverse", "brand-primary"]
 ];
 
 let fail = 0;
+function check(label, fgHex, bgHex, min) {
+  const r = ratio(fgHex, bgHex);
+  const ok = r >= min;
+  if (!ok) fail++;
+  console.log(`${ok ? "✓" : "✗"} ${label} → ${r.toFixed(2)}${ok ? "" : `  <— below ${min}`}`);
+}
+
 for (const theme of ["light", "dark"]) {
-  console.log(`\n── ${theme.toUpperCase()} ──`);
+  console.log(`\n── ${theme.toUpperCase()} · aliases ──`);
   for (const [fg, bg] of pairs) {
-    const fgHex = tokens.alias[theme][fg];
-    const bgHex = tokens.alias[theme][bg];
-    const r = ratio(fgHex, bgHex);
-    const ok = r >= 4.5;
-    if (!ok) fail++;
-    console.log(`${ok ? "✓" : "✗"} ${fg} on ${bg} → ${r.toFixed(2)}${ok ? "" : "  <— below AA 4.5"}`);
+    check(`${fg} on ${bg}`, tokens.alias[theme][fg], tokens.alias[theme][bg], 4.5);
+  }
+
+  // Status chips (Badge/Tag/Alert): text on tinted bg must pass AA text (4.5),
+  // the base color on the tinted bg must pass non-text 3:1 (icons, dots).
+  const sem = theme === "light" ? tokens.color.semantic : tokens.color.semanticDark;
+  const surface = tokens.alias[theme]["bg-surface"];
+  console.log(`\n── ${theme.toUpperCase()} · status ──`);
+  for (const tone of ["success", "warning", "danger", "info"]) {
+    const base = sem[tone].$value;
+    const bg = sem[`${tone}-bg`].$value;
+    const text = sem[`${tone}-text`].$value;
+    check(`${tone}-text on ${tone}-bg`, text, bg, 4.5);
+    check(`${tone}-text on bg-surface`, text, surface, 4.5);
+    check(`${tone} (icon) on ${tone}-bg`, base, bg, 3);
+    check(`${tone} (icon) on bg-surface`, base, surface, 3);
   }
 }
 

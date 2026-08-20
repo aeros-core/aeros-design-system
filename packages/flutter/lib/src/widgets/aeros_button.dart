@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
 import '../tokens/colors.dart';
+import '../tokens/motion.dart';
 import '../tokens/radii.dart';
 import '../tokens/typography.dart';
 
-enum AerosButtonVariant { primary, secondary, ghost, danger, dark, link }
+/// 2.0: `dark` was removed — it was byte-identical to `primary`.
+enum AerosButtonVariant { primary, secondary, ghost, danger, link }
 enum AerosButtonSize { xs, sm, md, lg, xl }
 
 class AerosButton extends StatefulWidget {
@@ -59,8 +61,9 @@ class _AerosButtonState extends State<AerosButton> {
     }
   }
 
-  /// Consistent min-heights so buttons share a vertical rhythm; md+ clears the
-  /// 44px comfortable tap target.
+  /// Consistent min-heights so buttons share a vertical rhythm. lg/xl clear
+  /// the 44px comfortable tap target; xs/sm/md meet the WCAG 2.5.8 AA 24px
+  /// floor and are intended for dense desktop surfaces — prefer lg+ on touch.
   double get _minHeight {
     switch (widget.size) {
       case AerosButtonSize.xs: return 28;
@@ -91,17 +94,17 @@ class _AerosButtonState extends State<AerosButton> {
     }
   }
 
-  ({Color bg, Color bgHover, Color fg, Color? border}) _colors(AerosAliasColors a) {
+  ({Color bg, Color bgHover, Color fg, Color? border}) _colors(
+      AerosAliasColors a, AerosSemanticColors s) {
     switch (widget.variant) {
       case AerosButtonVariant.primary:
-      case AerosButtonVariant.dark:
         return (bg: a.brandPrimary, bgHover: a.brandPrimaryHover, fg: a.fgInverse, border: null);
       case AerosButtonVariant.secondary:
         return (bg: a.bgSurface, bgHover: a.bgSubtle, fg: a.fgPrimary, border: a.borderDefault);
       case AerosButtonVariant.ghost:
         return (bg: Colors.transparent, bgHover: a.bgSubtle, fg: a.fgPrimary, border: a.borderDefault);
       case AerosButtonVariant.danger:
-        return (bg: AerosColors.dangerBg, bgHover: AerosColors.dangerBorder, fg: AerosColors.dangerText, border: AerosColors.dangerBorder);
+        return (bg: s.dangerBg, bgHover: s.dangerBorder, fg: s.dangerText, border: s.dangerBorder);
       case AerosButtonVariant.link:
         return (bg: Colors.transparent, bgHover: Colors.transparent, fg: a.brandPrimary, border: null);
     }
@@ -110,7 +113,7 @@ class _AerosButtonState extends State<AerosButton> {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final c = _colors(a);
+    final c = _colors(a, context.aerosSemantic);
     final disabled = widget.onPressed == null || widget.loading;
 
     // IconTheme makes leading/trailing icons inherit the resolved foreground
@@ -140,36 +143,47 @@ class _AerosButtonState extends State<AerosButton> {
     // (the variant border stays constant).
     final bg = (!disabled && _hovered) ? c.bgHover : c.bg;
 
-    return Opacity(
-      opacity: disabled ? 0.4 : 1,
-      child: Material(
-        color: bg,
-        borderRadius: _radius,
-        clipBehavior: Clip.none,
-        child: InkWell(
-          onTap: disabled ? null : widget.onPressed,
+    // A disabled InkWell (onTap: null) emits no button semantics at all, so a
+    // screen reader would announce a bare label. The explicit Semantics node
+    // keeps "button, disabled/loading" in the tree in every state.
+    return Semantics(
+      button: true,
+      enabled: !disabled,
+      // While loading, replace the subtree's semantics so the label and the
+      // busy state are announced once, together.
+      label: widget.loading ? '${widget.label}, loading' : null,
+      excludeSemantics: widget.loading,
+      child: Opacity(
+        opacity: disabled ? 0.4 : 1,
+        child: Material(
+          color: bg,
           borderRadius: _radius,
-          hoverColor: Colors.transparent,
-          splashColor: c.fg.withValues(alpha: 0.12),
-          onHover: (h) {
-            if (_hovered != h) setState(() => _hovered = h);
-          },
-          onFocusChange: (focused) {
-            if (_focused != focused) setState(() => _focused = focused);
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 120),
-            curve: Curves.easeOut,
-            constraints: BoxConstraints(minHeight: _minHeight),
-            padding: _padding,
-            decoration: BoxDecoration(
-              borderRadius: _radius,
-              border: c.border != null ? Border.all(color: c.border!) : null,
-              boxShadow: _focused
-                  ? [BoxShadow(color: a.focusRing.withValues(alpha: 0.30), spreadRadius: 3)]
-                  : null,
+          clipBehavior: Clip.none,
+          child: InkWell(
+            onTap: disabled ? null : widget.onPressed,
+            borderRadius: _radius,
+            hoverColor: Colors.transparent,
+            splashColor: c.fg.withValues(alpha: 0.12),
+            onHover: (h) {
+              if (_hovered != h) setState(() => _hovered = h);
+            },
+            onFocusChange: (focused) {
+              if (_focused != focused) setState(() => _focused = focused);
+            },
+            child: AnimatedContainer(
+              duration: AerosMotion.fast,
+              curve: AerosMotion.standard,
+              constraints: BoxConstraints(minHeight: _minHeight),
+              padding: _padding,
+              decoration: BoxDecoration(
+                borderRadius: _radius,
+                border: c.border != null ? Border.all(color: c.border!) : null,
+                boxShadow: _focused
+                    ? [BoxShadow(color: a.focusRing.withValues(alpha: 0.30), spreadRadius: 3)]
+                    : null,
+              ),
+              child: content,
             ),
-            child: content,
           ),
         ),
       ),

@@ -4,7 +4,9 @@ import '../tokens/colors.dart';
 import '../tokens/typography.dart';
 
 enum AerosAvatarSize { xs, sm, md, lg, xl }
-enum AerosAvatarTone { ink, dark, royal, green, amber }
+
+/// 2.0: tones renamed to intent (was ink/dark/royal/green/amber).
+enum AerosAvatarTone { neutral, inverse, info, success, warning }
 
 class AerosAvatar extends StatelessWidget {
   const AerosAvatar({
@@ -12,7 +14,7 @@ class AerosAvatar extends StatelessWidget {
     this.initials,
     this.imageUrl,
     this.size = AerosAvatarSize.md,
-    this.tone = AerosAvatarTone.ink,
+    this.tone = AerosAvatarTone.neutral,
   });
 
   final String? initials;
@@ -36,21 +38,21 @@ class AerosAvatar extends StatelessWidget {
         AerosAvatarSize.xl => 20,
       };
 
-  // Neutral tones (ink/dark/royal) resolve from the theme; green/amber stay
-  // fixed semantics.
-  ({Color bg, Color fg, Color border}) _palette(AerosAliasColors a) {
+  // Every tone resolves from the theme; status tints have true dark
+  // counterparts via AerosSemanticColors.
+  ({Color bg, Color fg, Color border}) _palette(AerosAliasColors a, AerosSemanticColors s) {
     switch (tone) {
-      case AerosAvatarTone.ink:   return (bg: a.bgSubtle,          fg: a.fgPrimary,            border: a.borderDefault);
-      case AerosAvatarTone.dark:  return (bg: a.brandPrimary,      fg: a.fgInverse,            border: a.brandPrimary);
-      case AerosAvatarTone.royal: return (bg: a.brandPrimaryMuted, fg: a.fgPrimary,            border: a.borderDefault);
-      case AerosAvatarTone.green: return (bg: AerosColors.successBg, fg: AerosColors.successText, border: AerosColors.successBorder);
-      case AerosAvatarTone.amber: return (bg: AerosColors.warningBg, fg: AerosColors.warningText, border: AerosColors.warningBorder);
+      case AerosAvatarTone.neutral: return (bg: a.bgSubtle,          fg: a.fgPrimary, border: a.borderDefault);
+      case AerosAvatarTone.inverse: return (bg: a.brandPrimary,      fg: a.fgInverse, border: a.brandPrimary);
+      case AerosAvatarTone.info:    return (bg: a.brandPrimaryMuted, fg: a.fgPrimary, border: a.borderDefault);
+      case AerosAvatarTone.success: return (bg: s.successBg, fg: s.successText, border: s.successBorder);
+      case AerosAvatarTone.warning: return (bg: s.warningBg, fg: s.warningText, border: s.warningBorder);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final p = _palette(context.aerosColors);
+    final p = _palette(context.aerosColors, context.aerosSemantic);
     return Container(
       width: _dim,
       height: _dim,

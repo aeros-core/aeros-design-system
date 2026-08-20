@@ -39,4 +39,7 @@ extension AerosThemeContext on BuildContext {
   AerosThemeExtension get aeros =>
       Theme.of(this).extension<AerosThemeExtension>() ?? AerosThemeExtension.light;
   AerosAliasColors get aerosColors => aeros.aliases;
+
+  /// Theme-aware status colors (success/warning/danger/info sets).
+  AerosSemanticColors get aerosSemantic => AerosSemanticColors.resolve(aeros.isDark);
 }

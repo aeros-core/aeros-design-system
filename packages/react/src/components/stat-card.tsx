@@ -9,9 +9,11 @@ export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
   delta?: { value: string; direction?: "up" | "down" | "flat" };
 }
 
-export function StatCard({ label, value, mono, delta, className, ...props }: StatCardProps) {
+export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
+  ({ label, value, mono, delta, className, ...props }, ref) => {
   return (
     <div
+      ref={ref}
       className={cn(
         "rounded-xl border border-border-default bg-bg-surface shadow-sm p-5",
         className
@@ -33,8 +35,8 @@ export function StatCard({ label, value, mono, delta, className, ...props }: Sta
         <div
           className={cn(
             "mt-3 inline-flex items-center gap-1 text-xs font-semibold",
-            delta.direction === "up" && "text-success",
-            delta.direction === "down" && "text-danger",
+            delta.direction === "up" && "text-success-text",
+            delta.direction === "down" && "text-danger-text",
             (!delta.direction || delta.direction === "flat") && "text-fg-muted font-normal"
           )}
         >
@@ -46,4 +48,5 @@ export function StatCard({ label, value, mono, delta, className, ...props }: Sta
       )}
     </div>
   );
-}
+});
+StatCard.displayName = "StatCard";

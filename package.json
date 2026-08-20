@@ -10,6 +10,8 @@
     "build:react": "pnpm --filter @aeros-core/react build",
     "dev": "pnpm -r --parallel dev",
     "check:contrast": "node scripts/check-contrast.mjs",
+    "check:hardcoded": "node scripts/check-hardcoded.mjs",
+    "check:flutter-drift": "node scripts/check-flutter-drift.mjs",
     "clean": "pnpm -r exec rm -rf dist",
     "changeset": "changeset",
     "version-packages": "changeset version",
