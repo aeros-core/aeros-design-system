@@ -1,11 +1,13 @@
 {
   "name": "@aeros-core/react",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Aeros React component library — built for Next.js.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "sideEffects": ["*.css"],
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
