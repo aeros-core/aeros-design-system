@@ -1,6 +1,6 @@
 {
   "name": "@aeros-core/tokens",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Aeros design tokens — source of truth.",
   "type": "module",
   "main": "./dist/js/tokens.js",
