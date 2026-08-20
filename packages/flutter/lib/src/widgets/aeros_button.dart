@@ -171,7 +171,7 @@ class _AerosButtonState extends State<AerosButton> {
               if (_focused != focused) setState(() => _focused = focused);
             },
             child: AnimatedContainer(
-              duration: AerosMotion.fast,
+              duration: AerosMotion.resolve(context, AerosMotion.fast),
               curve: AerosMotion.standard,
               constraints: BoxConstraints(minHeight: _minHeight),
               padding: _padding,

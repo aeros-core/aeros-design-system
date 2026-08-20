@@ -123,7 +123,7 @@ class _VariantTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final palette = AerosSelectionPalette.resolve(_state(), a);
+    final palette = AerosSelectionPalette.resolve(_state(), a, isDark: context.aeros.isDark);
 
     Widget tile = switch (style) {
       AerosVariantPickerStyle.chip => Container(

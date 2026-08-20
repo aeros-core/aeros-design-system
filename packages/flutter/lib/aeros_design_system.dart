@@ -29,6 +29,8 @@ export 'src/widgets/aeros_alert.dart';
 export 'src/widgets/aeros_progress.dart';
 export 'src/widgets/aeros_avatar.dart';
 export 'src/widgets/aeros_tabs.dart';
+export 'src/widgets/aeros_tooltip.dart';
+export 'src/widgets/aeros_snackbar.dart';
 export 'src/widgets/aeros_checkbox.dart';
 export 'src/widgets/aeros_radio.dart';
 export 'src/widgets/aeros_switch.dart';

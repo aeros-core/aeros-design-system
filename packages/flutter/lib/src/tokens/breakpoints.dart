@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import 'aeros_tokens.g.dart';
 import 'aeros_viewport_scope.dart';
 
 /// Named viewport breakpoints for the Aeros DS.
@@ -14,11 +15,11 @@ class AerosBreakpoints {
   AerosBreakpoints._();
 
   static const double xs = 0;
-  static const double sm = 640;
-  static const double md = 768;
-  static const double lg = 1024;
-  static const double xl = 1280;
-  static const double xxl = 1536;
+  static const double sm = AerosTokens.breakpointSm;
+  static const double md = AerosTokens.breakpointMd;
+  static const double lg = AerosTokens.breakpointLg;
+  static const double xl = AerosTokens.breakpointXl;
+  static const double xxl = AerosTokens.breakpoint2xl;
 
   /// Resolves the current breakpoint.
   ///

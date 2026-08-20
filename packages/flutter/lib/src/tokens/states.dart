@@ -96,10 +96,13 @@ class AerosSelectionPalette {
   /// `requiredButMissing`).
   final IconData? iconOverlay;
 
+  /// Pass `isDark: context.aeros.isDark` so the error state keeps contrast on
+  /// dark surfaces (defaults to the light set).
   static AerosSelectionPalette resolve(
     AerosSelectionState state,
-    AerosAliasColors a,
-  ) {
+    AerosAliasColors a, {
+    bool isDark = false,
+  }) {
     switch (state) {
       case AerosSelectionState.unselected:
         return AerosSelectionPalette(
@@ -128,12 +131,11 @@ class AerosSelectionPalette {
           iconOverlay: Icons.lock_outline,
         );
       case AerosSelectionState.requiredButMissing:
-        // NOTE: light-set constants; resolve() has no isDark input yet — the
-        // configurable-MTO surfaces are light-only today (audit A-17).
-        return const AerosSelectionPalette(
-          background: AerosColors.dangerBg,
-          foreground: AerosColors.dangerText,
-          border: AerosColors.dangerBorder,
+        final s = AerosSemanticColors.resolve(isDark);
+        return AerosSelectionPalette(
+          background: s.dangerBg,
+          foreground: s.dangerText,
+          border: s.dangerBorder,
         );
     }
   }

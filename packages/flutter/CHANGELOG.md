@@ -1,5 +1,22 @@
 # aeros_design_system
 
+## 2.1.0 — 2026-08-20 (audit P2/P3)
+
+### Added
+
+- **Generated tokens adopted**: `aeros_tokens.g.dart` is emitted by `pnpm build:tokens` and the whole token layer (colors, aliases, semantic sets, spacing, radii, breakpoints, motion) now aliases it — hand-drift is structurally impossible; CI checks freshness and completeness.
+- `AerosTooltip` and `AerosSnackbar.show(context, message, tone: …)` (neutral/success/warning/danger).
+- `AerosMotion.resolve(context, duration)` — honors the platform reduce-motion setting (WCAG 2.3.3); adopted by Button, Tabs, SearchField, TagField.
+- `AerosTabs` is keyboard-operable: tabs are focusable (Enter/Space activates), ←/→ move the selection, focus highlight included.
+- `AerosProgress` supports indeterminate (`value: null`) and exposes semantics.
+- `AerosConfirmDialog`: scrollable body, `barrierDismissible: false` for must-answer confirmations.
+- `AerosAvatar` degrades to initials when the network image fails (no more broken-URL throw).
+- `AerosSelectionPalette.resolve(..., isDark:)` — `requiredButMissing` reads correctly on dark surfaces.
+
+### Changed
+
+- `DottedDashedBorder` privatized (it was an implementation detail of `AerosFileUploadButton`).
+
 ## 2.0.0 — 2026-08-20 (coordinated with @aeros-core/tokens & @aeros-core/react 2.0.0)
 
 Breaking, from the 2026-08 design-system audit. Migration notes in `docs/migration.md`.

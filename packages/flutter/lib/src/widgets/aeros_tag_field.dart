@@ -115,7 +115,7 @@ class _AerosTagFieldState extends State<AerosTagField> {
           const SizedBox(height: 6),
         ],
         AnimatedContainer(
-          duration: AerosMotion.fast,
+          duration: AerosMotion.resolve(context, AerosMotion.fast),
           curve: AerosMotion.standard,
           constraints: BoxConstraints(minHeight: s.height),
           padding: EdgeInsets.symmetric(

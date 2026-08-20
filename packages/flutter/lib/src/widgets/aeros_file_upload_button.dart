@@ -109,7 +109,7 @@ class _AerosFileUploadButtonState extends State<AerosFileUploadButton> {
             child: InkWell(
               onTap: widget.enabled && !_busy ? _pick : null,
               borderRadius: AerosRadii.brLg,
-              child: DottedDashedBorder(
+              child: _DottedDashedBorder(
                 color: borderColor,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(
@@ -237,8 +237,8 @@ class _AttachedFile extends StatelessWidget {
 }
 
 /// Lightweight dashed-border container used by the empty file-upload state.
-class DottedDashedBorder extends StatelessWidget {
-  const DottedDashedBorder({super.key, required this.color, required this.child});
+class _DottedDashedBorder extends StatelessWidget {
+  const _DottedDashedBorder({required this.color, required this.child});
 
   final Color color;
   final Widget child;

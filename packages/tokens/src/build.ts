@@ -209,10 +209,25 @@ function buildDart(): string {
     lines.push(`  static const double ${key} = ${Number(v).toFixed(1)};`);
   }
   lines.push("");
-  lines.push("  // ─── Motion (ms) ───");
+  lines.push("  // ─── Motion (ms + curves) ───");
   for (const [k, v] of Object.entries(tokens.motion.duration)) {
     const key = `duration${k.charAt(0).toUpperCase() + k.slice(1)}`;
     lines.push(`  static const Duration ${key} = Duration(milliseconds: ${v});`);
+  }
+  for (const [k, v] of Object.entries(tokens.motion.ease)) {
+    const m = String(v).match(/cubic-bezier\(([^)]+)\)/);
+    if (!m) continue;
+    const args = m[1].split(",").map((n) => Number(n.trim())).join(", ");
+    const key = `ease${k.charAt(0).toUpperCase() + k.slice(1)}`;
+    lines.push(`  static const Cubic ${key} = Cubic(${args});`);
+  }
+  lines.push("");
+  lines.push("  // ─── Theme aliases (light / dark) ───");
+  for (const [theme, aliases] of [["Light", ALIAS_LIGHT], ["Dark", ALIAS_DARK]] as const) {
+    for (const [k, v] of Object.entries(aliases)) {
+      const name = `alias${theme}${k.charAt(0).toUpperCase() + camel(k).slice(1)}`;
+      lines.push(`  static const Color ${name} = ${hexToDartColor(v)};`);
+    }
   }
   lines.push("");
   lines.push("  // ─── Spacing (dp) ───");
@@ -253,11 +268,15 @@ function buildDart(): string {
 }
 
 // ── emit ─────────────────────────────────────────────────
+const dart = buildDart();
 write(resolve(root, "dist/css/tokens.css"),           buildCss());
 write(resolve(root, "dist/js/tokens.js"),             buildTs().replace("export type AerosTokens = typeof tokens;\n", ""));
 write(resolve(root, "dist/js/tokens.d.ts"),           `declare const tokens: any;\nexport type AerosTokens = typeof tokens;\nexport { tokens };\nexport default tokens;\n`);
 write(resolve(root, "dist/tailwind/preset.js"),       buildTailwind());
 write(resolve(root, "dist/tailwind/preset.d.ts"),     `declare const preset: any;\nexport default preset;\n`);
-write(resolve(root, "dist/dart/aeros_tokens.dart"),   buildDart());
+write(resolve(root, "dist/dart/aeros_tokens.dart"),   dart);
+// The Flutter package consumes the generated constants directly — this copy is
+// committed, and CI fails if it goes stale (build + git diff).
+write(resolve(root, "../flutter/lib/src/tokens/aeros_tokens.g.dart"), dart);
 
 console.log("\n✨ Aeros tokens built.");
