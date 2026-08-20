@@ -5,12 +5,13 @@ import '../tokens/typography.dart';
 class AerosProgress extends StatelessWidget {
   const AerosProgress({
     super.key,
-    required this.value,
+    this.value,
     this.label,
     this.color,
   });
 
-  final double value; // 0..1
+  /// 0..1, or `null` for an indeterminate bar.
+  final double? value;
   final String? label;
 
   /// Fill colour. Defaults to the theme brand colour so it inverts in dark mode.
@@ -29,7 +30,8 @@ class AerosProgress extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(label!, style: AerosTypography.caption(color: a.fgSecondary).copyWith(fontWeight: FontWeight.w600)),
-              Text('${(value * 100).round()}%', style: AerosTypography.monoSm(color: a.fgMuted)),
+              if (value != null)
+                Text('${(value! * 100).round()}%', style: AerosTypography.monoSm(color: a.fgMuted)),
             ],
           ),
           const SizedBox(height: 7),
@@ -37,10 +39,12 @@ class AerosProgress extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(999),
           child: LinearProgressIndicator(
-            value: value.clamp(0, 1),
+            value: value?.clamp(0, 1),
             minHeight: 6,
             backgroundColor: a.borderDefault,
             valueColor: AlwaysStoppedAnimation(fill),
+            semanticsLabel: label,
+            semanticsValue: value != null ? '${(value! * 100).round()}%' : null,
           ),
         ),
       ],

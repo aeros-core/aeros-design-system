@@ -1,18 +1,20 @@
 import 'package:flutter/widgets.dart';
+import 'aeros_tokens.g.dart';
 
+/// Radii — alias the generated [AerosTokens] constants.
 class AerosRadii {
   AerosRadii._();
 
-  static const double none = 0;
-  static const double xs = 4;
-  static const double sm = 6;
-  static const double md = 8;
-  static const double lg = 12;
-  static const double xl = 16;
-  static const double xl2 = 20;
-  static const double xl3 = 24;
-  static const double xl4 = 32;
-  static const double full = 9999;
+  static const double none = AerosTokens.radiusNone;
+  static const double xs = AerosTokens.radiusXs;
+  static const double sm = AerosTokens.radiusSm;
+  static const double md = AerosTokens.radiusMd;
+  static const double lg = AerosTokens.radiusLg;
+  static const double xl = AerosTokens.radiusXl;
+  static const double xl2 = AerosTokens.radius2xl;
+  static const double xl3 = AerosTokens.radius3xl;
+  static const double xl4 = AerosTokens.radius4xl;
+  static const double full = AerosTokens.radiusFull;
 
   static const BorderRadius brNone = BorderRadius.zero;
   static const BorderRadius brXs = BorderRadius.all(Radius.circular(xs));

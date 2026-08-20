@@ -3,6 +3,9 @@
 @import "@aeros-core/tokens/css";
 
 @import "tailwindcss";
+/* Enter/exit utilities (animate-in, fade-in-*, zoom-*, slide-in-from-*).
+   Without this import those classes silently generate nothing (audit A-23). */
+@import "tw-animate-css";
 
 /* Tailwind v4 scans files relative to this stylesheet. Point it at the
    component source tree explicitly so every class used inside
@@ -148,6 +151,18 @@
   --ease-decelerate: var(--aeros-ease-decelerate);
   --ease-entrance: var(--aeros-ease-entrance);
   --ease-spring: var(--aeros-ease-spring);
+
+  /* Accordion open/close (Radix measures content into the CSS var). */
+  --animate-accordion-down: aeros-accordion-down var(--aeros-duration-base) var(--aeros-ease-standard);
+  --animate-accordion-up: aeros-accordion-up var(--aeros-duration-base) var(--aeros-ease-standard);
+  @keyframes aeros-accordion-down {
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
+  }
+  @keyframes aeros-accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
+  }
 }
 
 /* DotMatrix keyframes — hoisted here so instances don't each inject a <style> tag. */

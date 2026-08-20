@@ -53,6 +53,9 @@ class AerosAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = _palette(context.aerosColors, context.aerosSemantic);
+    // The tinted circle + initials always render underneath; the network image
+    // paints over them, so a broken URL degrades to the initials fallback
+    // instead of throwing.
     return Container(
       width: _dim,
       height: _dim,
@@ -60,14 +63,25 @@ class AerosAvatar extends StatelessWidget {
         color: p.bg,
         shape: BoxShape.circle,
         border: Border.all(color: p.border, width: 1.5),
-        image: imageUrl != null
-            ? DecorationImage(image: NetworkImage(imageUrl!), fit: BoxFit.cover)
-            : null,
       ),
+      clipBehavior: Clip.antiAlias,
       alignment: Alignment.center,
-      child: imageUrl == null && initials != null
-          ? Text(initials!, style: AerosTypography.labelMd(color: p.fg).copyWith(fontSize: _font))
-          : null,
+      child: Stack(
+        fit: StackFit.expand,
+        alignment: Alignment.center,
+        children: [
+          if (initials != null)
+            Center(
+              child: Text(initials!, style: AerosTypography.labelMd(color: p.fg).copyWith(fontSize: _font)),
+            ),
+          if (imageUrl != null)
+            Image.network(
+              imageUrl!,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+            ),
+        ],
+      ),
     );
   }
 }

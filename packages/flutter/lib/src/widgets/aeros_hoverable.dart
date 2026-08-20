@@ -8,7 +8,7 @@ import 'package:flutter/widgets.dart';
 /// AerosHoverable(
 ///   onTap: () => navigate(),
 ///   builder: (context, hovered) => AnimatedContainer(
-///     duration: AerosMotion.fast,
+///     duration: AerosMotion.resolve(context, AerosMotion.fast),
 ///     decoration: BoxDecoration(
 ///       color: hovered ? aeros.bgSubtle : aeros.bgSurface,
 ///       border: Border.all(color: aeros.borderDefault),

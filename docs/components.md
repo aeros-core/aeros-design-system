@@ -6,10 +6,10 @@ Each component ships in both `@aeros-core/react` and `aeros_design_system` (Flut
 
 | Component | React | Flutter | Notes |
 |---|---|---|---|
-| Button | `Button` | `AerosButton` | 6 variants × 5 sizes, `loading`, leading/trailing icons |
+| Button | `Button` | `AerosButton` | 5 variants × 5 sizes, `loading`, leading/trailing icons |
 | Input | `Input` + `Field` | `AerosTextField` | Prefix/suffix, error/success states |
 | Textarea | `Textarea` | — | Use `AerosTextField` with `maxLines` in Flutter |
-| Select | `Select*` (Radix) | — | Use Flutter's `DropdownMenu` with theme |
+| Select | `Select*` (Radix) | `AerosDropdownSearch` | Scrolls long lists; `state`/`size` props on web |
 | Checkbox | `Checkbox` | `AerosCheckbox` | Indeterminate supported |
 | Radio | `RadioGroup` | `AerosRadio` | |
 | Switch | `Switch` | `AerosSwitch` | |
@@ -22,13 +22,13 @@ Each component ships in both `@aeros-core/react` and `aeros_design_system` (Flut
 | Avatar | `Avatar`, `AvatarStack` | `AerosAvatar` | 5 sizes, 5 variants |
 | Tabs | `Tabs*` | `AerosTabs` | Underline + pill variants |
 | Breadcrumb | `Breadcrumb` | `AerosBreadcrumb` | |
-| Dropdown Menu | `DropdownMenu*` (Radix) | — | Use Flutter `PopupMenuButton` |
-| Dialog | `Dialog*` (Radix) | — | Use `showDialog` with theme |
-| Tooltip | `Tooltip*` (Radix) | — | Use Flutter `Tooltip` with theme |
-| Table | `Table` + helpers | — | Plain Flutter `DataTable` |
+| Dropdown Menu | `DropdownMenu*` (Radix) | — | Use Flutter `PopupMenuButton` with theme |
+| Dialog | `Dialog*` (Radix) | `AerosConfirmDialog` | `showClose`, scrollable body |
+| Tooltip | `Tooltip*` (Radix) | `AerosTooltip` | Themed; message exposed to AT |
+| Table | `Table` + helpers | `AerosDataTable` | Sortable `Th` (aria-sort), `selected` rows, loading/empty rows |
 | Empty state | `EmptyState` | `AerosEmptyState` | |
-| TopNav | `TopNav*` | — | |
-| Sidebar | `Sidebar*` | — | |
+| TopNav | `TopNav*` | `AerosTopnav` | `asChild`, `aria-current` on web |
+| Sidebar | `Sidebar*` | `AerosSidenav` | `asChild`, `aria-current` on web |
 | Attribute selector | — | `AerosAttributeSelector` | Picks the right input from `(datatype, optionSource)` — see [configurable-mto.md](./configurable-mto.md) |
 | Enum dropdown | — | `AerosEnumDropdown` | Single-select dropdown over `AerosAttributeOption[]` |
 | Enum chips | — | `AerosEnumChips` | Single-select chip group with optional unit suffix and colour swatches |
@@ -40,6 +40,21 @@ Each component ships in both `@aeros-core/react` and `aeros_design_system` (Flut
 | Routing-signal badge | — | `AerosRoutingSignalBadge` | Pill for `requires_rfq`, `requires_credit_check`, …; severity-driven colour |
 | Constraint error alert | — | `AerosConstraintErrorAlert` | Locale-aware constraint violations from v1 literal or v2 JSONLogic constraints |
 | Wordmark | `aeros-logo` (CSS class) | `AerosWordmark` | Brand mark: Nunito Sans wdth-125, weight 800 |
+| Label | `Label` | — | Standalone control label (Radix) |
+| Separator | `Separator` | Material `Divider` | |
+| Spinner | `Spinner` | Material `CircularProgressIndicator` | `role="status"` + sr-only label |
+| Skeleton | `Skeleton` | — | `aria-hidden`; respects reduced motion |
+| Toast | `Toast*` + `Toaster` / `toast()` | `AerosSnackbar.show` | Imperative queue on web; tones on both |
+| Alert dialog | `AlertDialog*` (Radix) | `AerosConfirmDialog(barrierDismissible: false)` | Must-answer confirmations |
+| Popover | `Popover*` (Radix) | — | |
+| Accordion | `Accordion*` (Radix) | Material `ExpansionTile` | Token motion, reduced-motion safe |
+| Drawer / Sheet | `Drawer*` | Material `showModalBottomSheet` | right / left / bottom |
+| Pagination | `Pagination` | `AerosPagination` | `aria-current="page"`, ellipsis model |
+| Command / Combobox | `Command*` (cmdk) | `AerosDropdownSearch` | Compose in `Popover` for select-with-search |
+| Calendar / DatePicker | `Calendar` (react-day-picker) | — | Compose in `Popover`; token-styled |
+| Search field | recipe: `Input prefix={<Search/>}` | `AerosSearchField` | Escape clears; labeled clear button |
+| Tag field | — | `AerosTagField` | |
+| Stepper / Pagination shells | — | `AerosStepper`, `AerosScaffold`, `AerosPageHeader` | |
 
 ## Button
 

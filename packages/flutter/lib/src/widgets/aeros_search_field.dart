@@ -120,7 +120,7 @@ class _AerosSearchFieldState extends State<AerosSearchField> {
     final s = widget.size;
 
     return AnimatedContainer(
-      duration: AerosMotion.fast,
+      duration: AerosMotion.resolve(context, AerosMotion.fast),
       curve: AerosMotion.standard,
       height: s.height,
       padding: EdgeInsets.symmetric(horizontal: s.padH),
@@ -168,7 +168,7 @@ class _AerosSearchFieldState extends State<AerosSearchField> {
             ),
           ),
           AnimatedSwitcher(
-            duration: AerosMotion.fast,
+            duration: AerosMotion.resolve(context, AerosMotion.fast),
             transitionBuilder: (child, anim) =>
                 FadeTransition(opacity: anim, child: ScaleTransition(scale: anim, child: child)),
             // Labeled button semantics + a full-height, ≥36dp-wide hit target

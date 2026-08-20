@@ -68,6 +68,44 @@ import {
   SidebarSection,
   SidebarItem,
   DotMatrix,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  Calendar,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+  Label,
+  Pagination,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Separator,
+  Skeleton,
+  Spinner,
+  TableEmptyRow,
+  Toaster,
+  toast,
 } from "@aeros-core/react";
 import {
   Inbox,
@@ -263,6 +301,9 @@ const NAV: Array<{ section: string; items: Array<{ href: string; label: React.Re
       { href: "#empty", label: "Empty state" },
       { href: "#dot-matrix", label: "Dot matrix" },
       { href: "#nav", label: "TopNav" },
+      { href: "#overlays", label: "Overlays 2.1" },
+      { href: "#feedback21", label: "Feedback 2.1" },
+      { href: "#data21", label: "Data 2.1" },
     ],
   },
 ];
@@ -321,6 +362,16 @@ function ThemeToggle() {
       {dark ? "Dark" : "Light"}
     </button>
   );
+}
+
+function PaginationDemo() {
+  const [page, setPage] = React.useState(5);
+  return <Pagination page={page} count={20} onPageChange={setPage} />;
+}
+
+function CalendarDemo() {
+  const [date, setDate] = React.useState<Date | undefined>(new Date(2026, 7, 20));
+  return <Calendar mode="single" selected={date} onSelect={setDate} defaultMonth={new Date(2026, 7)} />;
 }
 
 export default function Playground() {
@@ -924,6 +975,132 @@ export default function Playground() {
             </TopNavRight>
           </TopNav>
         </Section>
+
+        {/* OVERLAYS 2.1 */}
+        <Section id="overlays" eyebrow="21 — Components" title="Overlays" description="Popover, AlertDialog, Drawer, Accordion — Radix-backed, token motion.">
+          <Row label="Popover + Command (combobox recipe)">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="secondary" trailingIcon={<ChevronDown className="h-4 w-4" />}>Assign vendor</Button>
+              </PopoverTrigger>
+              <PopoverContent className="p-0 w-64">
+                <Command>
+                  <CommandInput placeholder="Search vendors…" />
+                  <CommandList>
+                    <CommandEmpty>No vendor found.</CommandEmpty>
+                    <CommandGroup heading="Vendors">
+                      <CommandItem>Trimurti Packaging</CommandItem>
+                      <CommandItem>Shakti Bearings</CommandItem>
+                      <CommandItem>Everest Polymers</CommandItem>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </Row>
+          <Row label="AlertDialog (must answer)">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="danger">Delete industry</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete industry?</AlertDialogTitle>
+                  <AlertDialogDescription>Items in Construction will be reclassified as Other. This cannot be undone.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel asChild><Button variant="secondary">Cancel</Button></AlertDialogCancel>
+                  <AlertDialogAction asChild><Button variant="danger">Delete</Button></AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </Row>
+          <Row label="Drawer">
+            <Drawer>
+              <DrawerTrigger asChild>
+                <Button variant="secondary">Order details</Button>
+              </DrawerTrigger>
+              <DrawerContent>
+                <DrawerHeader><DrawerTitle>Order #1042</DrawerTitle></DrawerHeader>
+                <DrawerBody>
+                  <p className="text-[13px] text-fg-secondary leading-relaxed">12,000 double-wall cups · dispatch Friday · Trimurti Packaging.</p>
+                </DrawerBody>
+                <DrawerFooter><Button>Accept order</Button></DrawerFooter>
+              </DrawerContent>
+            </Drawer>
+          </Row>
+          <Row label="Accordion">
+            <div className="w-full max-w-md">
+              <Accordion type="single" collapsible defaultValue="ship">
+                <AccordionItem value="ship">
+                  <AccordionTrigger>Shipping policy</AccordionTrigger>
+                  <AccordionContent>Orders dispatch within 48 hours of QC clearance.</AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="returns">
+                  <AccordionTrigger>Returns</AccordionTrigger>
+                  <AccordionContent>Manufacturing defects are replaced free within 30 days.</AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          </Row>
+        </Section>
+
+        {/* FEEDBACK 2.1 */}
+        <Section id="feedback21" eyebrow="22 — Components" title="Feedback" description="Toast queue, Spinner, Skeleton, Label + Separator.">
+          <Row label="Toast (imperative queue)">
+            <Button variant="secondary" onClick={() => toast({ title: "Saved", description: "Catalog updated.", variant: "success" })}>Success toast</Button>
+            <Button variant="secondary" onClick={() => toast({ title: "Line 4 halted", description: "Check sensor 2.", variant: "danger" })}>Danger toast</Button>
+            <Button variant="secondary" onClick={() => toast({ title: "Heads up", description: "3 RFQs awaiting review." })}>Neutral toast</Button>
+          </Row>
+          <Row label="Spinner">
+            <Spinner size="sm" /><Spinner /><Spinner size="lg" />
+          </Row>
+          <Row label="Skeleton">
+            <div className="w-full max-w-sm space-y-2.5">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-24 w-full rounded-xl" />
+            </div>
+          </Row>
+          <Row label="Label + Separator">
+            <div className="w-full max-w-sm">
+              <Label htmlFor="po-ref">PO reference</Label>
+              <Input id="po-ref" className="mt-1.5" placeholder="PO-2026-…" />
+              <Separator className="my-4" />
+              <p className="text-xs text-fg-muted">Separators are decorative by default.</p>
+            </div>
+          </Row>
+        </Section>
+
+        {/* DATA 2.1 */}
+        <Section id="data21" eyebrow="23 — Components" title="Data" description="Sortable table headers, empty rows, Pagination, Calendar.">
+          <Row label="Sortable + empty">
+            <div className="w-full">
+              <Table>
+                <Thead>
+                  <Tr>
+                    <Th sortable sortDirection="asc" onSort={() => {}}>Order</Th>
+                    <Th sortable sortDirection={false} onSort={() => {}}>Vendor</Th>
+                    <Th>Status</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <TableEmptyRow colSpan={3}>No orders match the current filters.</TableEmptyRow>
+                </Tbody>
+              </Table>
+            </div>
+          </Row>
+          <Row label="Pagination">
+            <PaginationDemo />
+          </Row>
+          <Row label="Calendar">
+            <div className="rounded-xl border border-border-default bg-bg-surface shadow-sm inline-block">
+              <CalendarDemo />
+            </div>
+          </Row>
+        </Section>
+
+        <Toaster />
 
         <div className="mt-24 pt-8 border-t border-border-default">
           <p className="text-xs text-fg-muted font-mono">

@@ -122,7 +122,7 @@ class _Chip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final palette = AerosSelectionPalette.resolve(_state(), a);
+    final palette = AerosSelectionPalette.resolve(_state(), a, isDark: context.aeros.isDark);
     final labelText =
         unitSuffix == null ? option.label : '${option.label} $unitSuffix';
 

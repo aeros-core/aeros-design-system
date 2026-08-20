@@ -1,5 +1,6 @@
 import 'package:aeros_design_system/aeros_design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _app(Widget child, {bool dark = false}) => MaterialApp(
@@ -72,6 +73,53 @@ void main() {
       expect(AerosTypography.overline().color, isNull);
       expect(AerosTypography.monoMd().color, isNull);
       expect(AerosTypography.monoSm().color, isNull);
+    });
+  });
+
+  group('reduced motion (WCAG 2.3.3)', () {
+    testWidgets('AerosMotion.resolve collapses when animations are disabled', (tester) async {
+      late Duration resolved;
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: Builder(builder: (context) {
+            resolved = AerosMotion.resolve(context, AerosMotion.slow);
+            return const SizedBox.shrink();
+          }),
+        ),
+      );
+      expect(resolved, Duration.zero);
+    });
+  });
+
+  group('AerosTabs keyboard', () {
+    testWidgets('arrow keys move the selection while the strip has focus', (tester) async {
+      var selected = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AerosTheme.light(),
+          home: Scaffold(
+            body: StatefulBuilder(
+              builder: (context, setState) => AerosTabs(
+                tabs: const ['Day', 'Week', 'Month'],
+                selectedIndex: selected,
+                onChanged: (i) => setState(() => selected = i),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pump();
+      expect(selected, 1);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pump();
+      expect(selected, 2);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pump();
+      expect(selected, 1);
     });
   });
 

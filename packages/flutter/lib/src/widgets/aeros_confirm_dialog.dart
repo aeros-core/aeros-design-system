@@ -42,9 +42,12 @@ class AerosConfirmDialog extends StatelessWidget {
     String confirmLabel = 'Confirm',
     String cancelLabel = 'Cancel',
     bool destructive = false,
+    /// Set false to force an explicit answer (no scrim-tap / Escape dismiss).
+    bool barrierDismissible = true,
   }) async {
     final result = await showDialog<bool>(
       context: context,
+      barrierDismissible: barrierDismissible,
       builder: (_) => AerosConfirmDialog._(
         title: title,
         body: body,
@@ -63,7 +66,12 @@ class AerosConfirmDialog extends StatelessWidget {
       backgroundColor: a.bgSurface,
       shape: RoundedRectangleBorder(borderRadius: AerosRadii.brLg),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 440),
+        constraints: BoxConstraints(
+          maxWidth: 440,
+          // Long bodies scroll inside the dialog instead of overflowing short
+          // viewports.
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+        ),
         child: Padding(
           padding: const EdgeInsets.all(AerosSpacing.s5),
           child: Column(
@@ -72,7 +80,11 @@ class AerosConfirmDialog extends StatelessWidget {
             children: [
               Text(title, style: AerosTypography.h3(color: a.fgPrimary)),
               const SizedBox(height: AerosSpacing.s3),
-              Text(body, style: AerosTypography.bodyMd(color: a.fgSecondary)),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Text(body, style: AerosTypography.bodyMd(color: a.fgSecondary)),
+                ),
+              ),
               const SizedBox(height: AerosSpacing.s5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
