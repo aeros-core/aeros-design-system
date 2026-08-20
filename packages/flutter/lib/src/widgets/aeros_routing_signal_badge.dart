@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/aeros_theme_extension.dart';
 import '../tokens/radii.dart';
 import '../tokens/spacing.dart';
 import '../tokens/states.dart';
@@ -32,7 +33,7 @@ class AerosRoutingSignalBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = AerosSeverityPalette.of(_mapSeverity(signal.severity));
+    final palette = AerosSeverityPalette.of(_mapSeverity(signal.severity), isDark: context.aeros.isDark);
     final pad = dense
         ? const EdgeInsets.symmetric(horizontal: 8, vertical: 3)
         : const EdgeInsets.symmetric(

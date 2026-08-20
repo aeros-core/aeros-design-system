@@ -48,7 +48,7 @@ export const TabsTrigger = React.forwardRef<
     <RT.Trigger
       ref={ref}
       className={cn(
-        "text-sm font-medium text-fg-muted transition-colors duration-[120ms] whitespace-nowrap rounded-sm",
+        "text-sm font-medium text-fg-muted transition-colors duration-(--aeros-duration-fast) whitespace-nowrap rounded-sm",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas",
         variant === "underline"
           ? "px-4 py-2.5 border-b-2 border-transparent -mb-px hover:text-fg-primary data-[state=active]:text-fg-primary data-[state=active]:border-fg-primary data-[state=active]:font-semibold"
@@ -73,16 +73,30 @@ export const TabsContent = React.forwardRef<
 ));
 TabsContent.displayName = "TabsContent";
 
-// Count pill used inside tab labels
-export function TabCount({ children, active }: { children: React.ReactNode; active?: boolean }) {
-  return (
+// Count pill used inside tab labels. Styles itself from the parent trigger's
+// data-state, so no `active` prop bookkeeping is needed (still accepted as an
+// override for use outside a TabsTrigger).
+export interface TabCountProps extends React.HTMLAttributes<HTMLSpanElement> {
+  active?: boolean;
+}
+
+export const TabCount = React.forwardRef<HTMLSpanElement, TabCountProps>(
+  ({ children, active, className, ...props }, ref) => (
     <span
+      ref={ref}
       className={cn(
         "ml-1.5 inline-flex items-center rounded-full px-1.5 py-px text-[10px] font-bold",
-        active ? "bg-brand-primary text-fg-inverse" : "bg-bg-subtle text-fg-secondary"
+        active === undefined
+          ? "bg-bg-subtle text-fg-secondary [[data-state=active]_&]:bg-brand-primary [[data-state=active]_&]:text-fg-inverse"
+          : active
+            ? "bg-brand-primary text-fg-inverse"
+            : "bg-bg-subtle text-fg-secondary",
+        className
       )}
+      {...props}
     >
       {children}
     </span>
-  );
-}
+  )
+);
+TabCount.displayName = "TabCount";

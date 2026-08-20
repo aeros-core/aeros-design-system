@@ -20,6 +20,7 @@ const kebab = (s: string) => s.replace(/([A-Z])/g, "-$1").toLowerCase();
 function flattenColor(): Record<string, string> {
   const out: Record<string, string> = {};
   for (const [group, ramp] of Object.entries(tokens.color)) {
+    if (group === "semanticDark") continue; // dark overrides are emitted in the [data-theme='dark'] block
     for (const [stop, v] of Object.entries(ramp as any)) {
       out[`${group}-${stop}`] = (v as any).$value;
     }
@@ -51,17 +52,18 @@ function buildCss(): string {
   for (const [k, v] of Object.entries(tokens.motion.duration)) lines.push(`  --aeros-duration-${k}: ${v}ms;`);
   for (const [k, v] of Object.entries(tokens.motion.ease)) lines.push(`  --aeros-ease-${k}: ${v};`);
   for (const [k, v] of Object.entries(tokens.z)) lines.push(`  --aeros-z-${k}: ${v};`);
+  for (const [k, v] of Object.entries(tokens.breakpoint)) lines.push(`  --aeros-breakpoint-${k}: ${v}px;`);
   lines.push("}");
   lines.push("");
   lines.push("[data-theme='dark'] {");
   for (const [k, v] of Object.entries(ALIAS_DARK)) lines.push(`  --aeros-${k}: ${v};`);
+  // Status colors get true dark counterparts (light chips on dark canvas otherwise).
+  for (const [k, v] of Object.entries(tokens.color.semanticDark as Record<string, any>)) {
+    lines.push(`  --aeros-color-semantic-${k}: ${v.$value};`);
+  }
   // In dark mode rgba-black shadows vanish on near-black surfaces, so elevation
   // is carried by a deeper key + a faint light hairline ring for separation.
-  lines.push("  --aeros-shadow-xs: 0 1px 2px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.05);");
-  lines.push("  --aeros-shadow-sm: 0 1px 2px rgba(0,0,0,0.45), 0 2px 4px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06);");
-  lines.push("  --aeros-shadow-md: 0 2px 6px rgba(0,0,0,0.45), 0 6px 14px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.06);");
-  lines.push("  --aeros-shadow-lg: 0 4px 12px rgba(0,0,0,0.50), 0 12px 28px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.07);");
-  lines.push("  --aeros-shadow-xl: 0 8px 20px rgba(0,0,0,0.55), 0 20px 48px rgba(0,0,0,0.50), 0 0 0 1px rgba(255,255,255,0.08);");
+  for (const [k, v] of Object.entries(tokens.shadowDark)) lines.push(`  --aeros-shadow-${k}: ${v};`);
   lines.push("}");
   lines.push("");
   lines.push("@media (prefers-reduced-motion: reduce) {");
@@ -101,14 +103,14 @@ function buildTailwind(): string {
   // for v3 users or programmatic access. Keep it minimal.
   const colors: Record<string, any> = {};
   for (const [group, ramp] of Object.entries(tokens.color)) {
-    if (group === "semantic") continue;
+    if (group === "semantic" || group === "semanticDark") continue;
     const obj: Record<string, string> = {};
     for (const [stop, v] of Object.entries(ramp as any)) obj[stop] = (v as any).$value;
     colors[group] = obj;
   }
-  // semantic flat
-  for (const [k, v] of Object.entries((tokens.color as any).semantic)) {
-    colors[k] = (v as any).$value;
+  // semantic via CSS vars (theme-aware — dark values come from tokens.css)
+  for (const k of Object.keys((tokens.color as any).semantic)) {
+    colors[k] = `var(--aeros-color-semantic-${k})`;
   }
   // alias via CSS vars (theme-aware)
   for (const k of Object.keys(tokens.alias.light)) {
@@ -124,6 +126,12 @@ function buildTailwind(): string {
   const shadow: Record<string, string> = {};
   for (const [k, v] of Object.entries(tokens.shadow)) shadow[k] = String(v);
 
+  const durations: Record<string, string> = {};
+  for (const [k, v] of Object.entries(tokens.motion.duration)) durations[k] = `${v}ms`;
+
+  const screens: Record<string, string> = {};
+  for (const [k, v] of Object.entries(tokens.breakpoint)) screens[k] = `${v}px`;
+
   const preset = {
     theme: {
       extend: {
@@ -131,15 +139,14 @@ function buildTailwind(): string {
         spacing,
         borderRadius: radius,
         boxShadow: shadow,
+        screens,
+        zIndex: Object.fromEntries(Object.entries(tokens.z).map(([k, v]) => [k, String(v)])),
         fontFamily: {
-          sans: ["Plus Jakarta Sans", "ui-sans-serif", "system-ui", "sans-serif"],
+          sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
           mono: ["IBM Plex Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"]
         },
-        transitionDuration: {
-          fast: `${tokens.motion.duration.fast}ms`,
-          base: `${tokens.motion.duration.base}ms`,
-          slow: `${tokens.motion.duration.slow}ms`
-        }
+        transitionDuration: durations,
+        transitionTimingFunction: { ...tokens.motion.ease }
       }
     }
   };
@@ -180,16 +187,32 @@ function buildDart(): string {
   lines.push("");
   lines.push("  // ─── Color ramps ───");
   for (const [group, ramp] of Object.entries(tokens.color)) {
-    if (group === "semantic") continue;
+    if (group === "semantic" || group === "semanticDark") continue;
     for (const [stop, v] of Object.entries(ramp as any)) {
       lines.push(`  static const Color ${group}${stop} = ${hexToDartColor((v as any).$value)};`);
     }
   }
   lines.push("");
-  lines.push("  // ─── Semantic ───");
+  lines.push("  // ─── Semantic (light / dark) ───");
   for (const [k, v] of Object.entries((tokens.color as any).semantic)) {
     const name = k.replace(/-([a-z])/g, (_m, c) => c.toUpperCase());
     lines.push(`  static const Color ${name} = ${hexToDartColor((v as any).$value)};`);
+  }
+  for (const [k, v] of Object.entries((tokens.color as any).semanticDark)) {
+    const name = k.replace(/-([a-z])/g, (_m, c) => c.toUpperCase());
+    lines.push(`  static const Color ${name}Dark = ${hexToDartColor((v as any).$value)};`);
+  }
+  lines.push("");
+  lines.push("  // ─── Breakpoints (logical px) ───");
+  for (const [k, v] of Object.entries(tokens.breakpoint)) {
+    const key = `breakpoint${k.charAt(0).toUpperCase() + k.slice(1).replace("2xl", "2Xl")}`;
+    lines.push(`  static const double ${key} = ${Number(v).toFixed(1)};`);
+  }
+  lines.push("");
+  lines.push("  // ─── Motion (ms) ───");
+  for (const [k, v] of Object.entries(tokens.motion.duration)) {
+    const key = `duration${k.charAt(0).toUpperCase() + k.slice(1)}`;
+    lines.push(`  static const Duration ${key} = Duration(milliseconds: ${v});`);
   }
   lines.push("");
   lines.push("  // ─── Spacing (dp) ───");
@@ -205,7 +228,7 @@ function buildDart(): string {
   }
   lines.push("");
   lines.push("  // ─── Font families ───");
-  lines.push(`  static const String fontSans = 'Plus Jakarta Sans';`);
+  lines.push(`  static const String fontSans = 'Inter';`);
   lines.push(`  static const String fontMono = 'IBM Plex Mono';`);
   lines.push("}");
   lines.push("");
@@ -215,7 +238,7 @@ function buildDart(): string {
   lines.push("  AerosTextStyles._();");
   lines.push("");
   for (const [name, s] of Object.entries(tokens.text as Record<string, any>)) {
-    const fam = s.family === "mono" ? "IBM Plex Mono" : "Plus Jakarta Sans";
+    const fam = s.family === "mono" ? "IBM Plex Mono" : "Inter";
     const ls = trackingToLetterSpacing(s.tracking, s.size);
     lines.push(`  static const TextStyle ${camel(name)} = TextStyle(`);
     lines.push(`    fontFamily: '${fam}',`);

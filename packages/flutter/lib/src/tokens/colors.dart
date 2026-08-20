@@ -2,25 +2,11 @@ import 'package:flutter/material.dart';
 
 /// Aeros color ramps and semantic colors.
 /// Values mirror `packages/tokens/src/tokens.json` — keep in sync when the
-/// ramp changes (the generated `aeros_tokens.dart` is the source of truth).
+/// ramp changes (CI's drift check compares this file against tokens.json).
 class AerosColors {
   AerosColors._();
 
-  // ─── Royal (legacy alias — faint warm neutral) ───
-  static const Color royal0   = Color(0xFFFFFFFF);
-  static const Color royal50  = Color(0xFFFAFAF9);
-  static const Color royal100 = Color(0xFFF4F4F2);
-  static const Color royal200 = Color(0xFFE7E6E2);
-  static const Color royal300 = Color(0xFFD6D4CF);
-  static const Color royal400 = Color(0xFFA8A6A0);
-  static const Color royal500 = Color(0xFF7C7A74);
-  static const Color royal600 = Color(0xFF57554F);
-  static const Color royal700 = Color(0xFF403E39);
-  static const Color royal800 = Color(0xFF272622);
-  static const Color royal900 = Color(0xFF1A1916);
-  static const Color royal950 = Color(0xFF121110);
-
-  // ─── Ink (faint warm neutral) ───
+  // ─── Ink (faint warm neutral — the only ramp; royal/slate were deleted in 2.0) ───
   static const Color ink0   = Color(0xFFFFFFFF);
   static const Color ink50  = Color(0xFFFAFAF9);
   static const Color ink100 = Color(0xFFF4F4F2);
@@ -34,27 +20,13 @@ class AerosColors {
   static const Color ink900 = Color(0xFF1A1916);
   static const Color ink950 = Color(0xFF121110);
 
-  // ─── Slate (legacy alias — faint warm neutral) ───
-  static const Color slate0   = Color(0xFFFFFFFF);
-  static const Color slate50  = Color(0xFFFAFAF9);
-  static const Color slate100 = Color(0xFFF4F4F2);
-  static const Color slate200 = Color(0xFFE7E6E2);
-  static const Color slate300 = Color(0xFFD6D4CF);
-  static const Color slate400 = Color(0xFFA8A6A0);
-  static const Color slate500 = Color(0xFF7C7A74);
-  static const Color slate600 = Color(0xFF57554F);
-  static const Color slate700 = Color(0xFF403E39);
-  static const Color slate800 = Color(0xFF272622);
-  static const Color slate900 = Color(0xFF1A1916);
-  static const Color slate950 = Color(0xFF121110);
-
-  // ─── Semantic ───
+  // ─── Semantic (light values — prefer AerosSemanticColors for theme-aware use) ───
   static const Color success       = Color(0xFF16A34A);
   static const Color successBg     = Color(0xFFDCFCE7);
   static const Color successText   = Color(0xFF15803D);
   static const Color successBorder = Color(0xFFBBF7D0);
 
-  static const Color warning       = Color(0xFFD97706);
+  static const Color warning       = Color(0xFFCC6D04);
   static const Color warningBg     = Color(0xFFFEF3C7);
   static const Color warningText   = Color(0xFFB45309);
   static const Color warningBorder = Color(0xFFFDE68A);
@@ -64,10 +36,80 @@ class AerosColors {
   static const Color dangerText    = Color(0xFFB91C1C);
   static const Color dangerBorder  = Color(0xFFFECACA);
 
-  static const Color info          = royal600;
-  static const Color infoBg        = royal50;
-  static const Color infoText      = royal800;
-  static const Color infoBorder    = royal200;
+  static const Color info          = ink600;
+  static const Color infoBg        = ink50;
+  static const Color infoText      = ink800;
+  static const Color infoBorder    = ink200;
+}
+
+/// Theme-aware status colors — light chips read wrong on dark surfaces, so
+/// each tone carries a true dark counterpart (mirrors `semanticDark` in
+/// tokens.json). Resolve via `context.aerosSemantic`.
+@immutable
+class AerosSemanticColors {
+  const AerosSemanticColors({
+    required this.success,
+    required this.successBg,
+    required this.successText,
+    required this.successBorder,
+    required this.warning,
+    required this.warningBg,
+    required this.warningText,
+    required this.warningBorder,
+    required this.danger,
+    required this.dangerBg,
+    required this.dangerText,
+    required this.dangerBorder,
+    required this.info,
+    required this.infoBg,
+    required this.infoText,
+    required this.infoBorder,
+  });
+
+  final Color success, successBg, successText, successBorder;
+  final Color warning, warningBg, warningText, warningBorder;
+  final Color danger, dangerBg, dangerText, dangerBorder;
+  final Color info, infoBg, infoText, infoBorder;
+
+  static const AerosSemanticColors light = AerosSemanticColors(
+    success: AerosColors.success,
+    successBg: AerosColors.successBg,
+    successText: AerosColors.successText,
+    successBorder: AerosColors.successBorder,
+    warning: AerosColors.warning,
+    warningBg: AerosColors.warningBg,
+    warningText: AerosColors.warningText,
+    warningBorder: AerosColors.warningBorder,
+    danger: AerosColors.danger,
+    dangerBg: AerosColors.dangerBg,
+    dangerText: AerosColors.dangerText,
+    dangerBorder: AerosColors.dangerBorder,
+    info: AerosColors.info,
+    infoBg: AerosColors.infoBg,
+    infoText: AerosColors.infoText,
+    infoBorder: AerosColors.infoBorder,
+  );
+
+  static const AerosSemanticColors dark = AerosSemanticColors(
+    success: Color(0xFF4ADE80),
+    successBg: Color(0xFF132B1D),
+    successText: Color(0xFF86EFAC),
+    successBorder: Color(0xFF235C36),
+    warning: Color(0xFFFBBF24),
+    warningBg: Color(0xFF2E2410),
+    warningText: Color(0xFFFCD34D),
+    warningBorder: Color(0xFF6B4E16),
+    danger: Color(0xFFF87171),
+    dangerBg: Color(0xFF331414),
+    dangerText: Color(0xFFFCA5A5),
+    dangerBorder: Color(0xFF7F2A2A),
+    info: Color(0xFFA8A6A0),
+    infoBg: Color(0xFF2A2723),
+    infoText: Color(0xFFD6D4CF),
+    infoBorder: Color(0xFF46423B),
+  );
+
+  static AerosSemanticColors resolve(bool isDark) => isDark ? dark : light;
 }
 
 /// Theme-aware aliases. Two instances: light / dark.

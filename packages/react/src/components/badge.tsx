@@ -7,25 +7,25 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        green: "bg-success-bg text-success-text",
-        amber: "bg-warning-bg text-warning-text",
-        red:   "bg-danger-bg text-danger-text",
-        blue:  "bg-royal-50 text-royal-800",
-        grey:  "bg-ink-50 text-ink-600",
-        dark:  "bg-ink-900 text-ink-100"
+        success: "bg-success-bg text-success-text",
+        warning: "bg-warning-bg text-warning-text",
+        danger:  "bg-danger-bg text-danger-text",
+        info:    "bg-info-bg text-info-text",
+        neutral: "bg-bg-subtle text-fg-secondary",
+        inverse: "bg-bg-inverse text-fg-inverse"
       }
     },
-    defaultVariants: { variant: "grey" }
+    defaultVariants: { variant: "neutral" }
   }
 );
 
 const dotColor: Record<NonNullable<VariantProps<typeof badgeVariants>["variant"]>, string> = {
-  green: "bg-success",
-  amber: "bg-warning",
-  red:   "bg-danger",
-  blue:  "bg-royal-600",
-  grey:  "bg-ink-400",
-  dark:  "bg-ink-400"
+  success: "bg-success",
+  warning: "bg-warning",
+  danger:  "bg-danger",
+  info:    "bg-info",
+  neutral: "bg-fg-muted",
+  inverse: "bg-ink-400"
 };
 
 export interface BadgeProps
@@ -35,7 +35,7 @@ export interface BadgeProps
 }
 
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ className, variant = "grey", dot, children, ...props }, ref) => (
+  ({ className, variant = "neutral", dot, children, ...props }, ref) => (
     <span ref={ref} className={cn(badgeVariants({ variant }), className)} {...props}>
       {dot && <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", dotColor[variant!])} />}
       {children}

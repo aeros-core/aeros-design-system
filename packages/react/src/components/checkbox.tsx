@@ -11,8 +11,8 @@ export const Checkbox = React.forwardRef<
   <RC.Root
     ref={ref}
     className={cn(
-      "peer h-[18px] w-[18px] shrink-0 rounded-[5px] border-[1.5px] border-border-strong bg-bg-surface",
-      "transition-colors duration-[120ms]",
+      "group peer h-[18px] w-[18px] shrink-0 rounded-[5px] border-[1.5px] border-border-strong bg-bg-surface",
+      "transition-colors duration-(--aeros-duration-fast)",
       "hover:border-border-focus",
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas",
       "data-[state=checked]:bg-brand-primary data-[state=checked]:border-brand-primary data-[state=checked]:text-fg-inverse",
@@ -22,8 +22,10 @@ export const Checkbox = React.forwardRef<
     )}
     {...props}
   >
+    {/* Icon choice is driven by data-state so uncontrolled indeterminate works too. */}
     <RC.Indicator className="flex items-center justify-center text-current">
-      {props.checked === "indeterminate" ? <Minus className="h-3 w-3" /> : <Check className="h-3 w-3" strokeWidth={3} />}
+      <Check className="h-3 w-3 group-data-[state=indeterminate]:hidden" strokeWidth={3} />
+      <Minus className="hidden h-3 w-3 group-data-[state=indeterminate]:block" />
     </RC.Indicator>
   </RC.Root>
 ));

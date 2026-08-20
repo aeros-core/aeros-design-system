@@ -8,9 +8,11 @@ export interface EmptyStateProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   action?: React.ReactNode;
 }
 
-export function EmptyState({ icon, title, description, action, className, ...props }: EmptyStateProps) {
+export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
+  ({ icon, title, description, action, className, ...props }, ref) => {
   return (
     <div
+      ref={ref}
       className={cn(
         "text-center px-6 py-[52px] border-[1.5px] border-dashed border-border-strong rounded-xl",
         className
@@ -29,4 +31,5 @@ export function EmptyState({ icon, title, description, action, className, ...pro
       {action}
     </div>
   );
-}
+});
+EmptyState.displayName = "EmptyState";

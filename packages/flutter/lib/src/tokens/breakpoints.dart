@@ -4,19 +4,21 @@ import 'aeros_viewport_scope.dart';
 
 /// Named viewport breakpoints for the Aeros DS.
 ///
-/// `xs` is phone, `sm` is tablet portrait, `md` is the desktop sidebar
-/// threshold (matches `AerosWebShell.desktopBreakpoint = 900`), `lg` is
-/// the standard laptop, `xl` is wide monitors.
-enum AerosBreakpoint { xs, sm, md, lg, xl }
+/// 2.0: unified with the web token scale (640/768/1024/1280/1536) so
+/// "tablet" and "desktop" mean the same widths on every platform. The old
+/// Material-style values (600/900/1200/1600) are gone — app shells that keyed
+/// a desktop switch off `md = 900` now switch at 768.
+enum AerosBreakpoint { xs, sm, md, lg, xl, xxl }
 
 class AerosBreakpoints {
   AerosBreakpoints._();
 
   static const double xs = 0;
-  static const double sm = 600;
-  static const double md = 900;
-  static const double lg = 1200;
-  static const double xl = 1600;
+  static const double sm = 640;
+  static const double md = 768;
+  static const double lg = 1024;
+  static const double xl = 1280;
+  static const double xxl = 1536;
 
   /// Resolves the current breakpoint.
   ///
@@ -36,6 +38,7 @@ class AerosBreakpoints {
   }
 
   static AerosBreakpoint forWidth(double width) {
+    if (width >= xxl) return AerosBreakpoint.xxl;
     if (width >= xl) return AerosBreakpoint.xl;
     if (width >= lg) return AerosBreakpoint.lg;
     if (width >= md) return AerosBreakpoint.md;

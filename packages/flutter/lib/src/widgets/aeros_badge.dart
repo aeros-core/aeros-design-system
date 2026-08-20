@@ -3,32 +3,32 @@ import '../theme/aeros_theme_extension.dart';
 import '../tokens/colors.dart';
 import '../tokens/typography.dart';
 
-enum AerosBadgeTone { green, amber, red, blue, grey, dark }
+/// 2.0: tones renamed to intent (was green/amber/red/blue/grey/dark).
+enum AerosBadgeTone { success, warning, danger, info, neutral, inverse }
 
 class AerosBadge extends StatelessWidget {
-  const AerosBadge({super.key, required this.label, this.tone = AerosBadgeTone.grey, this.showDot = true});
+  const AerosBadge({super.key, required this.label, this.tone = AerosBadgeTone.neutral, this.showDot = true});
 
   final String label;
   final AerosBadgeTone tone;
   final bool showDot;
 
-  /// Semantic tones (green/amber/red) stay fixed across themes — a status is a
-  /// status. Neutral tones (blue/grey/dark) resolve from the theme so they read
-  /// correctly on both light and dark surfaces.
-  ({Color bg, Color fg, Color dot}) _palette(AerosAliasColors a) {
+  /// Every tone resolves from the theme — status tints have true dark
+  /// counterparts via [AerosSemanticColors].
+  ({Color bg, Color fg, Color dot}) _palette(AerosAliasColors a, AerosSemanticColors s) {
     switch (tone) {
-      case AerosBadgeTone.green: return (bg: AerosColors.successBg, fg: AerosColors.successText, dot: AerosColors.success);
-      case AerosBadgeTone.amber: return (bg: AerosColors.warningBg, fg: AerosColors.warningText, dot: AerosColors.warning);
-      case AerosBadgeTone.red:   return (bg: AerosColors.dangerBg,  fg: AerosColors.dangerText,  dot: AerosColors.danger);
-      case AerosBadgeTone.blue:  return (bg: a.brandPrimaryMuted,   fg: a.fgPrimary,             dot: a.fgSecondary);
-      case AerosBadgeTone.grey:  return (bg: a.bgSubtle,            fg: a.fgSecondary,           dot: a.fgMuted);
-      case AerosBadgeTone.dark:  return (bg: a.brandPrimary,        fg: a.fgInverse,             dot: a.fgInverse);
+      case AerosBadgeTone.success: return (bg: s.successBg, fg: s.successText, dot: s.success);
+      case AerosBadgeTone.warning: return (bg: s.warningBg, fg: s.warningText, dot: s.warning);
+      case AerosBadgeTone.danger:  return (bg: s.dangerBg,  fg: s.dangerText,  dot: s.danger);
+      case AerosBadgeTone.info:    return (bg: a.brandPrimaryMuted, fg: a.fgPrimary, dot: a.fgSecondary);
+      case AerosBadgeTone.neutral: return (bg: a.bgSubtle,  fg: a.fgSecondary, dot: a.fgMuted);
+      case AerosBadgeTone.inverse: return (bg: a.brandPrimary, fg: a.fgInverse, dot: a.fgInverse);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final p = _palette(context.aerosColors);
+    final p = _palette(context.aerosColors, context.aerosSemantic);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(color: p.bg, borderRadius: BorderRadius.circular(999)),

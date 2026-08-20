@@ -91,12 +91,12 @@ class _GalleryState extends State<Gallery> {
 
             _section('Badges & tags'),
             Wrap(spacing: 8, runSpacing: 8, children: const [
-              AerosBadge(label: 'Active', tone: AerosBadgeTone.green),
-              AerosBadge(label: 'Pending', tone: AerosBadgeTone.amber),
-              AerosBadge(label: 'Failed', tone: AerosBadgeTone.red),
-              AerosBadge(label: 'New', tone: AerosBadgeTone.blue),
-              AerosTag(label: 'RFQ-0042', tone: AerosTagTone.blue),
-              AerosTag(label: 'v1.0', tone: AerosTagTone.grey),
+              AerosBadge(label: 'Active', tone: AerosBadgeTone.success),
+              AerosBadge(label: 'Pending', tone: AerosBadgeTone.warning),
+              AerosBadge(label: 'Failed', tone: AerosBadgeTone.danger),
+              AerosBadge(label: 'New', tone: AerosBadgeTone.info),
+              AerosTag(label: 'RFQ-0042', tone: AerosTagTone.info),
+              AerosTag(label: 'v1.0', tone: AerosTagTone.neutral),
             ]),
             const SizedBox(height: 32),
 
@@ -114,7 +114,7 @@ class _GalleryState extends State<Gallery> {
             AerosCard(
               title: "Today's production",
               subtitle: 'Line 3 · updated 3 min ago',
-              trailing: const AerosBadge(label: 'Live', tone: AerosBadgeTone.green),
+              trailing: const AerosBadge(label: 'Live', tone: AerosBadgeTone.success),
               footer: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -128,13 +128,13 @@ class _GalleryState extends State<Gallery> {
 
             _section('Alerts'),
             Column(children: const [
-              AerosAlert(tone: AerosAlertTone.blue, title: 'Heads up', body: 'New RFQ available for review.'),
+              AerosAlert(tone: AerosAlertTone.info, title: 'Heads up', body: 'New RFQ available for review.'),
               SizedBox(height: 8),
-              AerosAlert(tone: AerosAlertTone.green, title: 'Approved', body: 'Order passed QC checks.'),
+              AerosAlert(tone: AerosAlertTone.success, title: 'Approved', body: 'Order passed QC checks.'),
               SizedBox(height: 8),
-              AerosAlert(tone: AerosAlertTone.amber, title: 'Delayed', body: 'Shipment running 2 hours behind.'),
+              AerosAlert(tone: AerosAlertTone.warning, title: 'Delayed', body: 'Shipment running 2 hours behind.'),
               SizedBox(height: 8),
-              AerosAlert(tone: AerosAlertTone.red, title: 'Failed', body: 'Line 4 halted — check sensor 2.'),
+              AerosAlert(tone: AerosAlertTone.danger, title: 'Failed', body: 'Line 4 halted — check sensor 2.'),
             ]),
             const SizedBox(height: 32),
 
@@ -240,11 +240,11 @@ class _GalleryState extends State<Gallery> {
             Row(children: const [
               AerosAvatar(initials: 'PS'),
               SizedBox(width: 12),
-              AerosAvatar(initials: 'RK', tone: AerosAvatarTone.dark),
+              AerosAvatar(initials: 'RK', tone: AerosAvatarTone.inverse),
               SizedBox(width: 12),
-              AerosAvatar(initials: 'MN', tone: AerosAvatarTone.green, size: AerosAvatarSize.lg),
+              AerosAvatar(initials: 'MN', tone: AerosAvatarTone.success, size: AerosAvatarSize.lg),
               SizedBox(width: 12),
-              AerosAvatar(initials: 'AA', tone: AerosAvatarTone.amber, size: AerosAvatarSize.xl),
+              AerosAvatar(initials: 'AA', tone: AerosAvatarTone.warning, size: AerosAvatarSize.xl),
             ]),
             const SizedBox(height: 32),
 
@@ -489,7 +489,7 @@ class _GalleryState extends State<Gallery> {
       padding: const EdgeInsets.only(bottom: 12),
       child: Text(
         label.toUpperCase(),
-        style: AerosTypography.overline(color: AerosColors.slate400),
+        style: AerosTypography.overline(color: AerosColors.ink400),
       ),
     );
   }

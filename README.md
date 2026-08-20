@@ -2,7 +2,7 @@
 
 Single source of truth for Aeros' visual language across **web (Next.js)** and **mobile (Flutter)**.
 
-> Built for operators. Clarity over decoration. Authority through weight. Quiet color with decisive accents.
+> Built for operators. Clarity over decoration. Authority through weight. Black on white — no accent hue.
 
 ## Packages
 
@@ -65,11 +65,12 @@ MaterialApp(
 
 ## Foundations
 
-- **Primary:** Royal Blue `#2347D9`
-- **Type:** Plus Jakarta Sans (UI) + IBM Plex Mono (data)
-- **Radius:** 6 / 8 / 12 / 16 / 20 / full
-- **Spacing:** 4-based scale (4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96)
-- **Themes:** Light + Dark from day one
+- **Color:** Monochrome — ink (warm near-black) on white. Status tints (success/warning/danger/info) are the only color, reserved for state. No brand accent hue.
+- **Type:** Inter (UI) + IBM Plex Mono (data); Nunito Sans (wdth 125) for the wordmark only
+- **Radius:** 0 / 4 / 6 / 8 / 12 / 16 / 20 / 24 / 32 / full
+- **Spacing:** 4-based scale with half-steps (1, 2, 4, 6, 8, 10, 12, 14, 16 … 128)
+- **Breakpoints:** 640 / 768 / 1024 / 1280 / 1536 — the same on web and Flutter
+- **Themes:** Light + Dark from day one (status colors and shadows included)
 
 See [`docs/`](./docs) for the full reference.
 

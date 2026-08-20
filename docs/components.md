@@ -14,12 +14,12 @@ Each component ships in both `@aeros-core/react` and `aeros_design_system` (Flut
 | Radio | `RadioGroup` | `AerosRadio` | |
 | Switch | `Switch` | `AerosSwitch` | |
 | Badge | `Badge` | `AerosBadge` | 6 tones, optional dot |
-| Tag | `Tag` | `AerosTag` | Blue / grey / slate |
+| Tag | `Tag` | `AerosTag` | Info / neutral / inverse |
 | Card | `Card*` | `AerosCard` | Header/Body/Footer composition |
 | StatCard | `StatCard` | `AerosStatCard` | Label + value + delta |
-| Alert | `Alert` | `AerosAlert` | Blue / green / amber / red |
+| Alert | `Alert` | `AerosAlert` | Info / success / warning / danger |
 | Progress | `Progress` | `AerosProgress` | 4 color variants |
-| Avatar | `Avatar`, `AvatarStack` | `AerosAvatar` | 5 sizes, 4 tones |
+| Avatar | `Avatar`, `AvatarStack` | `AerosAvatar` | 5 sizes, 5 variants |
 | Tabs | `Tabs*` | `AerosTabs` | Underline + pill variants |
 | Breadcrumb | `Breadcrumb` | `AerosBreadcrumb` | |
 | Dropdown Menu | `DropdownMenu*` (Radix) | — | Use Flutter `PopupMenuButton` |
@@ -62,7 +62,7 @@ AerosButton.danger(label: 'Delete', onPressed: () {})
 const AerosButton(label: 'Saving…', onPressed: null, loading: true)
 ```
 
-Variants: `primary | secondary | ghost | danger | dark | link`
+Variants: `primary | secondary | ghost | danger | link`
 Sizes: `xs | sm | md | lg | xl`
 
 ## Input / Text field
@@ -88,7 +88,7 @@ AerosTextField(label: 'Email', hint: 'you@example.com', required: true, helperTe
       <CardTitle>Today's production</CardTitle>
       <CardSubtitle>Line 3 · updated 3 min ago</CardSubtitle>
     </div>
-    <Badge variant="green" dot>Live</Badge>
+    <Badge variant="success" dot>Live</Badge>
   </CardHeader>
   <CardBody>…</CardBody>
   <CardFooter>
@@ -102,7 +102,7 @@ AerosTextField(label: 'Email', hint: 'you@example.com', required: true, helperTe
 AerosCard(
   title: "Today's production",
   subtitle: 'Line 3 · updated 3 min ago',
-  trailing: const AerosBadge(label: 'Live', tone: AerosBadgeTone.green),
+  trailing: const AerosBadge(label: 'Live', tone: AerosBadgeTone.success),
   footer: Row(/* … */),
   child: AerosProgress(label: 'Output', value: 0.64),
 )
@@ -122,21 +122,21 @@ const AerosStatCard(label: 'RFQ value', value: '₹1,24,000', mono: true, delta:
 
 | Tone | React prop | Flutter |
 |---|---|---|
-| Success | `variant="green"` | `AerosBadgeTone.green` |
-| Warning | `variant="amber"` | `AerosBadgeTone.amber` |
-| Danger  | `variant="red"`   | `AerosBadgeTone.red`   |
-| Info    | `variant="blue"`  | `AerosBadgeTone.blue`  |
-| Neutral | `variant="grey"`  | `AerosBadgeTone.grey`  |
-| Dark    | `variant="dark"`  | `AerosBadgeTone.dark`  |
+| Success | `variant="success"` | `AerosBadgeTone.success` |
+| Warning | `variant="warning"` | `AerosBadgeTone.warning` |
+| Danger  | `variant="danger"` | `AerosBadgeTone.danger` |
+| Info    | `variant="info"` | `AerosBadgeTone.info` |
+| Neutral | `variant="neutral"` | `AerosBadgeTone.neutral` |
+| Inverse | `variant="inverse"` | `AerosBadgeTone.inverse` |
 
 ```tsx
-<Badge variant="green" dot>Active</Badge>
+<Badge variant="success" dot>Active</Badge>
 ```
 
 ## Alert
 
 ```tsx
-<Alert variant="amber" title="Delayed">Shipment running 2 hours behind.</Alert>
+<Alert variant="warning" title="Delayed">Shipment running 2 hours behind.</Alert>
 ```
 
 ## Tabs

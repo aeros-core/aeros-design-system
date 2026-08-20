@@ -20,6 +20,7 @@ class AerosResponsiveValue<T> {
     this.md,
     this.lg,
     this.xl,
+    this.xxl,
   });
 
   /// Same value at every breakpoint.
@@ -28,18 +29,22 @@ class AerosResponsiveValue<T> {
         sm = value,
         md = value,
         lg = value,
-        xl = value;
+        xl = value,
+        xxl = value;
 
   final T xs;
   final T? sm;
   final T? md;
   final T? lg;
   final T? xl;
+  final T? xxl;
 
   T resolve(BuildContext context) => resolveFor(AerosBreakpoints.of(context));
 
   T resolveFor(AerosBreakpoint bp) {
     switch (bp) {
+      case AerosBreakpoint.xxl:
+        return xxl ?? xl ?? lg ?? md ?? sm ?? xs;
       case AerosBreakpoint.xl:
         return xl ?? lg ?? md ?? sm ?? xs;
       case AerosBreakpoint.lg:

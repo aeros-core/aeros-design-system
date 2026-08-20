@@ -31,17 +31,19 @@ class _ClampedMediaQuery extends StatelessWidget {
 
 void main() {
   group('AerosBreakpoints.forWidth', () {
-    test('classifies viewport widths', () {
+    test('classifies viewport widths (unified web scale)', () {
       expect(AerosBreakpoints.forWidth(320), AerosBreakpoint.xs);
-      expect(AerosBreakpoints.forWidth(599), AerosBreakpoint.xs);
-      expect(AerosBreakpoints.forWidth(600), AerosBreakpoint.sm);
-      expect(AerosBreakpoints.forWidth(899), AerosBreakpoint.sm);
-      expect(AerosBreakpoints.forWidth(900), AerosBreakpoint.md);
-      expect(AerosBreakpoints.forWidth(1199), AerosBreakpoint.md);
-      expect(AerosBreakpoints.forWidth(1200), AerosBreakpoint.lg);
-      expect(AerosBreakpoints.forWidth(1599), AerosBreakpoint.lg);
-      expect(AerosBreakpoints.forWidth(1600), AerosBreakpoint.xl);
-      expect(AerosBreakpoints.forWidth(2560), AerosBreakpoint.xl);
+      expect(AerosBreakpoints.forWidth(639), AerosBreakpoint.xs);
+      expect(AerosBreakpoints.forWidth(640), AerosBreakpoint.sm);
+      expect(AerosBreakpoints.forWidth(767), AerosBreakpoint.sm);
+      expect(AerosBreakpoints.forWidth(768), AerosBreakpoint.md);
+      expect(AerosBreakpoints.forWidth(1023), AerosBreakpoint.md);
+      expect(AerosBreakpoints.forWidth(1024), AerosBreakpoint.lg);
+      expect(AerosBreakpoints.forWidth(1279), AerosBreakpoint.lg);
+      expect(AerosBreakpoints.forWidth(1280), AerosBreakpoint.xl);
+      expect(AerosBreakpoints.forWidth(1535), AerosBreakpoint.xl);
+      expect(AerosBreakpoints.forWidth(1536), AerosBreakpoint.xxl);
+      expect(AerosBreakpoints.forWidth(2560), AerosBreakpoint.xxl);
     });
   });
 
@@ -53,6 +55,7 @@ void main() {
       expect(v.resolveFor(AerosBreakpoint.md), 4);
       expect(v.resolveFor(AerosBreakpoint.lg), 4);
       expect(v.resolveFor(AerosBreakpoint.xl), 4);
+      expect(v.resolveFor(AerosBreakpoint.xxl), 4);
     });
 
     test('AerosResponsiveValue.all uses one value everywhere', () {
@@ -120,7 +123,7 @@ void main() {
           ),
         ),
       );
-      expect(observed, AerosBreakpoint.lg);
+      expect(observed, AerosBreakpoint.xl);
     });
 
     testWidgets('falls back to MediaQuery when no scope is present',
@@ -135,7 +138,7 @@ void main() {
           home: _BreakpointProbe(onResolve: (bp) => observed = bp),
         ),
       );
-      expect(observed, AerosBreakpoint.sm);
+      expect(observed, AerosBreakpoint.md);
     });
   });
 
@@ -158,7 +161,7 @@ void main() {
     }
 
     testWidgets('stacks below md', (tester) async {
-      await pumpAt(tester, 800);
+      await pumpAt(tester, 700);
       expect(find.byType(Row), findsNothing);
       expect(find.byType(Column), findsOneWidget);
     });

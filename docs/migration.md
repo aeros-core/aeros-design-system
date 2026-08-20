@@ -1,3 +1,45 @@
+# Migration
+
+## 1.x → 2.0.0 (2026-08 audit release)
+
+One coordinated major across `@aeros-core/tokens`, `@aeros-core/react`, and `aeros_design_system` (Flutter). Versions are lockstep from 2.0.0 on.
+
+### Variant renames (both platforms)
+
+Color-word variants renamed to intent — the old names advertised colors the monochrome system doesn't have (`blue` rendered grey):
+
+| Component | Old | New |
+|---|---|---|
+| Badge / AerosBadge | `green` / `amber` / `red` / `blue` / `grey` / `dark` | `success` / `warning` / `danger` / `info` / `neutral` / `inverse` |
+| Alert / AerosAlert | `blue` / `green` / `amber` / `red` | `info` / `success` / `warning` / `danger` |
+| Tag / AerosTag | `blue` / `grey` / `dark` | `info` / `neutral` / `inverse` |
+| Avatar | `tone="ink|dark|royal|green|amber"` | `variant="neutral|inverse|info|success|warning"` |
+| Progress | `color="royal|success|warning|danger"` | `variant="brand|success|warning|danger"` |
+| Button | `variant="dark"` | removed — use `primary` (they were identical) |
+
+### Tokens
+
+- `royal-*` and `slate-*` ramps deleted — use `ink-*` (they were byte-identical copies).
+- `accent` / `accent-muted` aliases removed (nothing consumed them).
+- `warning` base is `#CC6D04` (was `#D97706`, which failed WCAG 3:1 on the warning chip).
+- Status colors and shadows now flip in dark mode (`semanticDark` / `shadowDark`); if you hardcoded light status hexes, switch to the `success-*` / `warning-*` / … classes (web) or `context.aerosSemantic` (Flutter).
+- Breakpoints unified to 640/768/1024/1280/1536 on both platforms. Flutter's old 600/900/1200/1600 scale is gone; `AerosBreakpoint.xxl` added, and desktop switches keyed off `md = 900` now fire at 768.
+
+### Web behavior changes
+
+- `Field` now auto-generates ids and wires `aria-describedby` / `aria-invalid` — remove manual `htmlFor`/`id` pairs unless you need a specific id.
+- `Alert` defaults to `role="status"`; pass `role="alert"` explicitly if you need assertive announcement outside the `danger` variant.
+- `SidebarItem` / `TopNavLink` render a `<button>` when no `href` is given, and accept `asChild` for framework `<Link>`s.
+- Form controls (`Input`, `Textarea`, `SelectTrigger`) accept `size="sm|md|lg"`; disabled opacity unified at 40%.
+
+### Flutter behavior changes
+
+- `AerosTypography` role styles inherit the ambient color unless `color:` is passed (no more hardcoded light defaults).
+- `AerosCheckbox` / `AerosRadio` / `AerosSwitch` default to padded 48dp touch targets; pass `compact: true` for the old dense layout.
+- `AerosSeverityPalette.of(severity, isDark: context.aeros.isDark)` for dark-correct severity chips.
+
+---
+
 # Migration — from `index.html` to the packages
 
 The original `index.html` v2 kit is preserved as a visual reference. Here's how its pieces map to the new packages.

@@ -19,10 +19,18 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build:tokens
       - run: pnpm build:react
+      # The published bundle must keep the "use client" directive, or every
+      # Radix-based component crashes in Next.js App Router server components.
+      - name: Assert "use client" survives bundling
+        run: |
+          head -c 200 packages/react/dist/index.js | grep -q '"use client"' \
+            || { echo '"use client" directive missing from dist/index.js'; exit 1; }
       - run: pnpm check:contrast
+      - run: pnpm check:hardcoded
+      - run: pnpm check:flutter-drift
 
   flutter:
-    name: Analyze (flutter)
+    name: Analyze + test (flutter)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,3 +41,5 @@ jobs:
         run: flutter pub get
       - working-directory: packages/flutter
         run: dart analyze lib
+      - working-directory: packages/flutter
+        run: flutter test

@@ -38,31 +38,8 @@ function buildHexPoints(rings: number, gap: number): HexPoint[] {
 
 const STEP_MS = 120;
 
-const keyframesCss = `
-@keyframes aeros-dotmatrix-ripple {
-  0%, 100% { transform: scale(0.6); opacity: 0.55; }
-  50%      { transform: scale(1.2); opacity: 1; }
-}
-.aeros-dotmatrix circle {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation-name: aeros-dotmatrix-ripple;
-  animation-duration: var(--aeros-dotmatrix-dur);
-  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
-  animation-iteration-count: infinite;
-  will-change: transform, opacity;
-}
-.aeros-dotmatrix[data-variant="pulse"] circle {
-  animation-delay: 0ms !important;
-}
-@media (prefers-reduced-motion: reduce) {
-  .aeros-dotmatrix circle {
-    animation: none !important;
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-`;
+// Keyframes + circle rules live in styles.css (.aeros-dotmatrix) so N instances
+// don't each inject an identical <style> tag.
 
 export const DotMatrix = React.forwardRef<HTMLDivElement, DotMatrixProps>(
   (
@@ -106,7 +83,6 @@ export const DotMatrix = React.forwardRef<HTMLDivElement, DotMatrixProps>(
         }}
         {...props}
       >
-        <style>{keyframesCss}</style>
         <svg
           viewBox={viewBox}
           width="100%"

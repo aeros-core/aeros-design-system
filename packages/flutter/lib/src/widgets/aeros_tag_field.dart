@@ -138,7 +138,7 @@ class _AerosTagFieldState extends State<AerosTagField> {
               for (final t in widget.tags)
                 AerosTag(
                   label: '${widget.prefixSymbol}$t',
-                  tone: AerosTagTone.grey,
+                  tone: AerosTagTone.neutral,
                   pill: true,
                   onRemove: widget.enabled ? () => _remove(t) : null,
                 ),

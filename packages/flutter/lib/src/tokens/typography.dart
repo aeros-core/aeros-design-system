@@ -20,9 +20,9 @@ class AerosTypography {
   static const String _family = 'Inter';
   static const String _package = 'aeros_design_system';
 
-  static const Color _fg = Color(0xFF1A1916);
-  static const Color _fgSecondary = Color(0xFF57554F);
-  static const Color _fgMuted = Color(0xFF6E6C66);
+  // NOTE: role styles inherit the ambient text color (DefaultTextStyle / theme)
+  // unless `color:` is passed. Hardcoded light-mode defaults made bare calls
+  // render near-black on near-black in dark themes — never reintroduce them.
 
   /// [opsz] picks Inter's optical size: 14 (text) for body/labels, 32 (display)
   /// for sizes >= 28px.
@@ -31,7 +31,7 @@ class AerosTypography {
     required FontWeight weight,
     double height = 1.5,
     double letterSpacing = 0,
-    Color color = _fg,
+    Color? color,
     double opsz = 14,
   }) =>
       TextStyle(
@@ -53,7 +53,7 @@ class AerosTypography {
     required FontWeight weight,
     double height = 1.5,
     double letterSpacing = 0,
-    Color color = _fg,
+    Color? color,
   }) =>
       GoogleFonts.ibmPlexMono(
         fontSize: size,
@@ -64,35 +64,35 @@ class AerosTypography {
       );
 
   // ─── Display (optical cut) ───
-  static TextStyle displayXl({Color? color}) => _sans(size: 56, weight: FontWeight.w800, height: 1.0, letterSpacing: -1.68, opsz: 32, color: color ?? _fg);
-  static TextStyle displayLg({Color? color}) => _sans(size: 42, weight: FontWeight.w800, height: 1.02, letterSpacing: -1.26, opsz: 32, color: color ?? _fg);
-  static TextStyle displayMd({Color? color}) => _sans(size: 32, weight: FontWeight.w700, height: 1.05, letterSpacing: -0.80, opsz: 32, color: color ?? _fg);
+  static TextStyle displayXl({Color? color}) => _sans(size: 56, weight: FontWeight.w800, height: 1.0, letterSpacing: -1.68, opsz: 32, color: color);
+  static TextStyle displayLg({Color? color}) => _sans(size: 42, weight: FontWeight.w800, height: 1.0, letterSpacing: -1.26, opsz: 32, color: color);
+  static TextStyle displayMd({Color? color}) => _sans(size: 32, weight: FontWeight.w700, height: 1.05, letterSpacing: -0.80, opsz: 32, color: color);
 
   // ─── Headings ───
-  static TextStyle h1({Color? color}) => _sans(size: 28, weight: FontWeight.w700, height: 1.12, letterSpacing: -0.62, opsz: 32, color: color ?? _fg);
-  static TextStyle h2({Color? color}) => _sans(size: 22, weight: FontWeight.w700, height: 1.18, letterSpacing: -0.40, color: color ?? _fg);
-  static TextStyle h3({Color? color}) => _sans(size: 20, weight: FontWeight.w700, height: 1.25, letterSpacing: -0.30, color: color ?? _fg);
-  static TextStyle h4({Color? color}) => _sans(size: 16, weight: FontWeight.w600, height: 1.35, letterSpacing: -0.16, color: color ?? _fg);
-  static TextStyle titleLg({Color? color}) => _sans(size: 18, weight: FontWeight.w600, height: 1.35, letterSpacing: -0.18, color: color ?? _fg);
+  static TextStyle h1({Color? color}) => _sans(size: 28, weight: FontWeight.w700, height: 1.1, letterSpacing: -0.62, opsz: 32, color: color);
+  static TextStyle h2({Color? color}) => _sans(size: 22, weight: FontWeight.w700, height: 1.15, letterSpacing: -0.40, color: color);
+  static TextStyle h3({Color? color}) => _sans(size: 20, weight: FontWeight.w700, height: 1.2, letterSpacing: -0.30, color: color);
+  static TextStyle h4({Color? color}) => _sans(size: 16, weight: FontWeight.w600, height: 1.3, letterSpacing: -0.16, color: color);
+  static TextStyle titleLg({Color? color}) => _sans(size: 18, weight: FontWeight.w600, height: 1.35, letterSpacing: -0.18, color: color);
 
   // ─── Body ───
-  static TextStyle bodyLg({Color? color}) => _sans(size: 16, weight: FontWeight.w400, height: 1.5, color: color ?? _fg);
-  static TextStyle bodyMd({Color? color}) => _sans(size: 14, weight: FontWeight.w400, height: 1.55, color: color ?? _fg);
-  static TextStyle bodySm({Color? color}) => _sans(size: 13, weight: FontWeight.w400, height: 1.5, letterSpacing: 0.01, color: color ?? _fg);
+  static TextStyle bodyLg({Color? color}) => _sans(size: 16, weight: FontWeight.w400, height: 1.5, color: color);
+  static TextStyle bodyMd({Color? color}) => _sans(size: 14, weight: FontWeight.w400, height: 1.55, color: color);
+  static TextStyle bodySm({Color? color}) => _sans(size: 13, weight: FontWeight.w400, height: 1.55, letterSpacing: 0.01, color: color);
 
   // ─── Labels / UI controls (w600 — sturdy, never thin) ───
-  static TextStyle labelMd({Color? color}) => _sans(size: 14, weight: FontWeight.w600, height: 1.4, color: color ?? _fg);
-  static TextStyle labelSm({Color? color}) => _sans(size: 13, weight: FontWeight.w600, height: 1.35, letterSpacing: 0.01, color: color ?? _fg);
-  static TextStyle labelXs({Color? color}) => _sans(size: 11, weight: FontWeight.w600, height: 1.0, letterSpacing: 0.02, color: color ?? _fg);
-  static TextStyle caption({Color? color}) => _sans(size: 12, weight: FontWeight.w500, height: 1.45, letterSpacing: 0.02, color: color ?? _fgSecondary);
+  static TextStyle labelMd({Color? color}) => _sans(size: 14, weight: FontWeight.w600, height: 1.4, color: color);
+  static TextStyle labelSm({Color? color}) => _sans(size: 13, weight: FontWeight.w600, height: 1.4, letterSpacing: 0.01, color: color);
+  static TextStyle labelXs({Color? color}) => _sans(size: 11, weight: FontWeight.w600, height: 1.0, letterSpacing: 0.02, color: color);
+  static TextStyle caption({Color? color}) => _sans(size: 12, weight: FontWeight.w500, height: 1.5, letterSpacing: 0.02, color: color);
   static TextStyle overline({Color? color}) =>
-      _sans(size: 11, weight: FontWeight.w700, height: 1.3, letterSpacing: 0.55, color: color ?? _fgMuted);
+      _sans(size: 11, weight: FontWeight.w700, height: 1.3, letterSpacing: 0.55, color: color);
 
   // ─── Mono (data stays crisp) ───
-  static TextStyle monoLg({Color? color}) => _mono(size: 22, weight: FontWeight.w500, height: 1.2, letterSpacing: -0.22, color: color ?? _fg);
-  static TextStyle monoMd({Color? color}) => _mono(size: 14, weight: FontWeight.w500, height: 1.5, color: color ?? const Color(0xFF272622));
-  static TextStyle monoSm({Color? color}) => _mono(size: 12, weight: FontWeight.w500, height: 1.5, color: color ?? const Color(0xFF7C7A74));
-  static TextStyle monoXs({Color? color}) => _mono(size: 11, weight: FontWeight.w500, height: 1.5, color: color ?? const Color(0xFF7C7A74));
+  static TextStyle monoLg({Color? color}) => _mono(size: 22, weight: FontWeight.w500, height: 1.2, letterSpacing: -0.22, color: color);
+  static TextStyle monoMd({Color? color}) => _mono(size: 14, weight: FontWeight.w500, height: 1.5, color: color);
+  static TextStyle monoSm({Color? color}) => _mono(size: 12, weight: FontWeight.w400, height: 1.5, color: color);
+  static TextStyle monoXs({Color? color}) => _mono(size: 11, weight: FontWeight.w400, height: 1.5, color: color);
 
   /// Full Material TextTheme from Aeros scale.
   static TextTheme textTheme({required Color fg, required Color fgMuted}) {

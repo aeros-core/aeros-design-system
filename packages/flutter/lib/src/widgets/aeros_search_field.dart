@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../theme/aeros_theme_extension.dart';
 import '../tokens/motion.dart';
 import '../tokens/radii.dart';
@@ -75,13 +76,16 @@ class _AerosSearchFieldState extends State<AerosSearchField> {
   void didUpdateWidget(covariant AerosSearchField old) {
     super.didUpdateWidget(old);
     if (old.controller != widget.controller) {
-      old.controller?.removeListener(_onText);
+      // The previously-active controller may be the internal one (null → non-null
+      // swap) — detach from whichever actually held the listener.
+      (old.controller ?? _internalController)?.removeListener(_onText);
       _controller.addListener(_onText);
       _onText();
     }
     if (old.focusNode != widget.focusNode) {
-      old.focusNode?.removeListener(_onFocus);
+      (old.focusNode ?? _internalFocus)?.removeListener(_onFocus);
       _focus.addListener(_onFocus);
+      _onFocus();
     }
   }
 
@@ -135,23 +139,31 @@ class _AerosSearchFieldState extends State<AerosSearchField> {
           Icon(Icons.search, size: s.iconSize, color: a.fgMuted),
           const SizedBox(width: AerosSpacing.s2),
           Expanded(
-            child: TextField(
-              controller: _controller,
-              focusNode: _focus,
-              enabled: widget.enabled,
-              autofocus: widget.autofocus,
-              autocorrect: widget.autocorrect,
-              enableSuggestions: widget.enableSuggestions,
-              textInputAction: widget.textInputAction,
-              onChanged: widget.onChanged,
-              onSubmitted: widget.onSubmitted,
-              style: s.valueStyle(color: a.fgPrimary),
-              decoration: InputDecoration(
-                isCollapsed: true,
-                border: InputBorder.none,
-                hintText: widget.hint,
-                hintStyle: s.valueStyle(color: a.fgMuted),
-                hintMaxLines: 1,
+            child: CallbackShortcuts(
+              // Escape clears the query — expected desktop-search behavior.
+              bindings: {
+                const SingleActivator(LogicalKeyboardKey.escape): () {
+                  if (_hasText) _clear();
+                },
+              },
+              child: TextField(
+                controller: _controller,
+                focusNode: _focus,
+                enabled: widget.enabled,
+                autofocus: widget.autofocus,
+                autocorrect: widget.autocorrect,
+                enableSuggestions: widget.enableSuggestions,
+                textInputAction: widget.textInputAction,
+                onChanged: widget.onChanged,
+                onSubmitted: widget.onSubmitted,
+                style: s.valueStyle(color: a.fgPrimary),
+                decoration: InputDecoration(
+                  isCollapsed: true,
+                  border: InputBorder.none,
+                  hintText: widget.hint,
+                  hintStyle: s.valueStyle(color: a.fgMuted),
+                  hintMaxLines: 1,
+                ),
               ),
             ),
           ),
@@ -159,14 +171,25 @@ class _AerosSearchFieldState extends State<AerosSearchField> {
             duration: AerosMotion.fast,
             transitionBuilder: (child, anim) =>
                 FadeTransition(opacity: anim, child: ScaleTransition(scale: anim, child: child)),
+            // Labeled button semantics + a full-height, ≥36dp-wide hit target
+            // (the bare 18dp glyph was unlabeled and sub-target before).
             child: _hasText
-                ? GestureDetector(
+                ? Semantics(
                     key: const ValueKey('clear'),
-                    behavior: HitTestBehavior.opaque,
-                    onTap: _clear,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: AerosSpacing.s2),
-                      child: Icon(Icons.close, size: s.iconSize, color: a.fgMuted),
+                    button: true,
+                    label: 'Clear search',
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _clear,
+                      child: SizedBox(
+                        width: 36,
+                        height: double.infinity,
+                        child: Center(
+                          child: ExcludeSemantics(
+                            child: Icon(Icons.close, size: s.iconSize, color: a.fgMuted),
+                          ),
+                        ),
+                      ),
                     ),
                   )
                 : const SizedBox.shrink(key: ValueKey('empty')),
