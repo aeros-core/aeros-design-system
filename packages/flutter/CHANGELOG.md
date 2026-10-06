@@ -1,5 +1,17 @@
 # aeros_design_system
 
+## 2.2.0 — 2026-10-06 (sidebar spec)
+
+### Added
+
+- `TextStyle.withWeight(FontWeight)` (`AerosTextStyleWeight`). Inter is a variable font and every Aeros sans style pins its `wght` axis, which is what the glyphs follow — so `style.copyWith(fontWeight: FontWeight.w600)` rendered at the style's original weight (measured: identical advance widths). `withWeight` moves the axis too and keeps `opsz`. Audit consumer `copyWith(fontWeight:)` calls on Aeros styles: none of them have been changing anything.
+- `AerosSidenav`: `AerosNavItem.section` (sentence-case group labels, drawn where the section changes), `AerosNavItem.count` (a pill, announced with the label), `AerosNavItem.key`, and `density: AerosSidenavDensity.pointer | touch` (32px rows / 16px icons / 13px labels, or 48 / 20 / 14 for fingers and gloves).
+
+### Changed
+
+- `AerosSidenav` follows the shared sidebar spec: rows are 6px-radius pills inset 12px with a 2px gap; rest = `fgSecondary` label + `fgMuted` icon, hover = `borderSubtle` fill, selected = `bgSubtle` fill + `fgPrimary` at w600 (now actually rendered bold), keyboard focus = a `borderFocus` ring. Children align with their parent's label; a parent holding the selection starts open; the expand chevron rotates with `AerosMotion.resolve`. Rows were 34px edge-to-edge with no hover, no selected tint and no focus indication.
+- `AerosNavItem` and `AerosSidenav` now live in `aeros_sidenav.dart` (still exported from the package barrel — no import changes).
+
 ## 2.1.0 — 2026-08-20 (audit P2/P3)
 
 ### Added

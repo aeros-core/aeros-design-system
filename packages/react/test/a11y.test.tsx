@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   Select,
   SidebarItem,
+  SidebarSection,
   Skeleton,
   Spinner,
   Table,
@@ -155,6 +156,19 @@ describe("Navigation items", () => {
     );
     expect(screen.getByRole("button", { name: "Dashboard" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Orders" })).toHaveAttribute("href", "/orders");
+  });
+
+  it("announces a count with its label, and shows none at zero", async () => {
+    const { container } = render(
+      <SidebarSection label="Floor">
+        <SidebarItem href="/inbox" count={3}>Inbox</SidebarItem>
+        <SidebarItem href="/queue" count={0}>Queue</SidebarItem>
+      </SidebarSection>
+    );
+    expect(screen.getByRole("link", { name: /^Inbox\s*,\s*3$/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Queue" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Floor" })).toBeInTheDocument();
+    expect(await axe(container)).toHaveNoViolations();
   });
 });
 
