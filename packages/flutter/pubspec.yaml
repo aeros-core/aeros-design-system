@@ -1,6 +1,6 @@
 name: aeros_design_system
 description: Aeros Design System — theme, tokens and widgets for Flutter apps.
-version: 2.2.0
+version: 2.3.0
 publish_to: none
 
 environment:
