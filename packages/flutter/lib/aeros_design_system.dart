@@ -12,6 +12,7 @@ export 'src/tokens/motion.dart';
 export 'src/tokens/states.dart';
 export 'src/tokens/breakpoints.dart';
 export 'src/tokens/aeros_viewport_scope.dart';
+export 'src/tokens/density.dart';
 
 export 'src/theme/aeros_theme.dart';
 export 'src/theme/aeros_theme_extension.dart';
@@ -19,6 +20,8 @@ export 'src/theme/aeros_theme_extension.dart';
 export 'src/widgets/aeros_button.dart';
 export 'src/widgets/aeros_text_field.dart';
 export 'src/widgets/aeros_badge.dart';
+export 'src/widgets/aeros_count_badge.dart';
+export 'src/widgets/aeros_filter_chip.dart';
 export 'src/widgets/aeros_tag.dart';
 export 'src/widgets/aeros_card.dart';
 export 'src/widgets/aeros_stat_card.dart';

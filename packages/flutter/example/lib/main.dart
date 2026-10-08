@@ -53,6 +53,11 @@ class _GalleryState extends State<Gallery> {
   AerosAttributeValue _artwork = const AerosAttributeValue();
   String? _variantId = 'red';
 
+  // Density gallery state.
+  AerosDensity _density = AerosDensity.pointer;
+  int _filter = 0;
+  String? _stage;
+
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
@@ -97,6 +102,48 @@ class _GalleryState extends State<Gallery> {
               AerosTag(label: 'RFQ-0042', tone: AerosTagTone.blue),
               AerosTag(label: 'v1.0', tone: AerosTagTone.grey),
             ]),
+            const SizedBox(height: 32),
+
+            _section('Density — filter chips & count badges'),
+            AerosDensityScope(
+              density: _density,
+              child: Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                for (final d in AerosDensity.values)
+                  AerosFilterChip(
+                    label: d.name,
+                    selected: _density == d,
+                    onTap: () => setState(() => _density = d),
+                  ),
+                const SizedBox(width: 12),
+                for (final (i, label) in const ['All', 'Mine', 'Unassigned'].indexed)
+                  AerosFilterChip(
+                    label: label,
+                    count: i == 0 ? null : 6 - i * 2,
+                    countIsFloor: true,
+                    selected: _filter == i,
+                    onTap: () => setState(() => _filter = i),
+                  ),
+                AerosFilterChip(
+                  label: 'Needs attention',
+                  leadingIcon: Icons.flag_rounded,
+                  tone: AerosFilterChipTone.warning,
+                  count: 2,
+                  onTap: () {},
+                ),
+                AerosFilterChip(
+                  label: _stage == null ? 'Stage' : 'Stage: $_stage',
+                  dropdown: true,
+                  selected: _stage != null,
+                  onTap: () => setState(() => _stage = 'Quote sent'),
+                  onClear: () => setState(() => _stage = null),
+                ),
+                const SizedBox(width: 12),
+                const AerosCountBadge(count: 3),
+                const AerosCountBadge(count: 6, floor: true),
+                const AerosCountBadge(count: 120),
+                const AerosCountBadge(count: 4, muted: true),
+              ]),
+            ),
             const SizedBox(height: 32),
 
             _section('Stat cards'),

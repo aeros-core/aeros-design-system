@@ -14,6 +14,8 @@ Each component ships in both `@aeros-core/react` and `aeros_design_system` (Flut
 | Radio | `RadioGroup` | `AerosRadio` | |
 | Switch | `Switch` | `AerosSwitch` | |
 | Badge | `Badge` | `AerosBadge` | 6 tones, optional dot |
+| Count badge | — | `AerosCountBadge` | Unread / pending count; `99+` cap, `N+` floor, muted grey |
+| Filter chip | — | `AerosFilterChip` | One filter in a chip row: count, leading icon, dropdown caret, clear ✕, warning tone |
 | Tag | `Tag` | `AerosTag` | Blue / grey / slate |
 | Card | `Card*` | `AerosCard` | Header/Body/Footer composition |
 | StatCard | `StatCard` | `AerosStatCard` | Label + value + delta |
@@ -132,6 +134,47 @@ const AerosStatCard(label: 'RFQ value', value: '₹1,24,000', mono: true, delta:
 ```tsx
 <Badge variant="green" dot>Active</Badge>
 ```
+
+## Density
+
+`AerosDensity` sizes a surface by the pointer that will use it. **`pointer` on desktop web, `touch` on phones and tablets.** Wrap the surface in an `AerosDensityScope`; widgets and screens read it with `AerosDensity.of(context)`. With no scope it resolves to `touch`, so nothing changes until a screen opts in.
+
+| Metric | `pointer` | `touch` |
+|---|---|---|
+| `controlHeight` (chips, inline filters) | 28 | 32 (44 tap target) |
+| `headerHeight` (app bars, pane headers) | 48 | 56 |
+| `rowPadding` (list rows) | 12 × 10 | 16 × 10 |
+| `listAvatar` / `inlineAvatar` | 40 / 26 | 48 / 30 |
+| `iconButton` / `iconSize` | 32 / 18 | 44 / 22 |
+| `badgeHeight` | 18 | 20 |
+| `titleStyle` | 14 / 1.3 w600 | 16 / 1.25 w600 |
+| `bodyStyle` | 14 / 1.4 | 14 / 1.45 |
+| `secondaryStyle` | 13 / 1.35 | 13 / 1.35 |
+| `metaStyle` | 12 / 1.25 | 12 / 1.3 |
+| `labelStyle` | 12 w600 | 13 w600 |
+| `microStyle` | 11 / 1.2 | 11 / 1.2 |
+
+`touch` keeps the phone's type sizes; it only tightens line heights. The ramp's styles take a `weight:` and move Inter's `wght` axis with it — never re-weight an Aeros style with `copyWith(fontWeight:)`, which does not change the glyphs (use `withWeight`).
+
+The reference for `pointer` is WhatsApp Desktop and Apple Mail: two-line list rows, timestamps inside the message, one filter row, one slim status strip. Information density is a feature (principle 1).
+
+## Count badge
+
+```dart
+AerosCountBadge(count: row.unread, muted: row.muted, semanticsLabel: '${row.unread} unread')
+```
+
+A filled pill, never narrower than tall. `floor: true` renders `6+` when the number is a lower bound.
+
+## Filter chip
+
+```dart
+AerosFilterChip(label: 'Mine', count: 6, countIsFloor: true, selected: lens == Lens.mine, onTap: …)
+AerosFilterChip(label: 'Needs attention', leadingIcon: Icons.flag_rounded, tone: AerosFilterChipTone.warning, …)
+AerosFilterChip(label: stage == null ? 'Stage' : 'Stage: ${stage.name}', dropdown: true, selected: stage != null, onTap: openMenu, onClear: clear)
+```
+
+Lay chips out in one horizontally scrolling row. A dropdown chip that is set shows a ✕ that clears it without reopening the menu.
 
 ## Alert
 
