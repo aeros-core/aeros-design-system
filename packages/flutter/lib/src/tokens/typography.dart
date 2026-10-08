@@ -114,3 +114,21 @@ class AerosTypography {
     );
   }
 }
+
+/// Re-weights an Aeros text style so the glyphs actually change.
+///
+/// Inter is bundled as a variable font and every Aeros sans style pins its `wght` axis — which is
+/// what the renderer follows. `style.copyWith(fontWeight: FontWeight.w600)` therefore renders at the
+/// style's original weight (measured: identical advance widths for w400 and a copyWith'd w600).
+/// Use `AerosTypography.bodySm().withWeight(FontWeight.w600)` instead; it moves the axis with it and
+/// keeps every other variation (the `opsz` optical cut).
+extension AerosTextStyleWeight on TextStyle {
+  TextStyle withWeight(FontWeight weight) => copyWith(
+        fontWeight: weight,
+        fontVariations: [
+          for (final v in fontVariations ?? const <FontVariation>[])
+            if (v.axis != 'wght') v,
+          FontVariation('wght', weight.value.toDouble()),
+        ],
+      );
+}
