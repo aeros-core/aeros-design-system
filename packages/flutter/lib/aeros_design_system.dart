@@ -42,6 +42,7 @@ export 'src/widgets/aeros_page_header.dart';
 export 'src/widgets/aeros_confirm_dialog.dart';
 export 'src/widgets/aeros_data_table.dart';
 export 'src/widgets/aeros_wordmark.dart';
+export 'src/widgets/aeros_thinking_orb.dart';
 
 // Responsive primitives.
 export 'src/widgets/aeros_responsive_value.dart';
