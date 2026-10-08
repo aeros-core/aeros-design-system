@@ -1,5 +1,11 @@
 # aeros_design_system
 
+## 2.2.0 — 2026-10-08
+
+### Added
+
+- `AerosThinkingOrb` — a turning sphere of depth-shaded dots with a wave folding through it, for "the app is working" moments (startup splash, an agent composing a reply). CustomPainter only, no new dependencies; `fgPrimary` dots by default (ink on light, pearl on dark), overridable via `color`; seamless loop; renders one static frame under reduce-motion. Also back-ported as **v1.3.3** (on `release/1.3.x`) for apps still pinned to 1.3.x.
+
 ## 2.1.0 — 2026-08-20 (audit P2/P3)
 
 ### Added

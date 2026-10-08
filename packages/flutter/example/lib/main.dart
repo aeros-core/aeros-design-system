@@ -256,6 +256,19 @@ class _GalleryState extends State<Gallery> {
             ),
             const SizedBox(height: 32),
 
+            _section('Thinking orb'),
+            const Wrap(
+              spacing: 24,
+              runSpacing: 16,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                AerosThinkingOrb(size: 48),
+                AerosThinkingOrb(),
+                AerosThinkingOrb(size: 160),
+              ],
+            ),
+            const SizedBox(height: 32),
+
             _section('Configurable MTO — attribute selectors'),
             AerosCard(
               title: 'Printed paper cups · 12oz',
