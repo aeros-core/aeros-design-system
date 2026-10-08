@@ -28,7 +28,7 @@ Each component ships in both `@aeros-core/react` and `aeros_design_system` (Flut
 | Table | `Table` + helpers | `AerosDataTable` | Sortable `Th` (aria-sort), `selected` rows, loading/empty rows |
 | Empty state | `EmptyState` | `AerosEmptyState` | |
 | TopNav | `TopNav*` | `AerosTopnav` | `asChild`, `aria-current` on web |
-| Sidebar | `Sidebar*` | `AerosSidenav` | 32px rows, 16px icons, 13px labels; sentence-case group labels; `count` pill; Flutter `density: touch` = 48px rows. `asChild`, `aria-current` on web. Web chrome is dark in both themes; Flutter uses `bgSurface` |
+| Sidebar | `Sidebar*` | `AerosSidenav` | 32px rows, 16px icons, 13px labels; sentence-case group labels; `count` pill; Flutter `density: touch` = 48px rows; Flutter `AerosSidenavHeader` (workspace + switcher) / `AerosSidenavFooter` (signed-in person + one action) are the 56px top and bottom blocks. `asChild`, `aria-current` on web. Web chrome is dark in both themes; Flutter uses `bgSurface` |
 | Attribute selector | — | `AerosAttributeSelector` | Picks the right input from `(datatype, optionSource)` — see [configurable-mto.md](./configurable-mto.md) |
 | Enum dropdown | — | `AerosEnumDropdown` | Single-select dropdown over `AerosAttributeOption[]` |
 | Enum chips | — | `AerosEnumChips` | Single-select chip group with optional unit suffix and colour swatches |

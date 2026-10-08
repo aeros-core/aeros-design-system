@@ -6,11 +6,13 @@
 
 - `TextStyle.withWeight(FontWeight)` (`AerosTextStyleWeight`). Inter is a variable font and every Aeros sans style pins its `wght` axis, which is what the glyphs follow — so `style.copyWith(fontWeight: FontWeight.w600)` rendered at the style's original weight (measured: identical advance widths). `withWeight` moves the axis too and keeps `opsz`. Audit consumer `copyWith(fontWeight:)` calls on Aeros styles: none of them have been changing anything.
 - `AerosSidenav`: `AerosNavItem.section` (sentence-case group labels, drawn where the section changes), `AerosNavItem.count` (a pill, announced with the label), `AerosNavItem.key`, and `density: AerosSidenavDensity.pointer | touch` (32px rows / 16px icons / 13px labels, or 48 / 20 / 14 for fingers and gloves).
+- The rail's top and bottom blocks, both `kAerosSidenavBlockHeight` (56px — an app header bar's height, so the first block sits level with the page title): `AerosSidenavHeader` (the workspace — mark, title, subtitle — and, with `onTap`, the way to switch it, signalled by an unfold chevron), `AerosSidenavMark` (the 24px brand-square mark: an icon or a letter), and `AerosSidenavFooter` (the signed-in person — avatar, name, subtitle — under a `borderSubtle` rule, with one icon action such as Sign out). Mark, icons, group labels and avatar all sit on one line 20px in.
 
 ### Changed
 
-- `AerosSidenav` follows the shared sidebar spec: rows are 6px-radius pills inset 12px with a 2px gap; rest = `fgSecondary` label + `fgMuted` icon, hover = `borderSubtle` fill, selected = `bgSubtle` fill + `fgPrimary` at w600 (now actually rendered bold), keyboard focus = a `borderFocus` ring. Children align with their parent's label; a parent holding the selection starts open; the expand chevron rotates with `AerosMotion.resolve`. Rows were 34px edge-to-edge with no hover, no selected tint and no focus indication.
+- `AerosSidenav` follows the shared sidebar spec: rows are 6px-radius pills inset 12px with a 2px gap; rest = `fgSecondary` label + `fgMuted` icon; hover = a fill halfway between `bgSurface` and `bgSubtle`, a step lighter than selection in both themes (no single alias token is: `borderSubtle` is *darker* than `bgSubtle` in light); selected = `bgSubtle` fill + `fgPrimary` at w600 (now actually rendered bold); keyboard focus = a `borderFocus` ring. Children align with their parent's label; a parent holding the selection starts open; the expand chevron rotates with `AerosMotion.resolve`. Rows were 34px edge-to-edge with no hover, no selected tint and no focus indication.
 - `AerosNavItem` and `AerosSidenav` now live in `aeros_sidenav.dart` (still exported from the package barrel — no import changes).
+- Also back-ported as **v1.3.4** (on `release/1.3.x`) for apps still pinned to 1.3.x.
 
 ## 2.2.0 — 2026-10-08
 

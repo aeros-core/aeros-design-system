@@ -1,4 +1,5 @@
 import 'package:aeros_design_system/aeros_design_system.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -7,6 +8,8 @@ void main() {
     WidgetTester tester, {
     AerosSidenavDensity density = AerosSidenavDensity.pointer,
     ThemeData? theme,
+    Widget? header,
+    Widget? footer,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -16,6 +19,8 @@ void main() {
             width: 240,
             child: AerosSidenav(
               density: density,
+              header: header,
+              footer: footer,
               items: [
                 AerosNavItem(
                   key: const ValueKey('nav:orders'),
@@ -55,6 +60,11 @@ void main() {
       .firstWhere((v) => v.axis == 'wght')
       .value;
 
+  Color? fillOf(WidgetTester tester, Finder f) => tester
+      .widgetList<Material>(find.ancestor(of: f, matching: find.byType(Material)))
+      .first
+      .color;
+
   group('AerosSidenav density', () {
     testWidgets('pointer rows are 32px with 16px icons and 13px labels', (tester) async {
       await pumpSidenav(tester);
@@ -81,6 +91,12 @@ void main() {
       expect(find.text('Admin'), findsOneWidget);
       expect(find.text('ADMIN'), findsNothing);
       expect(tester.getTopLeft(find.text('Admin')).dy, lessThan(tester.getTopLeft(find.text('Masters')).dy));
+    });
+
+    testWidgets('icons and group labels share one leading edge, 20px in', (tester) async {
+      await pumpSidenav(tester);
+      expect(tester.getTopLeft(find.byIcon(Icons.receipt_long_outlined)).dx, 20);
+      expect(tester.getTopLeft(find.text('Admin')).dx, 20);
     });
 
     testWidgets('a parent holding the selection starts open; children align with its label', (tester) async {
@@ -111,16 +127,120 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('the selected row fills bgSubtle in both themes', (tester) async {
+    testWidgets('selected fills bgSubtle; hover is a step lighter, in both themes', (tester) async {
       for (final theme in [AerosTheme.light(), AerosTheme.dark()]) {
         await pumpSidenav(tester, theme: theme);
-        final fill = tester
-            .widgetList<Material>(find.ancestor(of: find.text('Industry Master'), matching: find.byType(Material)))
-            .first
-            .color;
-        final ctx = tester.element(find.text('Industry Master'));
-        expect(fill, ctx.aerosColors.bgSubtle);
+        final a = tester.element(find.text('Orders')).aerosColors;
+        expect(fillOf(tester, find.text('Industry Master')), a.bgSubtle);
+
+        final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+        await mouse.addPointer(location: Offset.zero);
+        await mouse.moveTo(tester.getCenter(find.text('Orders')));
+        await tester.pump();
+        final hover = fillOf(tester, find.text('Orders'))!;
+        // Strictly between the rail and the selected fill.
+        final l = hover.computeLuminance();
+        final s = a.bgSurface.computeLuminance(), sel = a.bgSubtle.computeLuminance();
+        expect(l, isNot(s));
+        expect(l, isNot(sel));
+        expect(l, inInclusiveRange(s < sel ? s : sel, s < sel ? sel : s));
+        await mouse.removePointer();
       }
+    });
+  });
+
+  group('AerosSidenav blocks', () {
+    testWidgets('header and footer are 56px; mark and avatar sit on the 20px line', (tester) async {
+      var switched = 0, signedOut = 0;
+      await pumpSidenav(
+        tester,
+        header: AerosSidenavHeader(
+          title: 'Aeros Packaging',
+          subtitle: 'Organisation',
+          onTap: () => switched++,
+        ),
+        footer: AerosSidenavFooter(
+          name: 'Parth Panchal',
+          subtitle: 'Admin',
+          actionIcon: Icons.logout_rounded,
+          actionLabel: 'Sign out',
+          actionKey: const ValueKey('action:sign-out'),
+          onAction: () => signedOut++,
+        ),
+      );
+
+      expect(tester.getSize(find.byType(AerosSidenavHeader)).height, kAerosSidenavBlockHeight);
+      expect(tester.getSize(find.byType(AerosSidenavFooter)).height, kAerosSidenavBlockHeight);
+      // Default mark = the title's first letter.
+      expect(tester.getTopLeft(find.byType(AerosSidenavMark)).dx, 20);
+      expect(find.descendant(of: find.byType(AerosSidenavMark), matching: find.text('A')), findsOneWidget);
+      expect(tester.getCenter(find.text('P')).dx, 20 + 12);
+
+      // A switchable header says so with a chevron.
+      expect(find.byIcon(Icons.unfold_more_rounded), findsOneWidget);
+      await tester.tap(find.text('Aeros Packaging'));
+      await tester.tap(find.byKey(const ValueKey('action:sign-out')));
+      expect(switched, 1);
+      expect(signedOut, 1);
+    });
+
+    testWidgets('a static header draws no chevron; a footer with no action has no button', (tester) async {
+      await pumpSidenav(
+        tester,
+        header: const AerosSidenavHeader(title: 'FactoryOS', mark: AerosSidenavMark(icon: Icons.factory)),
+        footer: const AerosSidenavFooter(name: 'Floor tablet'),
+      );
+      expect(find.byIcon(Icons.unfold_more_rounded), findsNothing);
+      expect(find.byIcon(Icons.factory), findsOneWidget);
+      expect(find.byType(Tooltip), findsNothing);
+    });
+
+    testWidgets('a rail with no Overlay above it still builds (no tooltip)', (tester) async {
+      // Where a web shell puts its rail: in MaterialApp.builder, above the Navigator's Overlay.
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AerosTheme.light(),
+          builder: (context, child) => Row(
+            textDirection: TextDirection.ltr,
+            children: [
+              SizedBox(
+                width: 240,
+                child: Material(
+                  child: AerosSidenav(
+                    items: const [AerosNavItem(label: 'Orders', icon: Icons.receipt_long_outlined)],
+                    footer: AerosSidenavFooter(
+                      name: 'Parth',
+                      actionIcon: Icons.logout_rounded,
+                      actionLabel: 'Sign out',
+                      onAction: () {},
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(child: child!),
+            ],
+          ),
+          home: const SizedBox(),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(find.byIcon(Icons.logout_rounded), findsOneWidget);
+      expect(find.byType(Tooltip), findsNothing);
+    });
+
+    testWidgets('the footer action is announced by its label', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpSidenav(
+        tester,
+        footer: AerosSidenavFooter(
+          name: 'Parth',
+          actionIcon: Icons.logout_rounded,
+          actionLabel: 'Sign out',
+          onAction: () {},
+        ),
+      );
+      expect(find.bySemanticsLabel('Sign out'), findsOneWidget);
+      handle.dispose();
     });
   });
 
