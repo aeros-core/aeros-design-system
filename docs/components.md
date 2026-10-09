@@ -41,7 +41,7 @@ Each component ships in both `@aeros-core/react` and `aeros_design_system` (Flut
 | Price breakdown | — | `AerosPriceBreakdown` | Collapsible breakdown of `BreakdownStep[]` with discountable / non-discountable subtotal split |
 | Routing-signal badge | — | `AerosRoutingSignalBadge` | Pill for `requires_rfq`, `requires_credit_check`, …; severity-driven colour |
 | Constraint error alert | — | `AerosConstraintErrorAlert` | Locale-aware constraint violations from v1 literal or v2 JSONLogic constraints |
-| Wordmark | `aeros-logo` (CSS class) | `AerosWordmark` | Brand mark: Nunito Sans wdth-125, weight 800 |
+| Wordmark | `aeros-logo` (CSS class) | `AerosWordmark` | Brand mark: Nunito Sans wdth-125, weight 500, +0.01em |
 | Label | `Label` | — | Standalone control label (Radix) |
 | Separator | `Separator` | Material `Divider` | |
 | Spinner | `Spinner` | Material `CircularProgressIndicator` | `role="status"` + sr-only label |

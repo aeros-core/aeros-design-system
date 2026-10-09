@@ -7,8 +7,7 @@ Widget _wrap(Widget child, {bool dark = false}) => MaterialApp(
       home: Scaffold(body: child),
     );
 
-TextStyle _styleOf(WidgetTester t) =>
-    t.widget<Text>(find.text('Aeros')).style!;
+TextStyle _styleOf(WidgetTester t) => t.widget<Text>(find.text('Aeros')).style!;
 
 void main() {
   group('AerosWordmark', () {
@@ -17,28 +16,25 @@ void main() {
       expect(find.text('Aeros'), findsOneWidget);
     });
 
-    testWidgets('uses Nunito Sans (Google Fonts variable family)',
-        (t) async {
+    testWidgets('uses the bundled expanded face, not google_fonts', (t) async {
       await t.pumpWidget(_wrap(const AerosWordmark()));
-      // Google Fonts loads variable fonts under a family name that
-      // starts with the family identifier (e.g. "NunitoSans_*").
-      // Asserting the prefix keeps the test robust against the
-      // hashed-suffix changes that Google Fonts can introduce.
-      final family = _styleOf(t).fontFamily ?? '';
-      expect(family, startsWith('NunitoSans'));
-    });
-
-    testWidgets('applies the wdth-125 font variation', (t) async {
-      await t.pumpWidget(_wrap(const AerosWordmark()));
+      // google_fonts serves static normal-width cuts (the wdth axis was
+      // silently ignored), so the wordmark ships its own subset font.
       expect(
-        _styleOf(t).fontVariations,
-        contains(const FontVariation('wdth', 125)),
+        _styleOf(t).fontFamily,
+        'packages/aeros_design_system/${AerosWordmark.fontFamily}',
       );
+      expect(_styleOf(t).fontVariations, isNull);
     });
 
-    testWidgets('weight 800 by default', (t) async {
+    testWidgets('regular weight (Medium, 500)', (t) async {
       await t.pumpWidget(_wrap(const AerosWordmark()));
-      expect(_styleOf(t).fontWeight, FontWeight.w800);
+      expect(_styleOf(t).fontWeight, FontWeight.w500);
+    });
+
+    testWidgets('tracks open at +0.01em of the size', (t) async {
+      await t.pumpWidget(_wrap(const AerosWordmark(size: 40)));
+      expect(_styleOf(t).letterSpacing, closeTo(0.4, 1e-9));
     });
 
     testWidgets('defaults size to 24 logical pixels', (t) async {
