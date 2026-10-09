@@ -1,5 +1,14 @@
 # aeros_design_system
 
+## 2.4.0 — 2026-10-08 (density)
+
+### Added
+
+- `AerosDensity { pointer, touch }` + `AerosDensityScope` — size a surface by the pointer that will use it: **pointer on desktop web, touch on phones and tablets**. With no scope it resolves to `touch`, so nothing shifts until a screen opts in. Metrics: `controlHeight` 28/32, `headerHeight` 48/56, `rowPadding`, `listAvatar` 40/48, `inlineAvatar` 26/30, `iconButton` 32/44, `iconSize` 18/22, `badgeHeight` 18/20; and a density type ramp — `titleStyle` (14/1.3 or 16/1.25), `bodyStyle` (14/1.4 or 1.45), `secondaryStyle` (13/1.35), `metaStyle` (12/1.25 or 1.3), `labelStyle` (12 or 13, w600), `microStyle` (11/1.2) — each taking a `weight:` that moves the `wght` axis (`withWeight`). Reference for pointer: WhatsApp Desktop and Apple Mail.
+- `AerosCountBadge` — the public count pill (`99+` cap, `N+` with `floor`, grey when `muted`), 18px pointer / 20px touch.
+- `AerosFilterChip` — one filter in a chip row: optional count (`countIsFloor` → `N+`), leading icon, dropdown caret, clear ✕ while selected (`onClear`), and a `warning` tone (`aerosSemantic` amber, so it follows the theme). 28px at pointer; 32px at touch with a 44px tap target.
+- Also back-ported as **v1.3.5** (on `release/1.3.x`) for apps still pinned to 1.3.x — the Aeros app's Messages screens are the first consumer.
+
 ## 2.3.0 — 2026-10-08 (sidebar spec)
 
 ### Added
