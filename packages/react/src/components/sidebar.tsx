@@ -60,8 +60,9 @@ export const SidebarSection = React.forwardRef<HTMLDivElement, SidebarSectionPro
         className={cn("px-3 pt-3 pb-1", className)}
         {...props}
       >
+        {/* Sentence case, quiet: the label sorts the destinations, it does not compete with them. */}
         {label && (
-          <div id={labelId} className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.06em] text-ink-400">
+          <div id={labelId} className="mb-1.5 mt-2 px-3 text-xs font-medium text-ink-400">
             {label}
           </div>
         )}
@@ -75,12 +76,14 @@ SidebarSection.displayName = "SidebarSection";
 export interface SidebarItemProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   active?: boolean;
   icon?: React.ReactNode;
+  /** Shown as a count pill when above zero (unread, pending) and announced with the label. */
+  count?: number;
   /** Render the child element (e.g. a framework `<Link>`) instead of a native anchor. */
   asChild?: boolean;
 }
 
 export const SidebarItem = React.forwardRef<HTMLAnchorElement, SidebarItemProps>(
-  ({ active, icon, className, children, asChild, href, ...props }, ref) => {
+  ({ active, icon, count, className, children, asChild, href, ...props }, ref) => {
     // Anchors without href are not keyboard-operable — fall back to a real button.
     const Comp: React.ElementType = asChild ? Slot : href != null ? "a" : "button";
     return (
@@ -90,7 +93,7 @@ export const SidebarItem = React.forwardRef<HTMLAnchorElement, SidebarItemProps>
         {...(Comp === "button" ? { type: "button" as const } : null)}
         aria-current={active ? "page" : undefined}
         className={cn(
-          "flex w-full items-center gap-2.5 rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors duration-(--aeros-duration-quick) text-left",
+          "flex h-8 w-full items-center gap-2.5 rounded-md px-3 text-[13px] font-medium transition-colors duration-(--aeros-duration-quick) text-left [&>svg]:size-4 [&>svg]:shrink-0",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80",
           active
             ? "bg-white/[0.08] text-white"
@@ -100,7 +103,19 @@ export const SidebarItem = React.forwardRef<HTMLAnchorElement, SidebarItemProps>
         {...props}
       >
         {icon ?? <span className={cn("h-1.5 w-1.5 rounded-full", active ? "bg-white" : "bg-white/20")} />}
-        {children}
+        {asChild ? (
+          children
+        ) : (
+          <>
+            <span className="min-w-0 flex-1 truncate">{children}</span>
+            {count != null && count > 0 && (
+              <span className="ml-auto inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-white px-1.5 text-[11px] font-semibold text-ink-950">
+                <span className="sr-only">, </span>
+                {count > 99 ? "99+" : count}
+              </span>
+            )}
+          </>
+        )}
       </Comp>
     );
   }
