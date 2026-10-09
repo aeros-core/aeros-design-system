@@ -4,7 +4,7 @@ Aeros is built for **operators** — people running factories, buying teams, war
 
 ## 1. Operators first
 
-Our users aren't shopping. They're deciding. Interfaces should be read like a dashboard instrument, not a magazine. Information density is a feature, not a bug. Whitespace exists to separate meaningful groups, not to decorate.
+Our users aren't shopping. They're deciding. Interfaces should be read like a dashboard instrument, not a magazine. Information density is a feature, not a bug. Whitespace exists to separate meaningful groups, not to decorate. On desktop, size for the mouse (`AerosDensity.pointer`): a desktop window should show as much as WhatsApp Desktop or Apple Mail does, not a phone layout blown up.
 
 ## 2. Clarity over decoration
 
