@@ -5,32 +5,34 @@ import 'package:flutter/widgets.dart';
 import '../theme/aeros_theme_extension.dart';
 import '../tokens/motion.dart';
 
-/// The Aeros "thinking" loader: a slowly turning sphere of dots with a wave
-/// folding through it.
+/// The Aeros "thinking" loader: a finely dotted sphere with a soft pulse of
+/// thought sweeping through it.
 ///
 /// Use it where the app is genuinely working and there is nothing to show
 /// yet: the startup splash, or an agent composing a reply. It is not a
 /// progress bar — pair it with [AerosProgress] when progress is known.
 ///
-/// The dots sit on a latitude/longitude grid, the sphere is tilted toward the
-/// viewer and spins about its axis, and every dot is
-/// depth-shaded: near dots are larger and solid, far dots small and faint,
-/// which is what makes a flat point cloud read as a globe. A ripple travels
-/// pole to pole, pushing each latitude band in and out — the "thinking" fold.
+/// The dots are spread evenly over the sphere (a Fibonacci lattice: no
+/// seams, no pole clumps), the sphere is tilted toward the viewer and turns
+/// once per [period], and every dot is depth-shaded — near dots larger and
+/// solid, far dots small and faint — so the point cloud reads as a globe.
+/// A pulse travels back and forth along a slanted axis: the dots it passes
+/// swell, brighten and lift off the surface, while the whole surface ripples
+/// gently. That pulse is the "thinking".
 ///
 /// Every motion completes whole cycles per [period], so the loop is seamless.
 /// With the platform "reduce motion" setting on, it renders one static frame
 /// and never ticks.
 ///
 /// `web/index.html` in the apps carries a canvas twin of this painter (same
-/// lattice, tilt, wave and shading) so the HTML splash hands off seamlessly —
+/// lattice, tilt, pulse and shading) so the HTML splash hands off seamlessly —
 /// change both together.
 class AerosThinkingOrb extends StatefulWidget {
   const AerosThinkingOrb({
     super.key,
     this.size = 96,
     this.color,
-    this.period = const Duration(seconds: 8),
+    this.period = const Duration(seconds: 10),
     this.semanticLabel = 'Loading',
   });
 
@@ -106,7 +108,7 @@ class _AerosThinkingOrbState extends State<AerosThinkingOrb>
               child: AnimatedBuilder(
                 animation: _loop,
                 builder: (context, _) => CustomPaint(
-                  painter: _DotSpherePainter(t: _loop.value, color: color),
+                  painter: _PulseSpherePainter(t: _loop.value, color: color),
                 ),
               ),
             ),
@@ -117,67 +119,59 @@ class _AerosThinkingOrbState extends State<AerosThinkingOrb>
   }
 }
 
-class _DotSpherePainter extends CustomPainter {
-  _DotSpherePainter({required this.t, required this.color});
+class _PulseSpherePainter extends CustomPainter {
+  _PulseSpherePainter({required this.t, required this.color});
 
   /// Phase in [0, 1); every motion below completes whole cycles over it.
   final double t;
   final Color color;
 
   static const double _tau = math.pi * 2;
-  static const double _tilt = 0.32; // top pole leans toward the viewer (~18°)
+  static const double _tilt = 0.38; // top pole leans toward the viewer (~22°)
 
-  // Unit-sphere lattices, cached per (meridians, rings).
+  // The pulse travels along this slanted unit axis (normalised (.45,.8,.35)).
+  static const double _ax = 0.4581, _ay = 0.8144, _az = 0.3563;
+
+  // Unit-sphere lattices, cached per dot count.
   static final Map<int, List<_P3>> _lattices = {};
 
-  /// A latitude/longitude grid: dots line up in meridian columns, which is
-  /// what gives the globe its striped texture as it turns. Density scales
-  /// with size — sparse enough to read as dots at 24px, a globe at 160px.
-  static List<_P3> _lattice(double size) {
-    final meridians = (size / 4).round().clamp(12, 40);
-    final rings = (size / 7.5).round().clamp(7, 21);
-    return _lattices.putIfAbsent(meridians * 100 + rings, () {
-      final pts = <_P3>[];
-      for (var r = 0; r < rings; r++) {
-        // Latitudes from just below one pole to just above the other.
-        final lat = (r + 0.5) / rings * math.pi - math.pi / 2;
-        final y = math.sin(lat), ring = math.cos(lat);
-        // Near the poles keep only every k-th meridian, so rings thin out
-        // instead of piling up — while the survivors stay in their columns.
-        final every = (1 / ring).round().clamp(1, meridians ~/ 4);
-        for (var m = 0; m < meridians; m += every) {
-          final lon = m / meridians * _tau;
-          pts.add(_P3(math.cos(lon) * ring, y, math.sin(lon) * ring));
-        }
-      }
-      return pts;
-    });
-  }
+  /// Dot count scales with area-ish: ~560 at 128px — fine enough to read as
+  /// a surface, sparse enough to stay crisp at 48px.
+  static int dotCount(double size) => (size * 4.4).round().clamp(120, 900);
+
+  static List<_P3> _lattice(int n) => _lattices.putIfAbsent(n, () {
+        final golden = math.pi * (3 - math.sqrt(5));
+        return List.generate(n, (i) {
+          final y = 1 - 2 * (i + 0.5) / n;
+          final r = math.sqrt(1 - y * y);
+          final phi = i * golden;
+          return _P3(math.cos(phi) * r, y, math.sin(phi) * r);
+        });
+      });
 
   @override
   void paint(Canvas canvas, Size size) {
     final s = size.shortestSide;
     final c = size.center(Offset.zero);
-    final radius = s * 0.42;
-    final dotR = math.max(0.5, s * 0.0095);
+    final radius = s * 0.4;
+    final dotR = math.max(0.5, s * 0.0074);
     final phase = t * _tau;
 
-    final spin = phase; // one turn per period
-    final cs = math.cos(spin), sn = math.sin(spin);
+    final cs = math.cos(phase), sn = math.sin(phase); // one turn per period
     final ct = math.cos(_tilt), st = math.sin(_tilt);
-    final breath = 1 + 0.02 * math.sin(phase * 2);
+    // Where the pulse is along its axis: sweeps -1.15 → 1.15 and back, twice
+    // per period, so it fully clears the sphere at each end.
+    final pulseAt = math.sin(phase * 2) * 1.15;
 
     final paint = Paint()..isAntiAlias = true;
-    for (final p in _lattice(s)) {
-      // The fold: a narrow band that sinks into the sphere, riding the
-      // sphere's own latitude (p.y) so it sweeps pole to pole (twice per turn)
-      // while the sphere spins under it. Seen through the tilt it reads as a
-      // crescent seam; the silhouette elsewhere stays round.
-      final band = math.pow((math.sin(p.y * 2.4 - phase * 2) + 1) / 2, 10);
-      final fold = 1 - 0.15 * band;
-      final px = p.x * fold * breath;
-      final py = p.y * fold * breath;
-      final pz = p.z * fold * breath;
+    for (final p in _lattice(dotCount(s))) {
+      final along = p.x * _ax + p.y * _ay + p.z * _az;
+      final d2 = along - pulseAt;
+      final pulse = math.exp(-(d2 * d2) / 0.018); // 0..1, narrow band
+      final lift = 1 +
+          0.02 * math.sin(3 * p.x + phase * 2) * math.sin(2 * p.y - phase) +
+          0.07 * pulse;
+      final px = p.x * lift, py = p.y * lift, pz = p.z * lift;
 
       // Spin about the vertical axis, then tilt toward the viewer.
       final x1 = px * cs + pz * sn;
@@ -187,18 +181,19 @@ class _DotSpherePainter extends CustomPainter {
 
       // Depth 0 (far) → 1 (near).
       final depth = ((z2 / 1.1) + 1) / 2;
-      final a = 0.08 + 0.92 * depth * depth;
+      final a = 0.09 + 0.85 * math.pow(depth, 1.4) + 0.4 * pulse;
       paint.color = color.withValues(alpha: color.a * a.clamp(0.0, 1.0));
       canvas.drawCircle(
         c + Offset(x1, -y2) * radius,
-        dotR * (0.45 + 0.75 * depth),
+        dotR * (0.5 + 0.7 * depth) * (1 + 1.1 * pulse),
         paint,
       );
     }
   }
 
   @override
-  bool shouldRepaint(_DotSpherePainter old) => old.t != t || old.color != color;
+  bool shouldRepaint(_PulseSpherePainter old) =>
+      old.t != t || old.color != color;
 }
 
 class _P3 {

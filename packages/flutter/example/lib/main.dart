@@ -314,6 +314,26 @@ class _GalleryState extends State<Gallery> {
                 AerosThinkingOrb(size: 160),
               ],
             ),
+            const SizedBox(height: 16),
+            // The splash lockup: pearl orb + wordmark on the dark canvas.
+            Container(
+              height: 360,
+              decoration: BoxDecoration(
+                color: AerosAliasColors.dark.bgCanvas,
+                borderRadius: AerosRadii.brMd,
+              ),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AerosThinkingOrb(
+                      size: 128, color: AerosAliasColors.dark.fgPrimary),
+                  const SizedBox(height: 28),
+                  AerosWordmark(
+                      size: 40, color: AerosAliasColors.dark.fgPrimary),
+                ],
+              ),
+            ),
             const SizedBox(height: 32),
 
             _section('Configurable MTO — attribute selectors'),

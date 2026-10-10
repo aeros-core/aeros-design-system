@@ -1,5 +1,14 @@
 # aeros_design_system
 
+## 2.5.0 — 2026-10-09 (wordmark + pulse orb)
+
+### Changed
+
+- **`AerosWordmark` matches the reference logo artwork**: Nunito Sans Expanded (wdth 125) **Medium (500)** with **+0.01em tracking** — was weight 800 at −0.5px. Matched against the logo artwork by pixel overlap (0.93). Same change on the web `aeros-logo` class (`@aeros-core/react`).
+- **The wordmark face is now bundled** (`AerosWordmark` family, `assets/fonts/AerosWordmark-NunitoSansExpanded-Medium.ttf`, a 2.4 KB OFL subset with only A e r o s). Through `google_fonts` it was never expanded: that package serves static normal-width cuts, so the `wdth 125` variation was silently ignored. No runtime font fetch any more; `AerosWordmark.fontFamily` is public for HTML/canvas twins.
+- **`AerosThinkingOrb` is now the Pulse sphere**: ~560 evenly spread dots (Fibonacci lattice, scaled with size) on a tilted, turning sphere, depth-shaded, with a soft pulse sweeping back and forth along a slanted axis — the dots it passes swell, brighten and lift. Default `period` 10 s (was 8). API unchanged. Designed for the dark splash (pearl dots on `bgCanvas` dark), reads equally well on light.
+- Also back-ported as **v1.3.6** (on `release/1.3.x`).
+
 ## 2.4.0 — 2026-10-08 (density)
 
 ### Added
