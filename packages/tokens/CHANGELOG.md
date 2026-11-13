@@ -1,5 +1,15 @@
 # @aeros-core/tokens
 
+## 2.2.0
+
+### Minor Changes
+
+- 5350b28: The sidebar spec, shared by web and Flutter.
+
+  **Sidebar (react)**: rows are a fixed 32px (`h-8`) with 16px icons; `SidebarSection` labels are sentence case, 12px medium (were 10px uppercase tracked); `SidebarItem` gains `count`, a pill announced with the label. The dark chrome is unchanged.
+
+  Flutter `AerosSidenav` moves to the same spec in `aeros_design_system` 2.3.0 (see `packages/flutter/CHANGELOG.md`).
+
 ## 2.1.0
 
 ### Minor Changes
