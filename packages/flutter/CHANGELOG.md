@@ -1,19 +1,5 @@
 # aeros_design_system
 
-## 2.6.0 — 2026-11-12 (the woven A)
-
-### Changed
-
-- **`AerosWordmark` is now the new Aeros logo** (brand kit, 11 Nov 2026): the woven-A symbol beside "Aeros" outlined from Inter Medium (−0.03 em, kerned). It is **painted from the brand outlines** (`AerosLogoPainter`, path data generated into `aeros_logo_paths.dart`), never typed, so it is exact at every size and needs no font.
-- **`size` now means the logo's height** (the symbol's height; the wordmark's capitals are 0.62 × it). It used to be the font size. Width is `size × kAerosLockupAspect` (≈ 3.70).
-- New `showSymbol` (default `true`); `false` draws the outlined wordmark alone.
-- The widget is no longer a `Text`: it exposes the semantics label "Aeros". Tests that used `find.text('Aeros')` should use `find.bySemanticsLabel('Aeros')` or `find.byType(AerosWordmark)`.
-
-### Removed
-
-- The bundled Nunito Sans Expanded subset (`AerosWordmark` font family, `assets/fonts/AerosWordmark-NunitoSansExpanded-Medium.ttf`, `OFL-NunitoSans.txt`) and `AerosWordmark.fontFamily`. HTML twins should inline the logo SVG instead.
-- Also back-ported as **v1.3.7** (on `release/1.3.x`).
-
 ## 2.5.0 — 2026-10-09 (wordmark + pulse orb)
 
 ### Changed
