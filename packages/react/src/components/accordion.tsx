@@ -22,9 +22,8 @@ export const AccordionTrigger = React.forwardRef<
     <RA.Trigger
       ref={ref}
       className={cn(
-        "flex flex-1 items-center justify-between gap-3 py-3.5 text-left text-sm font-medium text-fg-primary",
-        "transition-colors duration-fast hover:text-fg-secondary",
-        "rounded-sm",
+        "flex flex-1 items-center justify-between gap-3 py-3 text-left text-label-md text-fg-primary [&>svg]:size-icon-md [&>svg]:text-fg-muted",
+        "rounded-item transition-colors duration-fast hover:text-fg-secondary",
         "[&[data-state=open]>svg]:rotate-180",
         className
       )}
@@ -43,10 +42,10 @@ export const AccordionContent = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <RA.Content
     ref={ref}
-    className="overflow-hidden text-[13px] text-fg-secondary data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down motion-reduce:animate-none"
+    className="overflow-hidden text-body-sm text-fg-secondary data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down motion-reduce:animate-none"
     {...props}
   >
-    <div className={cn("pb-4 pt-0 leading-relaxed", className)}>{children}</div>
+    <div className={cn("pb-3 pt-0", className)}>{children}</div>
   </RA.Content>
 ));
 AccordionContent.displayName = "AccordionContent";

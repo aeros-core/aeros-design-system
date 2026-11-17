@@ -14,19 +14,19 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
     <div
       ref={ref}
       className={cn(
-        "text-center px-6 py-[52px] border-[1.5px] border-dashed border-border-strong rounded-xl",
+        "rounded-surface border border-dashed border-border-strong px-6 py-12 text-center",
         className
       )}
       {...props}
     >
       {icon && (
-        <div className="mx-auto mb-4 flex h-[52px] w-[52px] items-center justify-center rounded-lg bg-bg-subtle border border-border-default text-fg-muted">
+        <div className="mx-auto mb-3 flex size-10 items-center justify-center rounded-control bg-bg-subtle text-fg-muted [&_svg]:size-icon-lg">
           {icon}
         </div>
       )}
-      <div className="text-[15px] font-semibold tracking-[-0.01em] text-fg-secondary mb-1">{title}</div>
+      <h3 className="mb-1 text-h4 text-fg-primary">{title}</h3>
       {description && (
-        <p className="mx-auto max-w-[280px] text-[13px] text-fg-muted leading-relaxed mb-4">{description}</p>
+        <p className="mx-auto mb-4 max-w-xs text-body-sm text-fg-muted">{description}</p>
       )}
       {action}
     </div>

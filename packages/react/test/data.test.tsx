@@ -365,12 +365,8 @@ describe("StatCard", () => {
     expect(stat).not.toHaveAttribute("delta");
   });
 
-  // DEFECT (a11y, WCAG 1.1.1 / 1.4.1): the delta's direction is carried only by
-  // an unlabelled arrow icon plus colour. Assistive tech hears just the value
-  // string ("12%"), with no "up"/"down", unless the caller encodes a sign in it.
-  // (The icons are also not marked aria-hidden, unlike the other components.)
-  // Cause: packages/react/src/components/stat-card.tsx:43-46.
-  it.fails("announces the delta direction to assistive tech", () => {
+  // The arrow and colour are decorative; the direction is also said in words.
+  it("announces the delta direction to assistive tech", () => {
     render(<StatCard data-testid="stat" label="Orders" value="1,284" delta={{ value: "12%", direction: "down" }} />);
     expect(screen.getByTestId("stat")).toHaveTextContent(/down|decrease/i);
   });

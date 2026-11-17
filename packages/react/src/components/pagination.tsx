@@ -33,10 +33,10 @@ function pageModel(page: number, count: number, siblings: number): Array<number 
 }
 
 const itemBase =
-  "inline-flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-[13px] font-medium " +
+  "inline-flex h-control-sm min-w-control-sm items-center justify-center rounded-control px-1.5 text-label-sm [&_svg]:size-icon-md " +
   "transition-colors duration-quick " +
   "" +
-  "disabled:opacity-40 disabled:cursor-not-allowed";
+  "disabled:cursor-not-allowed disabled:opacity-disabled";
 
 export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
   ({ page, count, onPageChange, siblings = 1, className, ...props }, ref) => {
@@ -48,7 +48,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
       <nav ref={ref} aria-label="Pagination" className={cn("flex items-center gap-1", className)} {...props}>
         <button
           type="button"
-          className={cn(itemBase, "text-fg-secondary hover:bg-bg-subtle hover:text-fg-primary")}
+          className={cn(itemBase, "text-fg-secondary hover:bg-state-hover hover:text-fg-primary")}
           onClick={() => go(page - 1)}
           disabled={page <= 1}
           aria-label="Previous page"
@@ -69,8 +69,8 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
               className={cn(
                 itemBase,
                 item === page
-                  ? "bg-brand-primary text-fg-inverse font-semibold"
-                  : "text-fg-secondary hover:bg-bg-subtle hover:text-fg-primary"
+                  ? "bg-brand-primary text-fg-inverse"
+                  : "text-fg-secondary hover:bg-state-hover hover:text-fg-primary"
               )}
               onClick={() => go(item)}
             >
@@ -80,7 +80,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
         )}
         <button
           type="button"
-          className={cn(itemBase, "text-fg-secondary hover:bg-bg-subtle hover:text-fg-primary")}
+          className={cn(itemBase, "text-fg-secondary hover:bg-state-hover hover:text-fg-primary")}
           onClick={() => go(page + 1)}
           disabled={page >= count}
           aria-label="Next page"
