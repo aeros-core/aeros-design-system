@@ -231,7 +231,7 @@ class _SwitchRow extends StatelessWidget {
                 text: TextSpan(
                   text: spec.label,
                   style: AerosTypography.bodyMd(color: a.fgPrimary)
-                      .copyWith(fontWeight: FontWeight.w600),
+                      .withWeight(FontWeight.w600),
                   children: [
                     if (spec.required)
                       const TextSpan(

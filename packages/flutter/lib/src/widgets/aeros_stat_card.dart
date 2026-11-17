@@ -66,7 +66,7 @@ class AerosStatCard extends StatelessWidget {
               value,
               maxLines: 1,
               style: mono
-                  ? AerosTypography.monoLg(color: a.fgPrimary).copyWith(fontSize: 26, fontWeight: FontWeight.w500)
+                  ? AerosTypography.monoLg(color: a.fgPrimary).copyWith(fontSize: 26).withWeight(FontWeight.w500)
                   : AerosTypography.h1(color: a.fgPrimary),
             ),
           ),
@@ -77,7 +77,7 @@ class AerosStatCard extends StatelessWidget {
               children: [
                 Icon(deltaIcon, size: 12, color: deltaColor),
                 const SizedBox(width: 4),
-                Text(delta!, style: AerosTypography.caption(color: deltaColor).copyWith(fontWeight: FontWeight.w600)),
+                Text(delta!, style: AerosTypography.caption(color: deltaColor).withWeight(FontWeight.w600)),
               ],
             ),
           ],

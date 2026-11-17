@@ -1,5 +1,27 @@
 # aeros_design_system
 
+## 3.0.0 (unreleased)
+
+Typography now comes straight from the tokens, weights render, and the package has no runtime dependencies besides Flutter.
+
+### Breaking
+
+- **`google_fonts` is no longer a dependency.** IBM Plex Mono (Regular 400 + Medium 500, SIL OFL — `assets/fonts/OFL-IBMPlexMono.txt`) is bundled as the `IBM Plex Mono` family, like Inter, so mono text needs no network on first paint and renders in widget/golden tests. **If your app imports `package:google_fonts` itself and was getting it transitively through this package, add `google_fonts` to your own `pubspec.yaml`.** To use the bundled face outside `AerosTypography`, write `TextStyle(fontFamily: 'IBM Plex Mono', package: 'aeros_design_system')`.
+- **Body text is weight 450** (`bodyLg` / `bodyMd` / `bodySm`), the brand text weight — it rendered at 400. `fontWeight` still reports `w400` (Flutter has no 450); the `wght` axis carries the 450. Expect body copy a touch sturdier and a hair wider.
+- **Tracking follows the tokens.** `AerosTypography` is now a thin wrapper over the generated scale (`tokens.json`), so the hand-written values that had drifted are gone: `h4` −0.16 → −0.13, `bodySm` 0.01 → 0.04, `labelSm` 0.01 → 0.03, `caption` 0.02 → 0.05. Sizes, line heights and the other weights are unchanged.
+- **Weights inside the widgets now render.** 36 `copyWith(fontWeight:)` calls on Inter styles in the widget layer changed nothing on screen (Inter is a variable font and the glyphs follow the pinned `wght` axis — see 2.3.0); they now go through `withWeight`. Visibly heavier, and slightly wider, than before: the active tab (`AerosTabs`, w600 vs w500 inactive), the current breadcrumb, field labels (`AerosEnumChips`, `AerosEnumDropdown`, `AerosDropdownSearch`, `AerosMeasurementInput`, `AerosRangeSlider`, `AerosNumericRangeBand`, `AerosVariantPicker`, `AerosFileUploadButton`, `AerosAttributeSelector`), field values (w500), `AerosDataTable` headings, pagination numbers, chip and variant labels, the selected option in `AerosDropdownSearch` (w700), `AerosStepper` / `AerosProgress` labels, `AerosStatCard` deltas, `AerosIntentCard` badges, `AerosPriceBreakdown` titles, step names and total, `AerosConstraintErrorAlert` titles and `AerosRoutingSignalBadge`. Re-check tight layouts and re-record your goldens.
+- Mono amounts that ask for w600/w700 (`AerosPriceBreakdown`, `AerosRangeSlider`, `AerosNumericRangeBand`) resolve to the heaviest bundled face, Medium (the engine may embolden it synthetically); through `google_fonts` each weight was a separate download.
+
+### Added
+
+- **`weight:` on every `AerosTypography` role** — `AerosTypography.bodySm(color: c, weight: FontWeight.w600)`. It moves the `wght` axis with `fontWeight` and keeps the optical size, exactly like `style.withWeight(...)` (still public). Never `copyWith(fontWeight:)` an Aeros sans style: it renders at the style's original weight.
+
+### Migration
+
+1. Using `GoogleFonts.*` in your app? Add `google_fonts` to your own dependencies.
+2. Replace `AerosTypography.x().copyWith(fontWeight: w)` with `AerosTypography.x(weight: w)` (or `.withWeight(w)`); keep other `copyWith` arguments in a `copyWith` before it.
+3. Re-record golden images: body weight, tracking, widget weights and mono glyphs all change.
+
 ## 2.5.0 — 2026-10-09 (wordmark + pulse orb)
 
 ### Changed

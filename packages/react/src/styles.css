@@ -1,5 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=Nunito+Sans:opsz,wdth,wght@6..12,75..125,200..1000&display=swap");
-
+/* Fonts are not loaded here. Import "@aeros-core/react/fonts.css" for the
+   self-hosted faces, or load Inter / Nunito Sans / IBM Plex Mono yourself. */
 @import "@aeros-core/tokens/css";
 
 @import "tailwindcss";

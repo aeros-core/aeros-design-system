@@ -83,7 +83,7 @@ class _AerosFileUploadButtonState extends State<AerosFileUploadButton> {
             text: TextSpan(
               text: widget.label!,
               style: AerosTypography.bodySm(color: a.fgSecondary)
-                  .copyWith(fontWeight: FontWeight.w600),
+                  .withWeight(FontWeight.w600),
               children: [
                 if (widget.required)
                   const TextSpan(
@@ -139,7 +139,7 @@ class _AerosFileUploadButtonState extends State<AerosFileUploadButton> {
                       Text(
                         widget.hint,
                         style: AerosTypography.bodyMd(color: a.fgPrimary)
-                            .copyWith(fontWeight: FontWeight.w600),
+                            .withWeight(FontWeight.w600),
                       ),
                       const SizedBox(height: 2),
                       Text(
@@ -204,7 +204,7 @@ class _AttachedFile extends StatelessWidget {
                 Text(
                   file.name,
                   style: AerosTypography.bodyMd(color: a.fgPrimary)
-                      .copyWith(fontWeight: FontWeight.w600),
+                      .withWeight(FontWeight.w600),
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (file.sizeBytes != null)
@@ -221,7 +221,7 @@ class _AttachedFile extends StatelessWidget {
               child: Text(
                 'Replace',
                 style: AerosTypography.bodySm(color: a.brandPrimary)
-                    .copyWith(fontWeight: FontWeight.w600),
+                    .withWeight(FontWeight.w600),
               ),
             ),
           if (onRemove != null)

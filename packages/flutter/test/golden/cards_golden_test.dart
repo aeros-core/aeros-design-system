@@ -115,7 +115,6 @@ void main() {
             ],
           ),
         ),
-        // Mono values render in the test font until IBM Plex Mono is bundled.
         GoldenSection(
           'AerosStatCard mono',
           child: SizedBox(

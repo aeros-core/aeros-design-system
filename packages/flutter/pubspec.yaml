@@ -10,7 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_fonts: ^8.1.0
 
 dev_dependencies:
   flutter_test:
@@ -23,6 +22,15 @@ flutter:
     - family: Inter
       fonts:
         - asset: assets/fonts/InterVariable.ttf
+    # The data face: IBM Plex Mono, static Regular + Medium (the only weights
+    # the type scale uses; see assets/fonts/OFL-IBMPlexMono.txt). Bundled, so
+    # there is no runtime font fetch and it renders in tests.
+    - family: IBM Plex Mono
+      fonts:
+        - asset: assets/fonts/IBMPlexMono-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/IBMPlexMono-Medium.ttf
+          weight: 500
     # The wordmark face: Nunito Sans Expanded Medium, subset to "Aeros"
     # (see AerosWordmark + assets/fonts/OFL-NunitoSans.txt).
     - family: AerosWordmark

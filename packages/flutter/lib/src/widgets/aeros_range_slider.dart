@@ -68,7 +68,7 @@ class AerosRangeSlider extends StatelessWidget {
                   text: TextSpan(
                     text: label!,
                     style: AerosTypography.bodySm(color: a.fgSecondary)
-                        .copyWith(fontWeight: FontWeight.w600),
+                        .withWeight(FontWeight.w600),
                     children: [
                       if (required)
                         const TextSpan(
@@ -82,7 +82,7 @@ class AerosRangeSlider extends StatelessWidget {
               Text(
                 _format(value),
                 style: AerosTypography.monoMd(color: a.fgPrimary)
-                    .copyWith(fontWeight: FontWeight.w600),
+                    .withWeight(FontWeight.w600),
               ),
             ],
           ),

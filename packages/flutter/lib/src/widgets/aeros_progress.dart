@@ -29,7 +29,7 @@ class AerosProgress extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label!, style: AerosTypography.caption(color: a.fgSecondary).copyWith(fontWeight: FontWeight.w600)),
+              Text(label!, style: AerosTypography.caption(color: a.fgSecondary).withWeight(FontWeight.w600)),
               if (value != null)
                 Text('${(value! * 100).round()}%', style: AerosTypography.monoSm(color: a.fgMuted)),
             ],

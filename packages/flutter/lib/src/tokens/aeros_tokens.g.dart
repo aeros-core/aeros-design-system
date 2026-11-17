@@ -37,6 +37,7 @@ class AerosTokens {
   static const Color infoBg = Color(0xFFF4F4F2);
   static const Color infoText = Color(0xFF272622);
   static const Color infoBorder = Color(0xFFE7E6E2);
+  static const Color dangerHover = Color(0xFFB91C1C);
   static const Color successDark = Color(0xFF4ADE80);
   static const Color successBgDark = Color(0xFF132B1D);
   static const Color successTextDark = Color(0xFF86EFAC);
@@ -53,6 +54,7 @@ class AerosTokens {
   static const Color infoBgDark = Color(0xFF2A2723);
   static const Color infoTextDark = Color(0xFFD6D4CF);
   static const Color infoBorderDark = Color(0xFF46423B);
+  static const Color dangerHoverDark = Color(0xFFFCA5A5);
 
   // ─── Breakpoints (logical px) ───
   static const double breakpointSm = 640.0;
@@ -71,6 +73,8 @@ class AerosTokens {
   static const Cubic easeDecelerate = Cubic(0, 0, 0, 1);
   static const Cubic easeEntrance = Cubic(0.16, 1, 0.3, 1);
   static const Cubic easeSpring = Cubic(0.34, 1.4, 0.64, 1);
+  static const Cubic easeEnter = Cubic(0.16, 1, 0.3, 1);
+  static const Cubic easeExit = Cubic(0.4, 0, 1, 1);
 
   // ─── Theme aliases (light / dark) ───
   static const Color aliasLightBgCanvas = Color(0xFFF7F6F4);
@@ -92,6 +96,11 @@ class AerosTokens {
   static const Color aliasLightBrandPrimaryMuted = Color(0xFFF1F0ED);
   static const Color aliasLightFocusRing = Color(0xFF1A1916);
   static const Color aliasLightFocusRingOffset = Color(0xFFFFFFFF);
+  static const Color aliasLightFgDisabled = Color(0xFFA8A6A0);
+  static const Color aliasLightStateHover = Color(0x0D1A1916);
+  static const Color aliasLightStatePressed = Color(0x171A1916);
+  static const Color aliasLightStateSelected = Color(0x121A1916);
+  static const Color aliasLightScrim = Color(0x66121110);
   static const Color aliasDarkBgCanvas = Color(0xFF1A1815);
   static const Color aliasDarkBgSurface = Color(0xFF221F1B);
   static const Color aliasDarkBgElevated = Color(0xFF2A2723);
@@ -111,6 +120,11 @@ class AerosTokens {
   static const Color aliasDarkBrandPrimaryMuted = Color(0xFF2F2C27);
   static const Color aliasDarkFocusRing = Color(0xFFF5F3EF);
   static const Color aliasDarkFocusRingOffset = Color(0xFF1A1815);
+  static const Color aliasDarkFgDisabled = Color(0xFF57554F);
+  static const Color aliasDarkStateHover = Color(0x12FAFAF9);
+  static const Color aliasDarkStatePressed = Color(0x1FFAFAF9);
+  static const Color aliasDarkStateSelected = Color(0x1AFAFAF9);
+  static const Color aliasDarkScrim = Color(0xB3121110);
 
   // ─── Spacing (dp) ───
   static const double space0 = 0.0;

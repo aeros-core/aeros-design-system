@@ -1,4 +1,4 @@
-import { GENERATED, px, ramps, semantic, type Tokens } from "./shared";
+import { GENERATED, layout, px, ramps, semantic, sizes, type Tokens } from "./shared";
 
 /**
  * dist/css/tokens.css — every token as an `--aeros-*` custom property.
@@ -15,11 +15,12 @@ export function buildCss(tokens: Tokens): string {
   const light = tokens.alias.light as Record<string, string>;
   const dark = tokens.alias.dark as Record<string, string>;
 
-  const themed = (indent: string, aliases: Record<string, string>, set: "semantic" | "semanticDark", shadows: Record<string, string>, scheme: string) => {
+  const themed = (indent: string, aliases: Record<string, string>, set: "semantic" | "semanticDark", shadows: Record<string, string>, scheme: "light" | "dark") => {
     L.push(`${indent}color-scheme: ${scheme};`);
     for (const [k, v] of Object.entries(aliases)) L.push(`${indent}--aeros-${k}: ${v};`);
     for (const [k, v] of Object.entries(semantic(tokens, set))) L.push(`${indent}--aeros-color-semantic-${k}: ${v};`);
     for (const [k, v] of Object.entries(shadows)) L.push(`${indent}--aeros-shadow-${k}: ${v};`);
+    for (const [k, v] of Object.entries(tokens.elevation[scheme])) L.push(`${indent}--aeros-elevation-${k}: ${v};`);
   };
 
   L.push(`/* ${GENERATED} */`);
@@ -39,6 +40,26 @@ export function buildCss(tokens: Tokens): string {
   for (const [k, v] of Object.entries(tokens.motion.ease)) L.push(`  --aeros-ease-${k}: ${v};`);
   for (const [k, v] of Object.entries(tokens.z)) L.push(`  --aeros-z-${k}: ${v};`);
   for (const [k, v] of Object.entries(tokens.breakpoint)) L.push(`  --aeros-breakpoint-${k}: ${v}px;`);
+  // Semantic radii — components use these, never a raw scale step.
+  for (const [k, v] of Object.entries(tokens.shape)) L.push(`  --aeros-radius-${k}: ${px(v)};`);
+  for (const [k, v] of sizes(tokens, null)) L.push(`  --aeros-size-${k}: ${v}px;`);
+  for (const [k, v] of Object.entries(tokens.focus)) L.push(`  --aeros-focus-${k}: ${px(v)};`);
+  for (const [k, v] of Object.entries(tokens.opacity)) L.push(`  --aeros-opacity-${k}: ${v};`);
+  for (const [k, v] of Object.entries(tokens.borderWidth)) L.push(`  --aeros-border-width-${k}: ${px(v)};`);
+  for (const [k, v] of layout(tokens)) L.push(`  --aeros-layout-${k}: ${v}px;`);
+  L.push("}");
+  L.push("");
+
+  // Density — pointer (mouse) sizes by default; data-density="touch" on any
+  // element switches its subtree to the touch sizes.
+  L.push("/* Density: pointer (default) */");
+  L.push(":root, [data-density='pointer'] {");
+  for (const [k, v] of sizes(tokens, "pointer")) L.push(`  --aeros-size-${k}: ${v}px;`);
+  L.push("}");
+  L.push("");
+  L.push("/* Density: touch */");
+  L.push("[data-density='touch'] {");
+  for (const [k, v] of sizes(tokens, "touch")) L.push(`  --aeros-size-${k}: ${v}px;`);
   L.push("}");
   L.push("");
 

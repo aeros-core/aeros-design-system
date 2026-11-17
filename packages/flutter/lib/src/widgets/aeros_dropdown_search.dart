@@ -233,7 +233,7 @@ class _AerosDropdownSearchState<T> extends State<AerosDropdownSearch<T>> {
             text: TextSpan(
               text: widget.label!,
               style: AerosTypography.bodySm(color: a.fgSecondary)
-                  .copyWith(fontWeight: FontWeight.w600),
+                  .withWeight(FontWeight.w600),
               children: [
                 if (widget.required)
                   const TextSpan(
@@ -449,8 +449,8 @@ class _PopupBodyState<T> extends State<_PopupBody<T>> {
                             child: Text(
                               widget.itemAsString(item),
                               style: AerosTypography.bodyMd(color: a.fgPrimary)
-                                  .copyWith(
-                                fontWeight: isSelected
+                                  .withWeight(
+                                isSelected
                                     ? FontWeight.w700
                                     : FontWeight.w500,
                               ),

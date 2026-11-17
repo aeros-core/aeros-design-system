@@ -60,7 +60,7 @@ class AerosTabs extends StatelessWidget {
                         tabs[i],
                         style: AerosTypography.bodySm(
                           color: active ? a.fgPrimary : a.fgMuted,
-                        ).copyWith(fontWeight: active ? FontWeight.w600 : FontWeight.w500),
+                        ).withWeight(active ? FontWeight.w600 : FontWeight.w500),
                       ),
                     ),
                   ),
@@ -98,7 +98,7 @@ class AerosTabs extends StatelessWidget {
                       child: Text(
                         tabs[i],
                         style: AerosTypography.bodySm(color: active ? a.fgPrimary : a.fgMuted)
-                            .copyWith(fontWeight: active ? FontWeight.w600 : FontWeight.w500),
+                            .withWeight(active ? FontWeight.w600 : FontWeight.w500),
                       ),
                     ),
                   ),

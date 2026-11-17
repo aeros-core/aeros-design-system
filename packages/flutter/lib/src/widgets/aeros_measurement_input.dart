@@ -98,7 +98,7 @@ class _AerosMeasurementInputState extends State<AerosMeasurementInput> {
             text: TextSpan(
               text: widget.label!,
               style: AerosTypography.bodySm(color: a.fgSecondary)
-                  .copyWith(fontWeight: FontWeight.w600),
+                  .withWeight(FontWeight.w600),
               children: [
                 if (widget.required)
                   const TextSpan(

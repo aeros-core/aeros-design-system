@@ -1,6 +1,5 @@
 // Shared harness for the golden suite: one scene, four images
 // (light/dark × pointer/touch).
-import 'dart:async';
 import 'dart:io';
 import 'dart:ui' show PointerDeviceKind;
 
@@ -61,7 +60,7 @@ void goldenMatrix(
         '$name · ${theme.key} · ${density.key}',
         tags: 'golden',
         semanticsEnabled: semantics,
-        (tester) => _withoutMonoFontNoise(() async {
+        (tester) async {
           tester.view.physicalSize = _measure ? const Size(3000, 3000) : size;
           tester.view.devicePixelRatio = 1.0;
           tester.platformDispatcher.textScaleFactorTestValue = 1.0;
@@ -101,7 +100,7 @@ void goldenMatrix(
           } finally {
             debugDisableShadows = true;
           }
-        }),
+        },
       );
     }
   }
@@ -131,33 +130,6 @@ Widget _app(WidgetBuilder builder, {required bool dark, required AerosDensity de
             ),
           )
         : Builder(builder: builder),
-  );
-}
-
-/// Runs [body] with google_fonts' "unable to load font" report filtered out of
-/// the log.
-///
-/// Mono text asks google_fonts for IBM Plex Mono, which is not bundled and
-/// cannot be fetched in a test (see flutter_test_config.dart). google_fonts
-/// handles that failure itself but prints a six-line report every time, which
-/// would bury real output. Everything else still prints.
-Future<void> _withoutMonoFontNoise(Future<void> Function() body) {
-  var inReport = false;
-  return runZoned(
-    body,
-    zoneSpecification: ZoneSpecification(
-      print: (self, parent, zone, line) {
-        if (line.startsWith('Error: google_fonts was unable to load font IBMPlexMono')) {
-          inReport = true;
-          return;
-        }
-        if (inReport) {
-          if (line.startsWith("If troubleshooting doesn't solve the problem")) inReport = false;
-          return;
-        }
-        parent.print(zone, line);
-      },
-    ),
   );
 }
 

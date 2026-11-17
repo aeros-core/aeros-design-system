@@ -89,8 +89,8 @@ for (const [role, s] of Object.entries(tokens.text)) {
   if (s.family !== "mono") {
     // Inter is a variable font: the glyph weight follows the wght axis.
     expectIn(THEME, block, `FontVariation('wght', ${Number(s.weight).toFixed(1)})`, `text.${role} weight axis`);
-    expectIn(THEME, block, "package: 'aeros_design_system'", `text.${role} resolves the bundled font`);
   }
+  expectIn(THEME, block, "package: 'aeros_design_system'", `text.${role} resolves the bundled font`);
 }
 for (const [set, suffix] of [["shadow", ""], ["shadowDark", "Dark"]]) {
   for (const k of Object.keys(tokens[set])) {
@@ -100,6 +100,7 @@ for (const [set, suffix] of [["shadow", ""], ["shadowDark", "Dark"]]) {
 
 // (b) adoption — hand token files must alias the generated constants.
 const ADOPT = {
+  "typography.dart": "AerosTypeScale.",
   "colors.dart": "AerosTokens.",
   "spacing.dart": "AerosTokens.",
   "radii.dart": "AerosTokens.",
@@ -111,6 +112,10 @@ for (const [file, ref] of Object.entries(ADOPT)) {
   const src = read(file);
   expectIn(file, src, ".g.dart", `${file} imports the generated tokens`);
   expectIn(file, src, ref, `${file} references ${ref.slice(0, -1)}`);
+  if (file === "typography.dart" && /(fontSize|height|letterSpacing):\s*-?[0-9]/.test(src)) {
+    failures++;
+    console.error("✗ typography.dart carries its own size/height/tracking — read AerosTypeScale instead.");
+  }
   if (/Color\(0x/.test(src) || /BoxShadow\(/.test(src)) {
     failures++;
     console.error(`✗ ${file} still contains a literal Color(0x…)/BoxShadow(…) — alias the generated tokens instead.`);

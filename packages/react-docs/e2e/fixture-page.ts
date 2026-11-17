@@ -9,7 +9,7 @@ export const THEMES = ["light", "dark"] as const;
 export type Theme = (typeof THEMES)[number];
 
 /** Web fonts the docs site self-hosts; a fixture must never be captured in a fallback face. */
-const REQUIRED_FONT_FAMILIES = ["Inter", "IBM Plex Mono"];
+const REQUIRED_FONT_FAMILIES = ["Inter Variable", "Nunito Sans Variable", "IBM Plex Mono"];
 
 /**
  * Navigate to a fixture and settle it: theme applied, fonts loaded, network

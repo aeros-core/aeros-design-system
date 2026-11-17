@@ -208,7 +208,7 @@ class _PageButton extends StatelessWidget {
             label,
             style: AerosTypography.bodySm(
               color: selected ? selectedFg : (disabled ? fgMuted : fg),
-            ).copyWith(fontWeight: FontWeight.w600),
+            ).withWeight(FontWeight.w600),
           ),
         ),
       ),

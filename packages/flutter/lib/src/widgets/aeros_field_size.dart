@@ -54,6 +54,6 @@ extension AerosFieldSizeMetrics on AerosFieldSize {
     final base = this == AerosFieldSize.sm
         ? AerosTypography.bodySm(color: color)
         : AerosTypography.bodyMd(color: color);
-    return base.copyWith(fontWeight: FontWeight.w500, height: 1.3);
+    return base.copyWith(height: 1.3).withWeight(FontWeight.w500);
   }
 }

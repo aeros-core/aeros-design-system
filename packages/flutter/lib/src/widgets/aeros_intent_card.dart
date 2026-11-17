@@ -75,7 +75,7 @@ class AerosIntentCard extends StatelessWidget {
                             ),
                             child: Text(
                               badge!,
-                              style: AerosTypography.caption(color: a.fgSecondary).copyWith(fontWeight: FontWeight.w600),
+                              style: AerosTypography.caption(color: a.fgSecondary).withWeight(FontWeight.w600),
                             ),
                           ),
                         ],

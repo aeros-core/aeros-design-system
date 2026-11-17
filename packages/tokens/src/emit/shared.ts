@@ -80,3 +80,37 @@ export function parseShadow(value: string, label: string): ShadowLayer[] {
     return { x, y, blur, spread, r, g, b, a, inset: Boolean(m[1]) };
   });
 }
+
+/** A size entry that varies with density: `{ pointer, touch }`. */
+export const isDensity = (v: unknown): v is { pointer: number; touch: number } =>
+  v !== null && typeof v === "object" && "pointer" in (v as object) && "touch" in (v as object);
+
+/**
+ * Flattens the `size` block to `[name, value]` pairs — `control.md`, `header`,
+ * `icon.md` → `control-md`, `header`, `icon-md`. `pick` chooses the density
+ * (density-independent entries are returned only when `pick` is null).
+ */
+export function sizes(tokens: Tokens, pick: "pointer" | "touch" | null): [string, number][] {
+  const out: [string, number][] = [];
+  const walk = (node: Tokens, path: string[]) => {
+    for (const [k, v] of Object.entries(node)) {
+      if (isDensity(v)) {
+        if (pick) out.push([[...path, k].join("-"), v[pick]]);
+      } else if (typeof v === "number") {
+        if (!pick) out.push([[...path, k].join("-"), v]);
+      } else walk(v as Tokens, [...path, k]);
+    }
+  };
+  walk(tokens.size, []);
+  return out;
+}
+
+/** Flattens the `layout` block: `dialog.md` → `dialog-md`. */
+export function layout(tokens: Tokens): [string, number][] {
+  const out: [string, number][] = [];
+  for (const [k, v] of Object.entries(tokens.layout as Tokens)) {
+    if (typeof v === "number") out.push([k, v]);
+    else for (const [k2, v2] of Object.entries(v as Tokens)) out.push([`${k}-${k2}`, Number(v2)]);
+  }
+  return out;
+}

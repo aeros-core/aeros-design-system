@@ -133,7 +133,7 @@ class AerosDataTable<T> extends StatelessWidget {
           label: Text(
             columns[i].label,
             style: AerosTypography.bodySm(color: a.fgSecondary)
-                .copyWith(fontWeight: FontWeight.w600),
+                .withWeight(FontWeight.w600),
           ),
           numeric: columns[i].numeric,
           onSort: columns[i].sortable && onSortChanged != null
@@ -209,7 +209,7 @@ class AerosDataTable<T> extends StatelessWidget {
                                 WidgetStateProperty.all(a.bgSubtle),
                             headingTextStyle: AerosTypography.bodySm(
                                     color: a.fgSecondary)
-                                .copyWith(fontWeight: FontWeight.w600),
+                                .withWeight(FontWeight.w600),
                             dataTextStyle: AerosTypography.bodyMd(
                                 color: a.fgPrimary),
                             dividerThickness: 1,

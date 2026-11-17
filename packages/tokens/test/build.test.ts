@@ -127,8 +127,46 @@ describe("emitters (real tokens.json)", () => {
     // no hue other than the neutral ramp and black/white is defined statically
     const staticColours = [...theme.matchAll(/--color-([a-z]+)[-:]/g)].map((m) => m[1]);
     expect(new Set(staticColours)).toEqual(
-      new Set(["white", "black", "ink", "success", "warning", "danger", "info", "bg", "fg", "border", "brand", "focus"])
+      new Set(["white", "black", "ink", "success", "warning", "danger", "info", "bg", "fg", "border", "brand", "focus", "state", "scrim"])
     );
+  });
+
+  it("Tailwind theme carries the type scale, semantic radii, elevation and density-aware sizes", () => {
+    const theme = buildTheme(tokens);
+    for (const role of Object.keys(tokens.text)) {
+      expect(theme).toContain(`--text-${role}: `);
+      expect(theme).toContain(`--text-${role}--line-height: `);
+      expect(theme).toContain(`--text-${role}--font-weight: `);
+    }
+    for (const k of Object.keys(tokens.shape)) expect(theme).toContain(`--radius-${k}: var(--aeros-radius-${k});`);
+    for (const k of Object.keys(tokens.elevation.light)) expect(theme).toContain(`--shadow-${k}: var(--aeros-elevation-${k});`);
+    for (const k of Object.keys(tokens.size.control)) expect(theme).toContain(`--spacing-control-${k}: var(--aeros-size-control-${k});`);
+    for (const k of Object.keys(tokens.z)) expect(theme).toContain(`--z-index-${k}: ${tokens.z[k]};`);
+    expect(theme).toContain("--container-dialog-md: var(--aeros-layout-dialog-md);");
+    expect(theme).toContain("--outline-offset-field: var(--aeros-focus-offset-field);");
+  });
+
+  it("CSS switches density-dependent sizes under data-density and themes elevation", () => {
+    const css = buildCss(tokens);
+    const touch = css.slice(css.indexOf("[data-density='touch'] {"));
+    for (const [k, v] of Object.entries(tokens.size.control as Record<string, { pointer: number; touch: number }>)) {
+      expect(css).toContain(`--aeros-size-control-${k}: ${v.pointer}px;`);
+      expect(touch).toContain(`--aeros-size-control-${k}: ${v.touch}px;`);
+      expect(v.touch).toBeGreaterThanOrEqual(v.pointer);
+    }
+    expect(Object.keys(tokens.elevation.dark)).toEqual(Object.keys(tokens.elevation.light));
+    for (const k of Object.keys(tokens.elevation.light)) expect(css.split(`--aeros-elevation-${k}: `).length - 1).toBe(3);
+    // translucent aliases resolve to 8-digit hex
+    expect(css).toMatch(/--aeros-state-hover: #[0-9A-F]{8};/);
+  });
+
+  it("Dart carries elevation, sizes for both densities, shape and metrics", () => {
+    const theme = buildDartTheme(tokens);
+    expect(theme).toContain("static const AerosElevation light = AerosElevation(");
+    expect(theme).toContain("static const AerosSizeTokens touch = AerosSizeTokens(");
+    expect(theme).toContain(`controlMd: ${tokens.size.control.md.pointer.toFixed(1)},`);
+    expect(theme).toContain(`static const double control = ${Number(tokens.shape.control).toFixed(1)};`);
+    expect(theme).toContain(`static const double focusWidth = ${tokens.focus.width.toFixed(1)};`);
   });
 
   it("JS module exposes resolved and raw trees with a real type", () => {
