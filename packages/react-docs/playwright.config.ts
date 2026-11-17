@@ -23,7 +23,11 @@ export default defineConfig({
       animations: "disabled",
       caret: "hide",
       scale: "css",
-      maxDiffPixelRatio: 0.001,
+      // Strict on purpose. Playwright's defaults (threshold 0.2) treat a subtle
+      // colour shift — e.g. a warm grey becoming a cool grey — as "no change",
+      // and a ratio allowance hides a 2px radius change on a small control.
+      threshold: 0.01,
+      maxDiffPixels: 0,
     },
   },
 
