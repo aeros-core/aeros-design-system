@@ -26,9 +26,10 @@ jobs:
           head -c 200 packages/react/dist/index.js | grep -q '"use client"' \
             || { echo '"use client" directive missing from dist/index.js'; exit 1; }
       # Generated Dart tokens must be committed fresh — build:tokens rewrites
-      # packages/flutter/lib/src/tokens/aeros_tokens.g.dart.
+      # packages/flutter/lib/src/tokens/*.g.dart.
       - name: Assert generated Dart tokens are committed
-        run: git diff --exit-code packages/flutter/lib/src/tokens/aeros_tokens.g.dart
+        run: git diff --exit-code packages/flutter/lib/src/tokens/
+      - run: pnpm test:tokens
       - run: pnpm lint:react
       - run: pnpm test:react
       - run: pnpm check:contrast

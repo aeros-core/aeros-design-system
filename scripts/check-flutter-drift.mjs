@@ -8,8 +8,11 @@
 // Run: `node scripts/check-flutter-drift.mjs`
 import { readFileSync } from "node:fs";
 
-const tokens = JSON.parse(
-  readFileSync(new URL("../packages/tokens/src/tokens.json", import.meta.url), "utf8")
+import { parseHex, resolveTokens } from "../packages/tokens/src/resolve.mjs";
+
+// Aliases may be references ({color.ink.900}) — compare resolved values.
+const tokens = resolveTokens(
+  JSON.parse(readFileSync(new URL("../packages/tokens/src/tokens.json", import.meta.url), "utf8"))
 );
 const read = (p) => readFileSync(new URL(`../packages/flutter/lib/src/tokens/${p}`, import.meta.url), "utf8");
 
@@ -23,7 +26,12 @@ function expectIn(haystackName, haystack, needle, label) {
   }
 }
 
-const dartHex = (hex) => `Color(0xFF${hex.replace("#", "").toUpperCase()})`;
+const byte = (n) => Math.round(n).toString(16).padStart(2, "0").toUpperCase();
+const dartHex = (hex) => {
+  const { r, g, b, a } = parseHex(hex);
+  return `Color(0x${byte(a * 255)}${byte(r)}${byte(g)}${byte(b)})`;
+};
+const camel = (s) => s.replace(/-([a-z0-9])/g, (_m, c) => c.toUpperCase());
 
 // (a) generator completeness — every token value appears in the generated file.
 for (const [stop, v] of Object.entries(tokens.color.ink)) {
@@ -58,14 +66,54 @@ for (const [k, v] of Object.entries(tokens.motion.ease)) {
   expectIn("aeros_tokens.g.dart", gen, `Cubic(${args})`, `motion.ease.${k}`);
 }
 
-// (b) adoption — hand token files must alias the generated constants.
-for (const file of ["colors.dart", "spacing.dart", "radii.dart", "breakpoints.dart", "motion.dart"]) {
-  const src = read(file);
-  expectIn(file, src, "aeros_tokens.g.dart", `${file} imports the generated tokens`);
-  expectIn(file, src, "AerosTokens.", `${file} references AerosTokens`);
-  if (/Color\(0xFF/.test(src)) {
+// (a2) the typed theme file — colour sets, type scale and shadows are
+// generated whole, so every key in tokens.json must have a member.
+const theme = read("aeros_theme_tokens.g.dart");
+const THEME = "aeros_theme_tokens.g.dart";
+for (const k of Object.keys(tokens.alias.light)) {
+  expectIn(THEME, theme, `required this.${camel(k)},`, `AerosAliasColors.${camel(k)}`);
+}
+for (const k of Object.keys(tokens.color.semantic)) {
+  expectIn(THEME, theme, `required this.${camel(k)},`, `AerosSemanticColors.${camel(k)}`);
+}
+for (const [role, s] of Object.entries(tokens.text)) {
+  const start = theme.indexOf(`static const TextStyle ${camel(role)} = TextStyle(`);
+  if (start < 0) {
     failures++;
-    console.error(`✗ ${file} still contains a literal Color(0xFF…) — alias AerosTokens instead.`);
+    console.error(`✗ text.${role} — no AerosTypeScale.${camel(role)} in ${THEME}`);
+    continue;
+  }
+  const block = theme.slice(start, theme.indexOf(");", start));
+  const size = Number(s.size);
+  expectIn(THEME, block, `fontSize: ${Number.isInteger(size) ? size.toFixed(1) : size},`, `text.${role} size`);
+  if (s.family !== "mono") {
+    // Inter is a variable font: the glyph weight follows the wght axis.
+    expectIn(THEME, block, `FontVariation('wght', ${Number(s.weight).toFixed(1)})`, `text.${role} weight axis`);
+    expectIn(THEME, block, "package: 'aeros_design_system'", `text.${role} resolves the bundled font`);
+  }
+}
+for (const [set, suffix] of [["shadow", ""], ["shadowDark", "Dark"]]) {
+  for (const k of Object.keys(tokens[set])) {
+    expectIn(THEME, theme, `static const List<BoxShadow> ${camel(k)}${suffix} =`, `${set}.${k}`);
+  }
+}
+
+// (b) adoption — hand token files must alias the generated constants.
+const ADOPT = {
+  "colors.dart": "AerosTokens.",
+  "spacing.dart": "AerosTokens.",
+  "radii.dart": "AerosTokens.",
+  "breakpoints.dart": "AerosTokens.",
+  "motion.dart": "AerosTokens.",
+  "shadows.dart": "AerosShadowTokens."
+};
+for (const [file, ref] of Object.entries(ADOPT)) {
+  const src = read(file);
+  expectIn(file, src, ".g.dart", `${file} imports the generated tokens`);
+  expectIn(file, src, ref, `${file} references ${ref.slice(0, -1)}`);
+  if (/Color\(0x/.test(src) || /BoxShadow\(/.test(src)) {
+    failures++;
+    console.error(`✗ ${file} still contains a literal Color(0x…)/BoxShadow(…) — alias the generated tokens instead.`);
   }
 }
 

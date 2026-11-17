@@ -31,7 +31,12 @@ class AerosThemeExtension extends ThemeExtension<AerosThemeExtension> {
   @override
   AerosThemeExtension lerp(ThemeExtension<AerosThemeExtension>? other, double t) {
     if (other is! AerosThemeExtension) return this;
-    return t < 0.5 ? this : other;
+    // Interpolate the colours so a theme switch animates; brightness itself is
+    // binary and flips at the midpoint.
+    return AerosThemeExtension(
+      aliases: AerosAliasColors.lerp(aliases, other.aliases, t),
+      isDark: t < 0.5 ? isDark : other.isDark,
+    );
   }
 }
 
