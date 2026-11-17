@@ -6,6 +6,11 @@
 /* Enter/exit utilities (animate-in, fade-in-*, zoom-*, slide-in-from-*).
    Without this import those classes silently generate nothing (audit A-23). */
 @import "tw-animate-css";
+/* The Tailwind theme (colours, radii, shadows, easings, fonts, breakpoints and
+   the dark: variant) is generated from tokens.json — never hand-edit a theme
+   value here. It also resets Tailwind's default palette, so only Aeros tokens
+   compile. */
+@import "@aeros-core/tokens/theme.css";
 
 /* Tailwind v4 scans files relative to this stylesheet. Point it at the
    component source tree explicitly so every class used inside
@@ -20,13 +25,6 @@
 @source "../dist/**/*.js";
 
 @layer base {
-  :root {
-    color-scheme: light;
-  }
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-  }
-
   html, body {
     font-family: var(--aeros-font-sans);
     font-feature-settings: "cv11", "ss01";
@@ -71,93 +69,6 @@
 }
 
 @theme {
-  /* Static neutral ramp — deliberate fixed chrome (e.g. Sidebar/TopNav stay dark
-     in both themes). Everything theme-aware must use the alias/semantic classes
-     below, never raw ink stops. */
-  --color-ink-0: #FFFFFF;
-  --color-ink-50: #FAFAF9;
-  --color-ink-100: #F4F4F2;
-  --color-ink-200: #E7E6E2;
-  --color-ink-300: #D6D4CF;
-  --color-ink-400: #A8A6A0;
-  --color-ink-500: #7C7A74;
-  --color-ink-600: #57554F;
-  --color-ink-700: #403E39;
-  --color-ink-800: #272622;
-  --color-ink-900: #1A1916;
-  --color-ink-950: #121110;
-
-  /* Status colors route through tokens.css vars so [data-theme="dark"] flips them. */
-  --color-success: var(--aeros-color-semantic-success);
-  --color-success-bg: var(--aeros-color-semantic-success-bg);
-  --color-success-text: var(--aeros-color-semantic-success-text);
-  --color-success-border: var(--aeros-color-semantic-success-border);
-  --color-warning: var(--aeros-color-semantic-warning);
-  --color-warning-bg: var(--aeros-color-semantic-warning-bg);
-  --color-warning-text: var(--aeros-color-semantic-warning-text);
-  --color-warning-border: var(--aeros-color-semantic-warning-border);
-  --color-danger: var(--aeros-color-semantic-danger);
-  --color-danger-bg: var(--aeros-color-semantic-danger-bg);
-  --color-danger-text: var(--aeros-color-semantic-danger-text);
-  --color-danger-border: var(--aeros-color-semantic-danger-border);
-  --color-info: var(--aeros-color-semantic-info);
-  --color-info-bg: var(--aeros-color-semantic-info-bg);
-  --color-info-text: var(--aeros-color-semantic-info-text);
-  --color-info-border: var(--aeros-color-semantic-info-border);
-
-  --color-bg-canvas: var(--aeros-bg-canvas);
-  --color-bg-surface: var(--aeros-bg-surface);
-  --color-bg-elevated: var(--aeros-bg-elevated);
-  --color-bg-subtle: var(--aeros-bg-subtle);
-  --color-bg-inverse: var(--aeros-bg-inverse);
-  --color-fg-primary: var(--aeros-fg-primary);
-  --color-fg-secondary: var(--aeros-fg-secondary);
-  --color-fg-muted: var(--aeros-fg-muted);
-  --color-fg-inverse: var(--aeros-fg-inverse);
-  --color-fg-brand: var(--aeros-fg-brand);
-  --color-border-default: var(--aeros-border-default);
-  --color-border-strong: var(--aeros-border-strong);
-  --color-border-subtle: var(--aeros-border-subtle);
-  --color-border-focus: var(--aeros-border-focus);
-  --color-brand-primary: var(--aeros-brand-primary);
-  --color-brand-primary-hover: var(--aeros-brand-primary-hover);
-  --color-brand-primary-muted: var(--aeros-brand-primary-muted);
-  --color-focus-ring: var(--aeros-focus-ring);
-  --color-focus-ring-offset: var(--aeros-focus-ring-offset);
-
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-
-  --radius-none: 0px;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
-  --radius-3xl: 24px;
-  --radius-4xl: 32px;
-  --radius-full: 9999px;
-
-  /* Shadows route through tokens.css vars so dark elevation overrides apply
-     to Tailwind's shadow-* utilities too. */
-  --shadow-xs: var(--aeros-shadow-xs);
-  --shadow-sm: var(--aeros-shadow-sm);
-  --shadow-md: var(--aeros-shadow-md);
-  --shadow-lg: var(--aeros-shadow-lg);
-  --shadow-xl: var(--aeros-shadow-xl);
-  --shadow-focus: var(--aeros-shadow-focus);
-  --shadow-focus-danger: var(--aeros-shadow-focus-danger);
-  --shadow-focus-success: var(--aeros-shadow-focus-success);
-  --shadow-hairline: var(--aeros-shadow-hairline);
-
-  /* Motion easings from tokens (durations are consumed via duration-(--aeros-duration-*)). */
-  --ease-standard: var(--aeros-ease-standard);
-  --ease-emphasized: var(--aeros-ease-emphasized);
-  --ease-decelerate: var(--aeros-ease-decelerate);
-  --ease-entrance: var(--aeros-ease-entrance);
-  --ease-spring: var(--aeros-ease-spring);
-
   /* Accordion open/close (Radix measures content into the CSS var). */
   --animate-accordion-down: aeros-accordion-down var(--aeros-duration-base) var(--aeros-ease-standard);
   --animate-accordion-up: aeros-accordion-up var(--aeros-duration-base) var(--aeros-ease-standard);
