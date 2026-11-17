@@ -57,7 +57,7 @@ class AerosEnumChips extends StatelessWidget {
             text: TextSpan(
               text: label!,
               style: AerosTypography.bodySm(color: a.fgSecondary)
-                  .copyWith(fontWeight: FontWeight.w600),
+                  .withWeight(FontWeight.w600),
               children: [
                 if (required)
                   const TextSpan(
@@ -154,7 +154,7 @@ class _Chip extends StatelessWidget {
           Text(
             labelText,
             style: AerosTypography.bodySm(color: palette.foreground)
-                .copyWith(fontWeight: FontWeight.w600),
+                .withWeight(FontWeight.w600),
           ),
           if (selected) ...[
             const SizedBox(width: AerosSpacing.s2),

@@ -80,7 +80,7 @@ class _AerosPriceBreakdownState extends State<AerosPriceBreakdown> {
                         Text(
                           widget.title,
                           style: AerosTypography.caption(color: a.fgMuted)
-                              .copyWith(fontWeight: FontWeight.w700),
+                              .withWeight(FontWeight.w700),
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -146,13 +146,13 @@ class _AerosPriceBreakdownState extends State<AerosPriceBreakdown> {
                           child: Text(
                             'Total',
                             style: AerosTypography.bodyMd(color: a.fgPrimary)
-                                .copyWith(fontWeight: FontWeight.w700),
+                                .withWeight(FontWeight.w700),
                           ),
                         ),
                         Text(
                           _money(d.total),
                           style: AerosTypography.monoMd(color: a.fgPrimary)
-                              .copyWith(fontWeight: FontWeight.w700),
+                              .withWeight(FontWeight.w700),
                         ),
                       ],
                     ),
@@ -203,7 +203,7 @@ class _StepRow extends StatelessWidget {
                       child: Text(
                         step.name,
                         style: AerosTypography.bodySm(color: a.fgPrimary)
-                            .copyWith(fontWeight: FontWeight.w600),
+                            .withWeight(FontWeight.w600),
                       ),
                     ),
                     if (palette.label != null) ...[
@@ -220,11 +220,8 @@ class _StepRow extends StatelessWidget {
                         child: Text(
                           palette.label!,
                           style: AerosTypography.caption(color: a.fgMuted)
-                              .copyWith(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                height: 1,
-                              ),
+                              .copyWith(fontSize: 10, height: 1)
+                              .withWeight(FontWeight.w700),
                         ),
                       ),
                     ],
@@ -245,7 +242,7 @@ class _StepRow extends StatelessWidget {
           Text(
             amountText,
             style: AerosTypography.monoSm(color: palette.foreground)
-                .copyWith(fontWeight: FontWeight.w600),
+                .withWeight(FontWeight.w600),
           ),
         ],
       ),
@@ -279,7 +276,7 @@ class _SubtotalRow extends StatelessWidget {
         Text(
           amount,
           style: AerosTypography.monoSm(color: palette.foreground)
-              .copyWith(fontWeight: FontWeight.w600),
+              .withWeight(FontWeight.w600),
         ),
       ],
     );

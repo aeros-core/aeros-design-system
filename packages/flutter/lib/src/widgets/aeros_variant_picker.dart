@@ -51,7 +51,7 @@ class AerosVariantPicker extends StatelessWidget {
           text: TextSpan(
             text: label,
             style: AerosTypography.bodySm(color: a.fgSecondary)
-                .copyWith(fontWeight: FontWeight.w600),
+                .withWeight(FontWeight.w600),
             children: [
               if (required)
                 const TextSpan(
@@ -157,7 +157,7 @@ class _VariantTile extends StatelessWidget {
               Text(
                 variant.label,
                 style: AerosTypography.bodySm(color: palette.foreground)
-                    .copyWith(fontWeight: FontWeight.w600),
+                    .withWeight(FontWeight.w600),
               ),
               if (showStockBadge && !variant.inStock) ...[
                 const SizedBox(width: AerosSpacing.s2),
@@ -196,7 +196,7 @@ class _VariantTile extends StatelessWidget {
                         variant.label.isEmpty ? '?' : variant.label[0],
                         style: AerosTypography.bodyMd(
                           color: palette.foreground,
-                        ).copyWith(fontWeight: FontWeight.w800),
+                        ).withWeight(FontWeight.w800),
                       )
                     : null,
               ),
@@ -204,7 +204,7 @@ class _VariantTile extends StatelessWidget {
               Text(
                 variant.label,
                 style: AerosTypography.caption(color: palette.foreground)
-                    .copyWith(fontWeight: FontWeight.w600),
+                    .withWeight(FontWeight.w600),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
                 textAlign: TextAlign.center,
@@ -259,7 +259,7 @@ class _Badge extends StatelessWidget {
       child: Text(
         label,
         style: AerosTypography.caption(color: fg)
-            .copyWith(fontSize: 10, fontWeight: FontWeight.w700, height: 1),
+            .copyWith(fontSize: 10, height: 1).withWeight(FontWeight.w700),
       ),
     );
   }

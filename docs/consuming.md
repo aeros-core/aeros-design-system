@@ -27,11 +27,19 @@ Use a caret range (`^1.1.0`) so minor/patch DS releases are pickable by `pnpm up
 
 ### 3. Wire up styles
 
-```ts
-import "@aeros-core/react/styles.css"; // tokens + component styles
+In the app's global stylesheet (Tailwind v4):
+
+```css
+@import "@aeros-core/react/styles.css"; /* Tailwind + tokens + the Aeros theme */
+@import "@aeros-core/react/fonts.css";  /* optional: self-hosted Inter, Nunito Sans, IBM Plex Mono */
 ```
 
-Toggle dark mode with `data-theme="dark"` on `<html>`.
+- **Fonts (3.0):** `styles.css` no longer fetches fonts from Google. Import `fonts.css`, or load the faces yourself (e.g. `next/font`) — the font tokens fall back to the plain names `Inter`, `Nunito Sans` and `IBM Plex Mono`.
+- **Only Aeros tokens compile (3.0):** the theme resets Tailwind's default palette, radii, shadows and easings. `bg-blue-500`, `shadow-2xl` or `ease-out` generate nothing — use the alias classes (`bg-bg-surface`, `text-fg-muted`, `border-border-default`, `shadow-overlay`, `ease-standard`, …). `white`, `black` and `ink-*` remain.
+- **Theme:** set `data-theme` to `light`, `dark` or `system` (follows the OS) on `<html>`. It also works on any element, so a subtree can be themed on its own — e.g. `<aside data-theme="dark">`. A `dark:` variant is available.
+- **Density:** sizes default to pointer (mouse). Put `data-density="touch"` on `<html>` or any subtree for the larger touch sizes.
+
+The theme itself is generated from `tokens.json` and lives in `@aeros-core/tokens/theme.css`; `styles.css` already imports it.
 
 ## Mobile (Flutter)
 

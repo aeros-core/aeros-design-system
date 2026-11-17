@@ -26,6 +26,7 @@ class AerosSemanticColors {
     required this.infoBg,
     required this.infoText,
     required this.infoBorder,
+    required this.dangerHover,
   });
 
   final Color success;
@@ -44,6 +45,7 @@ class AerosSemanticColors {
   final Color infoBg;
   final Color infoText;
   final Color infoBorder;
+  final Color dangerHover;
 
   static const AerosSemanticColors light = AerosSemanticColors(
     success: AerosTokens.success,
@@ -62,6 +64,7 @@ class AerosSemanticColors {
     infoBg: AerosTokens.infoBg,
     infoText: AerosTokens.infoText,
     infoBorder: AerosTokens.infoBorder,
+    dangerHover: AerosTokens.dangerHover,
   );
 
   static const AerosSemanticColors dark = AerosSemanticColors(
@@ -81,6 +84,7 @@ class AerosSemanticColors {
     infoBg: AerosTokens.infoBgDark,
     infoText: AerosTokens.infoTextDark,
     infoBorder: AerosTokens.infoBorderDark,
+    dangerHover: AerosTokens.dangerHoverDark,
   );
 
   static AerosSemanticColors resolve(bool isDark) => isDark ? dark : light;
@@ -103,6 +107,7 @@ class AerosSemanticColors {
         infoBg: Color.lerp(a.infoBg, b.infoBg, t)!,
         infoText: Color.lerp(a.infoText, b.infoText, t)!,
         infoBorder: Color.lerp(a.infoBorder, b.infoBorder, t)!,
+        dangerHover: Color.lerp(a.dangerHover, b.dangerHover, t)!,
       );
 }
 
@@ -130,6 +135,11 @@ class AerosAliasColors {
     required this.brandPrimaryMuted,
     required this.focusRing,
     required this.focusRingOffset,
+    required this.fgDisabled,
+    required this.stateHover,
+    required this.statePressed,
+    required this.stateSelected,
+    required this.scrim,
   });
 
   final Color bgCanvas;
@@ -151,6 +161,11 @@ class AerosAliasColors {
   final Color brandPrimaryMuted;
   final Color focusRing;
   final Color focusRingOffset;
+  final Color fgDisabled;
+  final Color stateHover;
+  final Color statePressed;
+  final Color stateSelected;
+  final Color scrim;
 
   static const AerosAliasColors light = AerosAliasColors(
     bgCanvas: AerosTokens.aliasLightBgCanvas,
@@ -172,6 +187,11 @@ class AerosAliasColors {
     brandPrimaryMuted: AerosTokens.aliasLightBrandPrimaryMuted,
     focusRing: AerosTokens.aliasLightFocusRing,
     focusRingOffset: AerosTokens.aliasLightFocusRingOffset,
+    fgDisabled: AerosTokens.aliasLightFgDisabled,
+    stateHover: AerosTokens.aliasLightStateHover,
+    statePressed: AerosTokens.aliasLightStatePressed,
+    stateSelected: AerosTokens.aliasLightStateSelected,
+    scrim: AerosTokens.aliasLightScrim,
   );
 
   static const AerosAliasColors dark = AerosAliasColors(
@@ -194,6 +214,11 @@ class AerosAliasColors {
     brandPrimaryMuted: AerosTokens.aliasDarkBrandPrimaryMuted,
     focusRing: AerosTokens.aliasDarkFocusRing,
     focusRingOffset: AerosTokens.aliasDarkFocusRingOffset,
+    fgDisabled: AerosTokens.aliasDarkFgDisabled,
+    stateHover: AerosTokens.aliasDarkStateHover,
+    statePressed: AerosTokens.aliasDarkStatePressed,
+    stateSelected: AerosTokens.aliasDarkStateSelected,
+    scrim: AerosTokens.aliasDarkScrim,
   );
 
   static AerosAliasColors resolve(bool isDark) => isDark ? dark : light;
@@ -219,6 +244,11 @@ class AerosAliasColors {
         brandPrimaryMuted: Color.lerp(a.brandPrimaryMuted, b.brandPrimaryMuted, t)!,
         focusRing: Color.lerp(a.focusRing, b.focusRing, t)!,
         focusRingOffset: Color.lerp(a.focusRingOffset, b.focusRingOffset, t)!,
+        fgDisabled: Color.lerp(a.fgDisabled, b.fgDisabled, t)!,
+        stateHover: Color.lerp(a.stateHover, b.stateHover, t)!,
+        statePressed: Color.lerp(a.statePressed, b.statePressed, t)!,
+        stateSelected: Color.lerp(a.stateSelected, b.stateSelected, t)!,
+        scrim: Color.lerp(a.scrim, b.scrim, t)!,
       );
 }
 
@@ -367,6 +397,7 @@ class AerosTypeScale {
   );
   static const TextStyle monoLg = TextStyle(
     fontFamily: AerosTokens.fontMono,
+    package: 'aeros_design_system',
     fontSize: 22.0,
     fontWeight: FontWeight.w500,
     height: 1.2,
@@ -374,6 +405,7 @@ class AerosTypeScale {
   );
   static const TextStyle monoMd = TextStyle(
     fontFamily: AerosTokens.fontMono,
+    package: 'aeros_design_system',
     fontSize: 14.0,
     fontWeight: FontWeight.w500,
     height: 1.5,
@@ -381,6 +413,7 @@ class AerosTypeScale {
   );
   static const TextStyle monoSm = TextStyle(
     fontFamily: AerosTokens.fontMono,
+    package: 'aeros_design_system',
     fontSize: 12.0,
     fontWeight: FontWeight.w400,
     height: 1.5,
@@ -388,6 +421,7 @@ class AerosTypeScale {
   );
   static const TextStyle monoXs = TextStyle(
     fontFamily: AerosTokens.fontMono,
+    package: 'aeros_design_system',
     fontSize: 11.0,
     fontWeight: FontWeight.w400,
     height: 1.5,
@@ -476,4 +510,177 @@ class AerosShadowTokens {
   static const List<BoxShadow> hairlineDark = <BoxShadow>[
     BoxShadow(color: Color(0x14FFFFFF), blurRadius: 0.0, spreadRadius: 1.0),
   ];
+}
+
+/// Elevation intents (`elevation` in tokens.json). Resting surfaces carry a
+/// hairline and no shadow; only these intents float. Overlay and modal draw
+/// their own 1px edge inside the shadow, in both themes.
+@immutable
+class AerosElevation {
+  const AerosElevation({required this.raised, required this.overlay, required this.modal});
+
+  final List<BoxShadow> raised;
+  final List<BoxShadow> overlay;
+  final List<BoxShadow> modal;
+
+  static const AerosElevation light = AerosElevation(
+    raised: <BoxShadow>[
+      BoxShadow(color: Color(0x0F000000), blurRadius: 2.0, offset: Offset(0.0, 1.0)),
+    ],
+    overlay: <BoxShadow>[
+      BoxShadow(color: Color(0x14000000), blurRadius: 0.0, spreadRadius: 1.0),
+      BoxShadow(color: Color(0x1A000000), blurRadius: 12.0, spreadRadius: -2.0, offset: Offset(0.0, 4.0)),
+      BoxShadow(color: Color(0x0F000000), blurRadius: 4.0, spreadRadius: -2.0, offset: Offset(0.0, 2.0)),
+    ],
+    modal: <BoxShadow>[
+      BoxShadow(color: Color(0x14000000), blurRadius: 0.0, spreadRadius: 1.0),
+      BoxShadow(color: Color(0x29000000), blurRadius: 40.0, spreadRadius: -8.0, offset: Offset(0.0, 16.0)),
+      BoxShadow(color: Color(0x14000000), blurRadius: 12.0, spreadRadius: -4.0, offset: Offset(0.0, 4.0)),
+    ],
+  );
+
+  static const AerosElevation dark = AerosElevation(
+    raised: <BoxShadow>[
+      BoxShadow(color: Color(0x80000000), blurRadius: 2.0, offset: Offset(0.0, 1.0)),
+    ],
+    overlay: <BoxShadow>[
+      BoxShadow(color: Color(0x1AFFFFFF), blurRadius: 0.0, spreadRadius: 1.0),
+      BoxShadow(color: Color(0x99000000), blurRadius: 24.0, spreadRadius: -4.0, offset: Offset(0.0, 8.0)),
+    ],
+    modal: <BoxShadow>[
+      BoxShadow(color: Color(0x1AFFFFFF), blurRadius: 0.0, spreadRadius: 1.0),
+      BoxShadow(color: Color(0xB3000000), blurRadius: 56.0, spreadRadius: -12.0, offset: Offset(0.0, 24.0)),
+    ],
+  );
+
+  static AerosElevation resolve(bool isDark) => isDark ? dark : light;
+
+  static AerosElevation lerp(AerosElevation a, AerosElevation b, double t) => AerosElevation(
+        raised: BoxShadow.lerpList(a.raised, b.raised, t)!,
+        overlay: BoxShadow.lerpList(a.overlay, b.overlay, t)!,
+        modal: BoxShadow.lerpList(a.modal, b.modal, t)!,
+      );
+}
+
+/// Sizes that change with input density (`size` in tokens.json): `pointer` for
+/// a mouse, `touch` for fingers.
+@immutable
+class AerosSizeTokens {
+  const AerosSizeTokens({
+    required this.controlXs,
+    required this.controlSm,
+    required this.controlMd,
+    required this.controlLg,
+    required this.controlXl,
+    required this.header,
+    required this.row,
+    required this.iconButton,
+    required this.badge,
+    required this.listAvatar,
+    required this.inlineAvatar,
+    required this.navRow,
+    required this.navIcon,
+    required this.navLabel,
+    required this.minTarget,
+  });
+
+  final double controlXs;
+  final double controlSm;
+  final double controlMd;
+  final double controlLg;
+  final double controlXl;
+  final double header;
+  final double row;
+  final double iconButton;
+  final double badge;
+  final double listAvatar;
+  final double inlineAvatar;
+  final double navRow;
+  final double navIcon;
+  final double navLabel;
+  final double minTarget;
+
+  static const AerosSizeTokens pointer = AerosSizeTokens(
+    controlXs: 24.0,
+    controlSm: 28.0,
+    controlMd: 32.0,
+    controlLg: 36.0,
+    controlXl: 40.0,
+    header: 48.0,
+    row: 40.0,
+    iconButton: 32.0,
+    badge: 18.0,
+    listAvatar: 40.0,
+    inlineAvatar: 26.0,
+    navRow: 32.0,
+    navIcon: 16.0,
+    navLabel: 13.0,
+    minTarget: 24.0,
+  );
+
+  static const AerosSizeTokens touch = AerosSizeTokens(
+    controlXs: 32.0,
+    controlSm: 36.0,
+    controlMd: 40.0,
+    controlLg: 44.0,
+    controlXl: 48.0,
+    header: 56.0,
+    row: 48.0,
+    iconButton: 44.0,
+    badge: 20.0,
+    listAvatar: 48.0,
+    inlineAvatar: 30.0,
+    navRow: 48.0,
+    navIcon: 20.0,
+    navLabel: 14.0,
+    minTarget: 44.0,
+  );
+
+  // ─── Density-independent ───
+  static const double iconXs = 12.0;
+  static const double iconSm = 14.0;
+  static const double iconMd = 16.0;
+  static const double iconLg = 20.0;
+  static const double iconXl = 24.0;
+  static const double avatarXs = 20.0;
+  static const double avatarSm = 24.0;
+  static const double avatarMd = 32.0;
+  static const double avatarLg = 40.0;
+  static const double avatarXl = 56.0;
+}
+
+/// Semantic radii (`shape` in tokens.json) — widgets use these, never a raw scale step.
+class AerosShapeTokens {
+  AerosShapeTokens._();
+
+  static const double item = 6.0;
+  static const double control = 8.0;
+  static const double surface = 12.0;
+  static const double modal = 16.0;
+  static const double pill = 9999.0;
+}
+
+/// Focus ring, opacity, border width and layout metrics.
+class AerosMetricTokens {
+  AerosMetricTokens._();
+
+  static const double focusWidth = 2.0;
+  static const double focusOffset = 2.0;
+  static const double focusOffsetField = -1.0;
+  static const double focusOffsetInset = -2.0;
+  static const double opacityDisabled = 0.4;
+  static const double opacityMuted = 0.6;
+  static const double borderHairline = 1.0;
+  static const double borderThick = 2.0;
+  static const double layoutSidebar = 240.0;
+  static const double layoutSidebarRail = 56.0;
+  static const double layoutSidebarMobile = 280.0;
+  static const double layoutContentMax = 1200.0;
+  static const double layoutDialogSm = 400.0;
+  static const double layoutDialogMd = 520.0;
+  static const double layoutDialogLg = 720.0;
+  static const double layoutDialogXl = 960.0;
+  static const double layoutDrawerSm = 360.0;
+  static const double layoutDrawerMd = 480.0;
+  static const double layoutDrawerLg = 640.0;
 }

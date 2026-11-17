@@ -25,7 +25,7 @@ class AerosBreadcrumb extends StatelessWidget {
             items[i].label,
             style: AerosTypography.bodySm(
               color: last ? a.fgPrimary : a.fgMuted,
-            ).copyWith(fontWeight: last ? FontWeight.w600 : FontWeight.w500),
+            ).withWeight(last ? FontWeight.w600 : FontWeight.w500),
           ),
         ),
       );

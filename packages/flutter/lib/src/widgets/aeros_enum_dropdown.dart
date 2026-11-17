@@ -58,7 +58,7 @@ class AerosEnumDropdown extends StatelessWidget {
             text: TextSpan(
               text: label!,
               style: AerosTypography.bodySm(color: a.fgSecondary)
-                  .copyWith(fontWeight: FontWeight.w600),
+                  .withWeight(FontWeight.w600),
               children: [
                 if (required)
                   const TextSpan(

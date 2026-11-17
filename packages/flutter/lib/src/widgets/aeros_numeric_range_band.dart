@@ -105,7 +105,7 @@ class AerosNumericRangeBand extends StatelessWidget {
                   text: TextSpan(
                     text: label!,
                     style: AerosTypography.bodySm(color: a.fgSecondary)
-                        .copyWith(fontWeight: FontWeight.w600),
+                        .withWeight(FontWeight.w600),
                     children: [
                       if (required)
                         const TextSpan(
@@ -119,7 +119,7 @@ class AerosNumericRangeBand extends StatelessWidget {
               Text(
                 '${_format(safeStart)} – ${_format(safeEnd)}',
                 style: AerosTypography.monoMd(color: a.fgPrimary)
-                    .copyWith(fontWeight: FontWeight.w600),
+                    .withWeight(FontWeight.w600),
               ),
             ],
           ),

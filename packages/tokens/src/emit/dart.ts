@@ -1,5 +1,5 @@
 import { parseHex } from "../resolve.mjs";
-import { GENERATED, camel, cap, parseShadow, ramps, semantic, type Tokens } from "./shared";
+import { GENERATED, camel, cap, layout, parseShadow, ramps, semantic, sizes, type Tokens } from "./shared";
 
 const FLUTTER_PACKAGE = "aeros_design_system";
 
@@ -181,12 +181,9 @@ export function buildDartTheme(tokens: Tokens): string {
     const mono = s.family === "mono";
     const opsz = s.opsz ?? (s.size >= 28 ? 32 : 14);
     L.push(`  static const TextStyle ${camel(name)} = TextStyle(`);
-    if (mono) {
-      L.push("    fontFamily: AerosTokens.fontMono,");
-    } else {
-      L.push("    fontFamily: AerosTokens.fontSans,");
-      L.push(`    package: '${FLUTTER_PACKAGE}',`);
-    }
+    // Both faces are bundled with the Flutter package, so every style names it.
+    L.push(`    fontFamily: AerosTokens.${mono ? "fontMono" : "fontSans"},`);
+    L.push(`    package: '${FLUTTER_PACKAGE}',`);
     L.push(`    fontSize: ${num(Number(s.size))},`);
     L.push(`    fontWeight: ${dartFontWeight(s.weight)},`);
     L.push(`    height: ${num(Number(s.lineHeight))},`);
@@ -210,6 +207,73 @@ export function buildDartTheme(tokens: Tokens): string {
   for (const [k, v] of Object.entries(tokens.shadowDark as Record<string, string>)) {
     L.push(`  static const List<BoxShadow> ${camel(k)}Dark = ${shadowList(v, `shadowDark.${k}`)};`);
   }
+  L.push("}");
+  L.push("");
+
+  // Elevation intents — one value class with light/dark instances.
+  const intents = Object.keys(tokens.elevation.light);
+  L.push("/// Elevation intents (`elevation` in tokens.json). Resting surfaces carry a");
+  L.push("/// hairline and no shadow; only these intents float. Overlay and modal draw");
+  L.push("/// their own 1px edge inside the shadow, in both themes.");
+  L.push("@immutable");
+  L.push("class AerosElevation {");
+  L.push(`  const AerosElevation({${intents.map((k) => `required this.${camel(k)}`).join(", ")}});`);
+  L.push("");
+  for (const k of intents) L.push(`  final List<BoxShadow> ${camel(k)};`);
+  for (const theme of ["light", "dark"] as const) {
+    L.push("");
+    L.push(`  static const AerosElevation ${theme} = AerosElevation(`);
+    for (const k of intents) L.push(`    ${camel(k)}: ${shadowList(tokens.elevation[theme][k], `elevation.${theme}.${k}`).replace(/\n {2}/g, "\n    ")},`);
+    L.push("  );");
+  }
+  L.push("");
+  L.push("  static AerosElevation resolve(bool isDark) => isDark ? dark : light;");
+  L.push("");
+  L.push("  static AerosElevation lerp(AerosElevation a, AerosElevation b, double t) => AerosElevation(");
+  for (const k of intents) L.push(`        ${camel(k)}: BoxShadow.lerpList(a.${camel(k)}, b.${camel(k)}, t)!,`);
+  L.push("      );");
+  L.push("}");
+  L.push("");
+
+  // Density-dependent sizes.
+  const dens = sizes(tokens, "pointer").map(([k]) => k);
+  L.push("/// Sizes that change with input density (`size` in tokens.json): `pointer` for");
+  L.push("/// a mouse, `touch` for fingers.");
+  L.push("@immutable");
+  L.push("class AerosSizeTokens {");
+  L.push("  const AerosSizeTokens({");
+  for (const k of dens) L.push(`    required this.${camel(k)},`);
+  L.push("  });");
+  L.push("");
+  for (const k of dens) L.push(`  final double ${camel(k)};`);
+  for (const d of ["pointer", "touch"] as const) {
+    L.push("");
+    L.push(`  static const AerosSizeTokens ${d} = AerosSizeTokens(`);
+    for (const [k, v] of sizes(tokens, d)) L.push(`    ${camel(k)}: ${num(v)},`);
+    L.push("  );");
+  }
+  L.push("");
+  L.push("  // ─── Density-independent ───");
+  for (const [k, v] of sizes(tokens, null)) L.push(`  static const double ${camel(k)} = ${num(v)};`);
+  L.push("}");
+  L.push("");
+
+  L.push("/// Semantic radii (`shape` in tokens.json) — widgets use these, never a raw scale step.");
+  L.push("class AerosShapeTokens {");
+  L.push("  AerosShapeTokens._();");
+  L.push("");
+  for (const [k, v] of Object.entries(tokens.shape)) L.push(`  static const double ${camel(k)} = ${num(Number(v))};`);
+  L.push("}");
+  L.push("");
+
+  L.push("/// Focus ring, opacity, border width and layout metrics.");
+  L.push("class AerosMetricTokens {");
+  L.push("  AerosMetricTokens._();");
+  L.push("");
+  for (const [k, v] of Object.entries(tokens.focus)) L.push(`  static const double focus${cap(camel(k))} = ${num(Number(v))};`);
+  for (const [k, v] of Object.entries(tokens.opacity)) L.push(`  static const double opacity${cap(camel(k))} = ${num(Number(v))};`);
+  for (const [k, v] of Object.entries(tokens.borderWidth)) L.push(`  static const double border${cap(camel(k))} = ${num(Number(v))};`);
+  for (const [k, v] of layout(tokens)) L.push(`  static const double layout${cap(camel(k))} = ${num(v)};`);
   L.push("}");
   return L.join("\n") + "\n";
 }

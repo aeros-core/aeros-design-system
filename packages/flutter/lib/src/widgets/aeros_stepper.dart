@@ -34,7 +34,7 @@ class AerosStepper extends StatelessWidget {
           children: [
             Text(
               'Step $clampedStep of $totalSteps${label != null ? ' — $label' : ''}',
-              style: AerosTypography.caption(color: a.fgSecondary).copyWith(fontWeight: FontWeight.w600),
+              style: AerosTypography.caption(color: a.fgSecondary).withWeight(FontWeight.w600),
             ),
             Text('${(progress * 100).round()}%', style: AerosTypography.monoSm(color: a.fgMuted)),
           ],

@@ -61,11 +61,8 @@ class AerosRoutingSignalBadge extends StatelessWidget {
             child: Text(
               signal.label,
               style: AerosTypography.caption(color: palette.foreground)
-                  .copyWith(
-                    fontSize: dense ? 11 : 12,
-                    fontWeight: FontWeight.w700,
-                    height: 1.2,
-                  ),
+                  .copyWith(fontSize: dense ? 11 : 12, height: 1.2)
+                  .withWeight(FontWeight.w700),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

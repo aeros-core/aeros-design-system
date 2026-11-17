@@ -6,7 +6,6 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +15,11 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
     'packages/aeros_design_system/Inter',
     File('${package.path}/assets/fonts/InterVariable.ttf'),
   );
+  // Both mono faces go into one family; the engine picks by weight.
+  await _loadFamily('packages/aeros_design_system/IBM Plex Mono', [
+    File('${package.path}/assets/fonts/IBMPlexMono-Regular.ttf'),
+    File('${package.path}/assets/fonts/IBMPlexMono-Medium.ttf'),
+  ]);
   await _loadFont(
     'packages/aeros_design_system/AerosWordmark',
     File('${package.path}/assets/fonts/AerosWordmark-NunitoSansExpanded-Medium.ttf'),
@@ -31,23 +35,21 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
     stderr.writeln('golden: FLUTTER_ROOT is not set; icons will render as boxes.');
   }
 
-  // Mono text goes through `GoogleFonts.ibmPlexMono`, which fetches the font at
-  // run time. That cannot work in a test, so it is switched off: the lookup
-  // fails straight away, google_fonts swallows the failure itself (so no test
-  // fails), and mono text falls back to the test font. A later change bundles
-  // the font and removes this.
-  GoogleFonts.config.allowRuntimeFetching = false;
-
   await testMain();
 }
 
-Future<void> _loadFont(String family, File file) async {
-  if (!file.existsSync()) {
-    stderr.writeln('golden: font not found, "$family" will render as boxes: ${file.path}');
-    return;
+Future<void> _loadFont(String family, File file) => _loadFamily(family, [file]);
+
+Future<void> _loadFamily(String family, List<File> files) async {
+  final loader = FontLoader(family);
+  for (final file in files) {
+    if (!file.existsSync()) {
+      stderr.writeln('golden: font not found, "$family" will render as boxes: ${file.path}');
+      return;
+    }
+    final bytes = await file.readAsBytes();
+    loader.addFont(Future.value(ByteData.view(bytes.buffer)));
   }
-  final bytes = await file.readAsBytes();
-  final loader = FontLoader(family)..addFont(Future.value(ByteData.view(bytes.buffer)));
   await loader.load();
 }
 

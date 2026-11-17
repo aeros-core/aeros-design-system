@@ -94,7 +94,7 @@ class AerosConstraintErrorAlert extends StatelessWidget {
                 Text(
                   _title(),
                   style: AerosTypography.bodySm(color: palette.foreground)
-                      .copyWith(fontWeight: FontWeight.w700),
+                      .withWeight(FontWeight.w700),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -113,10 +113,8 @@ class AerosConstraintErrorAlert extends StatelessWidget {
                     child: Text(
                       resolveLabel!,
                       style: AerosTypography.bodySm(color: palette.foreground)
-                          .copyWith(
-                            fontWeight: FontWeight.w700,
-                            decoration: TextDecoration.underline,
-                          ),
+                          .copyWith(decoration: TextDecoration.underline)
+                          .withWeight(FontWeight.w700),
                     ),
                   ),
                 ],

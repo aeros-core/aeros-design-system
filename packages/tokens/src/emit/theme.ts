@@ -1,4 +1,4 @@
-import { GENERATED, px, ramps, semantic, type Tokens } from "./shared";
+import { GENERATED, layout, px, ramps, semantic, sizes, type Tokens } from "./shared";
 
 /**
  * dist/css/theme.css — the Tailwind v4 theme, generated so the utility names
@@ -54,6 +54,20 @@ export function buildTheme(tokens: Tokens): string {
   for (const [k, v] of Object.entries(tokens.radius)) L.push(`  --radius-${k}: ${px(v)};`);
   L.push("");
   for (const [k, v] of Object.entries(tokens.breakpoint)) L.push(`  --breakpoint-${k}: ${Number(v) / 16}rem;`);
+  L.push("");
+  L.push("  /* Type scale — text-<role> sets size, line height, tracking and weight together. */");
+  for (const [name, s] of Object.entries(tokens.text as Record<string, Tokens>)) {
+    L.push(`  --text-${name}: ${Number(s.size) / 16}rem;`);
+    L.push(`  --text-${name}--line-height: ${s.lineHeight};`);
+    L.push(`  --text-${name}--letter-spacing: ${s.tracking};`);
+    L.push(`  --text-${name}--font-weight: ${s.weight};`);
+  }
+  L.push("");
+  for (const [k, v] of Object.entries(tokens.z)) L.push(`  --z-index-${k}: ${v};`);
+  L.push("");
+  L.push("  /* Hover/press transitions default to the token timing, not Tailwind's 150ms. */");
+  L.push("  --default-transition-duration: var(--aeros-duration-fast);");
+  L.push("  --default-transition-timing-function: var(--aeros-ease-standard);");
   L.push("}");
   L.push("");
 
@@ -67,6 +81,25 @@ export function buildTheme(tokens: Tokens): string {
   for (const k of Object.keys(tokens.shadow)) L.push(`  --shadow-${k}: var(--aeros-shadow-${k});`);
   L.push("");
   for (const k of Object.keys(tokens.motion.ease)) L.push(`  --ease-${k}: var(--aeros-ease-${k});`);
+  for (const k of Object.keys(tokens.motion.duration)) L.push(`  --transition-duration-${k}: var(--aeros-duration-${k});`);
+  L.push("");
+  L.push("  /* Semantic radii and elevation */");
+  for (const k of Object.keys(tokens.shape)) L.push(`  --radius-${k}: var(--aeros-radius-${k});`);
+  for (const k of Object.keys(tokens.elevation.light)) L.push(`  --shadow-${k}: var(--aeros-elevation-${k});`);
+  L.push("");
+  L.push("  /* Sizes — h-control-md, size-icon-md, h-header, w-sidebar … (density-aware) */");
+  for (const [k] of [...sizes(tokens, "pointer"), ...sizes(tokens, null)]) L.push(`  --spacing-${k}: var(--aeros-size-${k});`);
+  for (const [k] of layout(tokens)) {
+    if (k.startsWith("sidebar")) L.push(`  --spacing-${k}: var(--aeros-layout-${k});`);
+    else L.push(`  --container-${k}: var(--aeros-layout-${k});`);
+  }
+  L.push("");
+  for (const k of Object.keys(tokens.opacity)) L.push(`  --opacity-${k}: var(--aeros-opacity-${k});`);
+  for (const k of Object.keys(tokens.borderWidth)) L.push(`  --border-width-${k}: var(--aeros-border-width-${k});`);
+  L.push("  --outline-width-focus: var(--aeros-focus-width);");
+  for (const k of Object.keys(tokens.focus)) {
+    if (k.startsWith("offset")) L.push(`  --outline-offset-${k === "offset" ? "focus" : k.replace("offset-", "")}: var(--aeros-focus-${k});`);
+  }
   L.push("}");
   return L.join("\n") + "\n";
 }

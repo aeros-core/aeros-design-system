@@ -44,8 +44,6 @@ void main() {
           _specimen(context, 'labelXs', AerosTypography.labelXs(color: fg)),
           _specimen(context, 'caption', AerosTypography.caption(color: fg)),
           _specimen(context, 'overline', AerosTypography.overline(color: fg)),
-          // The mono roles render in the test font until IBM Plex Mono is
-          // bundled; their size, line height and colour are still captured.
           _specimen(context, 'monoLg', AerosTypography.monoLg(color: fg)),
           _specimen(context, 'monoMd', AerosTypography.monoMd(color: fg)),
           _specimen(context, 'monoSm', AerosTypography.monoSm(color: fg)),

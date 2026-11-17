@@ -225,7 +225,6 @@ void main() {
     act: (t) => hover(t, find.text('Lorven Foods')),
   );
 
-  // Mono amounts render in the test font until IBM Plex Mono is bundled.
   goldenMatrix(
     'data_price_breakdown',
     size: const Size(860, 560),
