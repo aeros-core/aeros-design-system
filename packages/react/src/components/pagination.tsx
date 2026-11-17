@@ -53,11 +53,11 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
           disabled={page <= 1}
           aria-label="Previous page"
         >
-          <ChevronLeft className="h-4 w-4" aria-hidden />
+          <ChevronLeft aria-hidden />
         </button>
         {items.map((item, i) =>
           item === "…" ? (
-            <span key={`gap-${i}`} aria-hidden className="inline-flex h-8 min-w-8 items-center justify-center text-[13px] text-fg-muted">
+            <span key={`gap-${i}`} aria-hidden className="inline-flex h-control-sm min-w-control-sm items-center justify-center text-body-sm text-fg-muted">
               …
             </span>
           ) : (
@@ -85,7 +85,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
           disabled={page >= count}
           aria-label="Next page"
         >
-          <ChevronRight className="h-4 w-4" aria-hidden />
+          <ChevronRight aria-hidden />
         </button>
       </nav>
     );
