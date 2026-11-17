@@ -26,8 +26,10 @@ export default defineConfig({
       // Strict on purpose. Playwright's defaults (threshold 0.2) treat a subtle
       // colour shift — e.g. a warm grey becoming a cool grey — as "no change",
       // and a ratio allowance hides a 2px radius change on a small control.
+      // A handful of pixels is allowed: on Linux CI one anti-aliased pixel of a
+      // rotated icon can differ between two runs of identical code.
       threshold: 0.01,
-      maxDiffPixels: 0,
+      maxDiffPixels: 10,
     },
   },
 
