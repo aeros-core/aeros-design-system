@@ -2,6 +2,18 @@
 
 ## 3.0.0 (unreleased)
 
+### The "Crisp precision" values
+
+Every colour, radius, duration and text size moves with the tokens — nothing in an app needs
+renaming, but every screen looks different. Review visually when upgrading.
+
+- **Colour:** cool neutral ink ramp (was warm stone), plus `AerosColors.ink850`. Dark mode is
+  near-black: canvas `ink950`, surface `ink900`, elevated `ink850`.
+- **Radius:** `AerosRadii` tightens — xs 2, sm 4, md 6, lg 8, xl 12 (were 4 / 6 / 8 / 12 / 16).
+- **Motion:** quick 80, fast 120, base 180, slow 260 ms.
+- **Type:** h1 24, h2 20, h3 16, h4 14, display 48 / 36 / 30 (all w600); labels w500; mono 20 /
+  13 / 12 / 11. `AerosDensity.touch` body line height is 1.4 (was 1.45).
+
 Typography now comes straight from the tokens, weights render, and the package has no runtime dependencies besides Flutter.
 
 ### Breaking

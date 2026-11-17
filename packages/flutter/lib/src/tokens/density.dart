@@ -45,7 +45,7 @@ enum AerosDensity {
     badgeHeight: 20,
     titleSize: 16,
     titleHeight: 1.25,
-    bodyHeight: 1.45,
+    bodyHeight: 1.4,
     metaHeight: 1.3,
     labelSize: 13,
   );
@@ -115,7 +115,7 @@ enum AerosDensity {
   TextStyle titleStyle({Color? color, FontWeight weight = FontWeight.w600}) =>
       AerosTypography.bodyLg(color: color).copyWith(fontSize: _titleSize, height: _titleHeight).withWeight(weight);
 
-  /// Reading text — a message, a description: 14px, line height 1.4 (pointer) or 1.45 (touch).
+  /// Reading text — a message, a description: 14px, line height 1.4.
   TextStyle bodyStyle({Color? color, FontWeight weight = FontWeight.w400}) =>
       AerosTypography.bodyMd(color: color).copyWith(height: _bodyHeight).withWeight(weight);
 

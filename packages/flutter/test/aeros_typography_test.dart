@@ -73,7 +73,8 @@ void main() {
       expect(_wght(viaParam), 600);
       expect(_opsz(viaParam), _opsz(AerosTypography.bodyMd()));
 
-      final display = AerosTypography.h1(weight: FontWeight.w500);
+      // displayXl is the role that takes Inter's display optical cut (size >= 28).
+      final display = AerosTypography.displayXl(weight: FontWeight.w500);
       expect(_wght(display), 500);
       expect(_opsz(display), 32);
 
@@ -120,7 +121,7 @@ void main() {
       final wide = _advance('MMMMMMMMMM', style);
       expect(narrow, wide);
       // IBM Plex Mono advances 0.6em; the placeholder test font advances 1em.
-      expect(narrow, closeTo(10 * 14 * 0.6, 0.01));
+      expect(narrow, closeTo(10 * style.fontSize! * 0.6, 0.01));
     });
 
     test('the pubspec declares both mono faces and no google_fonts', () {
