@@ -20,3 +20,19 @@ pubspec.lock
 .ds-sync/
 ds-bundle/
 .design-sync/
+
+# Playwright (packages/react-docs). Linux is the canonical screenshot platform:
+# only e2e/__screenshots__/linux is committed; other platforms are local scratch.
+packages/react-docs/e2e/__screenshots__/darwin/
+packages/react-docs/e2e/__screenshots__/win32/
+packages/react-docs/test-results/
+packages/react-docs/playwright-report/
+packages/react-docs/blob-report/
+packages/react-docs/playwright/.cache/
+
+# Flutter golden baselines: only the Linux images (generated in CI) are
+# canonical. Images made on a developer's Mac or Windows machine stay local,
+# as do the diff images a failing comparison writes.
+packages/flutter/test/golden/goldens/macos/
+packages/flutter/test/golden/goldens/windows/
+packages/flutter/test/golden/failures/

@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test:visual": "playwright test --project=desktop --project=mobile",
+    "test:visual:update": "playwright test --project=desktop --project=mobile --update-snapshots",
+    "test:a11y": "playwright test --project=a11y"
   },
   "dependencies": {
     "@aeros-core/react": "workspace:*",
@@ -16,10 +19,13 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^20.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "serve": "^14.2.8",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.6.0"
   }

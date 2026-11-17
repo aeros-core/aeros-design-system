@@ -14,6 +14,10 @@
    consumers where transpilePackages compiles these from source. */
 @source "./components/**/*.{ts,tsx}";
 @source "./*.{ts,tsx}";
+/* The published package ships only dist/ + this stylesheet (no src/components),
+   so installed consumers need the compiled bundle scanned too — without this
+   line the component classes are never generated outside the monorepo. */
+@source "../dist/**/*.js";
 
 @layer base {
   :root {

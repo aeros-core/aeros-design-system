@@ -1,0 +1,92 @@
+import type { ComponentType } from "react";
+import type { FixtureSlug } from "./slugs";
+
+import AccordionFixture from "./accordion";
+import AlertFixture from "./alert";
+import AlertDialogFixture from "./alert-dialog";
+import AvatarFixture from "./avatar";
+import BadgeFixture from "./badge";
+import BreadcrumbFixture from "./breadcrumb";
+import ButtonFixture from "./button";
+import CalendarFixture from "./calendar";
+import CardFixture from "./card";
+import CheckboxFixture from "./checkbox";
+import CommandFixture from "./command";
+import DialogFixture from "./dialog";
+import DotMatrixFixture from "./dot-matrix";
+import { DrawerBottomFixture, DrawerLeftFixture, DrawerRightFixture } from "./drawer";
+import DropdownMenuFixture from "./dropdown-menu";
+import EmptyStateFixture from "./empty-state";
+import FoundationsSurfacesFixture from "./foundations-surfaces";
+import FoundationsTypeFixture from "./foundations-type";
+import InputFixture from "./input";
+import LabelFixture from "./label";
+import PaginationFixture from "./pagination";
+import PopoverFixture from "./popover";
+import ProgressFixture from "./progress";
+import RadioFixture from "./radio";
+import SelectFixture from "./select";
+import SelectOpenFixture from "./select-open";
+import SeparatorFixture from "./separator";
+import SidebarFixture from "./sidebar";
+import SkeletonFixture from "./skeleton";
+import SpinnerFixture from "./spinner";
+import StatCardFixture from "./stat-card";
+import SwitchFixture from "./switch";
+import TableFixture from "./table";
+import TabsFixture from "./tabs";
+import TagFixture from "./tag";
+import TextareaFixture from "./textarea";
+import ToastFixture from "./toast";
+import TooltipFixture from "./tooltip";
+import TopNavFixture from "./topnav";
+
+/**
+ * slug → fixture component. `Record<FixtureSlug, …>` makes this exhaustive in
+ * both directions: add the slug to `./slugs.ts` and the component here, or
+ * `next build` fails. The Playwright specs iterate `FIXTURE_SLUGS`, so a
+ * registered fixture is always screenshotted and axe-scanned.
+ */
+export const FIXTURES: Record<FixtureSlug, ComponentType> = {
+  "foundations-type": FoundationsTypeFixture,
+  "foundations-surfaces": FoundationsSurfacesFixture,
+  button: ButtonFixture,
+  input: InputFixture,
+  textarea: TextareaFixture,
+  select: SelectFixture,
+  "select-open": SelectOpenFixture,
+  checkbox: CheckboxFixture,
+  radio: RadioFixture,
+  switch: SwitchFixture,
+  badge: BadgeFixture,
+  tag: TagFixture,
+  card: CardFixture,
+  "stat-card": StatCardFixture,
+  alert: AlertFixture,
+  progress: ProgressFixture,
+  avatar: AvatarFixture,
+  tabs: TabsFixture,
+  breadcrumb: BreadcrumbFixture,
+  "dropdown-menu": DropdownMenuFixture,
+  dialog: DialogFixture,
+  "alert-dialog": AlertDialogFixture,
+  "drawer-right": DrawerRightFixture,
+  "drawer-left": DrawerLeftFixture,
+  "drawer-bottom": DrawerBottomFixture,
+  popover: PopoverFixture,
+  tooltip: TooltipFixture,
+  table: TableFixture,
+  "empty-state": EmptyStateFixture,
+  topnav: TopNavFixture,
+  sidebar: SidebarFixture,
+  "dot-matrix": DotMatrixFixture,
+  label: LabelFixture,
+  separator: SeparatorFixture,
+  spinner: SpinnerFixture,
+  skeleton: SkeletonFixture,
+  accordion: AccordionFixture,
+  toast: ToastFixture,
+  pagination: PaginationFixture,
+  command: CommandFixture,
+  calendar: CalendarFixture,
+};

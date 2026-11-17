@@ -36,17 +36,94 @@ jobs:
       - run: pnpm check:flutter-drift
       - run: pnpm check:versions
 
+  visual:
+    name: Screenshots + a11y (react)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:tokens
+      - run: pnpm build:react
+      - run: pnpm --filter @aeros-core/react-docs build
+      - run: pnpm --filter @aeros-core/react-docs exec playwright install --with-deps chromium
+      # Linux is the canonical platform: baselines live in
+      # packages/react-docs/e2e/__screenshots__/linux and are compared here.
+      - name: Compare against committed baselines
+        id: compare
+        run: pnpm test:visual
+      # On a mismatch (or a missing baseline) regenerate and publish the images,
+      # so an intended visual change is adopted by downloading this artifact
+      # into the PR — never by generating baselines on a developer machine.
+      - name: Regenerate baselines for review
+        if: failure() && steps.compare.outcome == 'failure'
+        run: pnpm test:visual:update
+      - name: Upload regenerated baselines + report
+        if: failure() && steps.compare.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: react-screenshots-linux
+          path: |
+            packages/react-docs/e2e/__screenshots__/linux
+            packages/react-docs/playwright-report
+          if-no-files-found: warn
+      # Runs even when screenshots differ, so one push reports both.
+      - name: Accessibility (axe)
+        if: ${{ !cancelled() }}
+        run: pnpm test:a11y
+
   flutter:
     name: Analyze + test (flutter)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Pinned: golden images are only stable on a fixed engine. Bump deliberately
+      # and regenerate the baselines in the same PR.
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.41.6
+      - working-directory: packages/flutter
+        run: flutter pub get
+      - working-directory: packages/flutter
+        run: dart analyze lib test
+      - working-directory: packages/flutter
+        run: flutter test --exclude-tags golden
+
+  flutter-goldens:
+    name: Golden images (flutter)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: 3.41.6
       - working-directory: packages/flutter
         run: flutter pub get
-      - working-directory: packages/flutter
-        run: dart analyze lib
-      - working-directory: packages/flutter
-        run: flutter test
+      # Linux is the canonical platform: baselines live in
+      # packages/flutter/test/golden/goldens/linux and are compared here.
+      - name: Compare against committed baselines
+        id: compare
+        working-directory: packages/flutter
+        run: flutter test --tags golden
+      # On a mismatch (or a missing baseline) regenerate and publish the images,
+      # so an intended visual change is adopted by downloading this artifact
+      # into the PR — never by generating baselines on a developer machine.
+      - name: Regenerate baselines for review
+        if: failure() && steps.compare.outcome == 'failure'
+        working-directory: packages/flutter
+        run: flutter test --tags golden --update-goldens
+      - name: Upload regenerated baselines + diffs
+        if: failure() && steps.compare.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-goldens-linux
+          path: |
+            packages/flutter/test/golden/goldens/linux
+            packages/flutter/test/golden/failures
+          if-no-files-found: warn
