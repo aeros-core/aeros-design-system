@@ -31,8 +31,11 @@ export async function openFixture(page: Page, slug: FixtureSlug, theme: Theme): 
   const fonts = await page.evaluate(() =>
     Array.from(document.fonts, (f) => ({ family: f.family.replace(/["']/g, ""), status: f.status }))
   );
+  // next/font adds a metric-matched "<Family> Fallback" face whose source is a
+  // local system font (e.g. Courier New). Where that font is not installed —
+  // Linux CI — the face reports "error" although the real web font loaded.
   expect(
-    fonts.filter((f) => f.status === "error"),
+    fonts.filter((f) => f.status === "error" && !f.family.endsWith(" Fallback")),
     "a web font failed to load"
   ).toEqual([]);
   const families = new Set(fonts.map((f) => f.family));
