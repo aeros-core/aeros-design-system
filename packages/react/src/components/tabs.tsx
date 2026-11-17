@@ -49,7 +49,7 @@ export const TabsTrigger = React.forwardRef<
       ref={ref}
       className={cn(
         "text-sm font-medium text-fg-muted transition-colors duration-(--aeros-duration-fast) whitespace-nowrap rounded-sm",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas",
+        "",
         variant === "underline"
           ? "px-4 py-2.5 border-b-2 border-transparent -mb-px hover:text-fg-primary data-[state=active]:text-fg-primary data-[state=active]:border-fg-primary data-[state=active]:font-semibold"
           : "rounded-md px-3.5 py-1.5 hover:text-fg-secondary data-[state=active]:bg-bg-surface data-[state=active]:text-fg-primary data-[state=active]:font-semibold data-[state=active]:shadow-sm",

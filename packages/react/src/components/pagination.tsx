@@ -35,7 +35,7 @@ function pageModel(page: number, count: number, siblings: number): Array<number 
 const itemBase =
   "inline-flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-[13px] font-medium " +
   "transition-colors duration-(--aeros-duration-quick) " +
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas " +
+  "" +
   "disabled:opacity-40 disabled:cursor-not-allowed";
 
 export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(

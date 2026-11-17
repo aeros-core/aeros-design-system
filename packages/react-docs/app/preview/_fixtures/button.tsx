@@ -4,7 +4,7 @@ import { Button } from "@aeros-core/react";
 import { ChevronDown, Plus, Settings } from "lucide-react";
 import { Group } from "./kit";
 
-const VARIANTS = ["primary", "secondary", "ghost", "danger", "link"] as const;
+const VARIANTS = ["primary", "secondary", "ghost", "danger", "danger-subtle", "link"] as const;
 
 export default function ButtonFixture() {
   return (
@@ -31,16 +31,17 @@ export default function ButtonFixture() {
         <Button variant="secondary" size="xl">xl</Button>
       </Group>
       <Group label="Icon-only sizes">
-        <Button size="icon-sm" aria-label="Settings"><Settings className="h-4 w-4" /></Button>
-        <Button size="icon-md" aria-label="Settings"><Settings className="h-4 w-4" /></Button>
-        <Button size="icon-lg" aria-label="Settings"><Settings className="h-4 w-4" /></Button>
-        <Button variant="secondary" size="icon-md" aria-label="Settings"><Settings className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon-md" aria-label="Settings"><Settings className="h-4 w-4" /></Button>
+        <Button size="xs" iconOnly aria-label="Settings"><Settings /></Button>
+        <Button size="sm" iconOnly aria-label="Settings"><Settings /></Button>
+        <Button size="md" iconOnly aria-label="Settings"><Settings /></Button>
+        <Button size="lg" iconOnly aria-label="Settings"><Settings /></Button>
+        <Button variant="secondary" size="md" iconOnly aria-label="Settings"><Settings /></Button>
+        <Button variant="ghost" size="md" iconOnly aria-label="Settings"><Settings /></Button>
       </Group>
       <Group label="With icons">
-        <Button leadingIcon={<Plus className="h-4 w-4" />}>Create RFQ</Button>
-        <Button variant="secondary" trailingIcon={<ChevronDown className="h-4 w-4" />}>Filter</Button>
-        <Button variant="ghost" leadingIcon={<Settings className="h-4 w-4" />}>Settings</Button>
+        <Button leadingIcon={<Plus />}>Create RFQ</Button>
+        <Button variant="secondary" trailingIcon={<ChevronDown />}>Filter</Button>
+        <Button variant="ghost" leadingIcon={<Settings />}>Settings</Button>
       </Group>
       <Group label="Loading">
         {VARIANTS.map((v) => (
@@ -56,9 +57,14 @@ export default function ButtonFixture() {
           </Button>
         ))}
       </Group>
-      {/* No asChild case: <Button asChild> currently throws ("React.Children.only
-          expected to receive a single React element child") because Button passes
-          [leadingIcon, children, trailingIcon] to Slot. Add one here once fixed. */}
+      <Group label="asChild — a link styled as a button">
+        <Button asChild leadingIcon={<Plus />}>
+          <a href="#new">New order</a>
+        </Button>
+        <Button asChild variant="secondary" trailingIcon={<ChevronDown />}>
+          <a href="#more">More</a>
+        </Button>
+      </Group>
     </>
   );
 }

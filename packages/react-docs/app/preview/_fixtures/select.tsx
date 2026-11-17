@@ -26,15 +26,15 @@ export default function SelectFixture() {
     <>
       <Group label="Sizes" className="max-w-xl flex-col items-stretch">
         <Select>
-          <SelectTrigger size="sm" aria-label="Small"><SelectValue placeholder="sm · 32" /></SelectTrigger>
+          <SelectTrigger size="sm" aria-label="Small"><SelectValue placeholder="sm · 28" /></SelectTrigger>
           <Options />
         </Select>
         <Select>
-          <SelectTrigger size="md" aria-label="Medium"><SelectValue placeholder="md · 36" /></SelectTrigger>
+          <SelectTrigger size="md" aria-label="Medium"><SelectValue placeholder="md · 32" /></SelectTrigger>
           <Options />
         </Select>
         <Select>
-          <SelectTrigger size="lg" aria-label="Large"><SelectValue placeholder="lg · 40" /></SelectTrigger>
+          <SelectTrigger size="lg" aria-label="Large"><SelectValue placeholder="lg · 36" /></SelectTrigger>
           <Options />
         </Select>
       </Group>
@@ -60,7 +60,7 @@ export default function SelectFixture() {
           <Options />
         </Select>
       </Group>
-      <Group label="Field wrapper" className="max-w-xl flex-col items-stretch gap-0">
+      <Group label="Field wrapper" className="max-w-xl flex-col items-stretch gap-4">
         <Field label="Vendor" hint="Only approved vendors are listed.">
           <Select>
             <SelectTrigger><SelectValue placeholder="Choose a vendor" /></SelectTrigger>

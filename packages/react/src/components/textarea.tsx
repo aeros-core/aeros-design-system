@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import { cn } from "../lib/cn";
+import { fieldBase, fieldState } from "../internal/recipes";
 import { useFieldControl, type FieldControlSize } from "./input";
 
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -10,9 +11,9 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
 }
 
 const sizeClasses: Record<FieldControlSize, string> = {
-  sm: "min-h-[72px] px-3 py-2 text-[13px]",
-  md: "min-h-[84px] px-3.5 py-2.5 text-sm",
-  lg: "min-h-[96px] px-4 py-3 text-sm"
+  sm: "min-h-18 px-2.5 py-1.5 text-body-sm",
+  md: "min-h-20 px-3 py-2 text-body-sm",
+  lg: "min-h-24 px-3.5 py-2.5 text-body-md"
 };
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -21,17 +22,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <textarea
         ref={ref}
-        className={cn(
-          "w-full font-medium rounded-md border bg-bg-surface text-fg-primary",
-          sizeClasses[size],
-          "placeholder:text-fg-muted placeholder:font-normal",
-          "transition-[border-color,box-shadow] duration-(--aeros-duration-fast) resize-y",
-          "focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed",
-          resolvedState === "default" && "border-border-default hover:border-border-strong focus:border-border-focus focus:shadow-focus",
-          resolvedState === "error"   && "border-danger focus:shadow-focus-danger",
-          resolvedState === "success" && "border-success focus:shadow-focus-success",
-          className
-        )}
+        className={cn(fieldBase, "resize-y", sizeClasses[size], fieldState[resolvedState], className)}
         {...props}
         {...fieldProps}
       />

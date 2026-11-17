@@ -95,7 +95,7 @@ export const Th = React.forwardRef<HTMLTableCellElement, ThProps>(
           className={cn(
             "flex w-full items-center gap-1 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]",
             "transition-colors duration-(--aeros-duration-quick) hover:text-fg-primary",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus-ring",
+            "focus-ring-inset",
             sortDirection ? "text-fg-primary" : "text-fg-muted"
           )}
         >

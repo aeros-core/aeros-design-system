@@ -2,6 +2,7 @@
 import * as React from "react";
 import * as RS from "@radix-ui/react-switch";
 import { cn } from "../lib/cn";
+import { colorTransition } from "../internal/recipes";
 
 export const Switch = React.forwardRef<
   React.ElementRef<typeof RS.Root>,
@@ -10,15 +11,15 @@ export const Switch = React.forwardRef<
   <RS.Root
     ref={ref}
     className={cn(
-      "peer inline-flex h-6 w-[42px] shrink-0 cursor-pointer items-center rounded-full transition-colors duration-(--aeros-duration-fast)",
-      "bg-border-strong data-[state=checked]:bg-brand-primary",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas",
-      "disabled:opacity-40 disabled:cursor-not-allowed",
+      "peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full bg-border-strong",
+      colorTransition,
+      "hover:bg-fg-disabled data-[state=checked]:bg-brand-primary data-[state=checked]:hover:bg-brand-primary-hover",
+      "disabled:cursor-not-allowed disabled:opacity-disabled",
       className
     )}
     {...props}
   >
-    <RS.Thumb className="pointer-events-none block h-[18px] w-[18px] translate-x-[3px] rounded-full bg-bg-surface shadow-[0_1px_3px_rgba(10,10,10,0.18)] transition-transform duration-(--aeros-duration-fast) ease-(--aeros-ease-standard) data-[state=checked]:translate-x-[21px]" />
+    <RS.Thumb className="pointer-events-none block size-4 translate-x-0.5 rounded-full bg-bg-surface shadow-raised transition-transform duration-base ease-standard data-[state=checked]:translate-x-4.5" />
   </RS.Root>
 ));
 Switch.displayName = "Switch";

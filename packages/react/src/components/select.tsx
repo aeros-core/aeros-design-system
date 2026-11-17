@@ -3,25 +3,14 @@ import * as React from "react";
 import * as RS from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "../lib/cn";
+import { fieldBase, fieldSize, fieldState, type FieldState } from "../internal/recipes";
 import { useFieldControl, type FieldControlSize } from "./input";
 
 export const Select: typeof RS.Root = RS.Root;
 export const SelectValue: typeof RS.Value = RS.Value;
 export const SelectGroup: typeof RS.Group = RS.Group;
 
-type TriggerState = "default" | "error" | "success";
-
-const triggerSizeClasses: Record<FieldControlSize, string> = {
-  sm: "h-8 px-3 text-[13px]",
-  md: "h-9 px-3.5 text-sm",
-  lg: "h-10 px-4 text-sm"
-};
-
-const triggerStateClasses: Record<TriggerState, string> = {
-  default: "border-border-default hover:border-border-strong focus:border-border-focus focus:shadow-focus",
-  error:   "border-danger focus:shadow-focus-danger",
-  success: "border-success focus:shadow-focus-success"
-};
+type TriggerState = FieldState;
 
 export const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof RS.Trigger>,
@@ -34,20 +23,13 @@ export const SelectTrigger = React.forwardRef<
   return (
     <RS.Trigger
       ref={ref}
-      className={cn(
-        "flex w-full items-center justify-between rounded-md border bg-bg-surface font-medium text-fg-primary",
-        triggerSizeClasses[size],
-        "transition-[border-color,box-shadow] duration-(--aeros-duration-fast)",
-        "focus:outline-none data-[placeholder]:text-fg-muted disabled:opacity-40 disabled:cursor-not-allowed",
-        triggerStateClasses[resolvedState],
-        className
-      )}
+      className={cn(fieldBase, "flex items-center justify-between gap-2 text-left", fieldSize[size], fieldState[resolvedState], className)}
       {...props}
       {...fieldProps}
     >
       {children}
       <RS.Icon asChild>
-        <ChevronDown className="h-4 w-4 text-fg-muted" />
+        <ChevronDown className="size-icon-md shrink-0 text-fg-muted" />
       </RS.Icon>
     </RS.Trigger>
   );

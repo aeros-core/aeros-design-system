@@ -73,7 +73,7 @@ export const ToastAction = React.forwardRef<
     className={cn(
       "ml-auto inline-flex h-7 shrink-0 items-center rounded-md border border-current/25 px-2.5 text-[12px] font-semibold",
       "transition-colors duration-(--aeros-duration-fast) hover:bg-bg-subtle/60",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring",
+      "",
       className
     )}
     {...props}
@@ -89,7 +89,7 @@ export const ToastClose = React.forwardRef<
     ref={ref}
     className={cn(
       "absolute right-2 top-2 rounded-md p-1 opacity-70 transition-opacity hover:opacity-100",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring",
+      "",
       className
     )}
     {...props}

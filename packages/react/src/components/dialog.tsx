@@ -48,7 +48,7 @@ export const DialogContent = React.forwardRef<
     >
       {children}
       {showClose && (
-        <RD.Close className="absolute right-3 top-3 rounded-md p-1 text-fg-muted hover:bg-bg-subtle hover:text-fg-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-elevated">
+        <RD.Close className="absolute right-3 top-3 rounded-md p-1 text-fg-muted hover:bg-bg-subtle hover:text-fg-primary transition-colors">
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </RD.Close>

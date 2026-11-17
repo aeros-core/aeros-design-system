@@ -17,7 +17,7 @@ export default function TextareaFixture() {
         <Textarea aria-label="Success" state="success" defaultValue="Looks good." />
         <Textarea aria-label="Disabled" disabled defaultValue="Disabled value" />
       </Group>
-      <Group label="Field wrapper" className="max-w-xl flex-col items-stretch gap-0">
+      <Group label="Field wrapper" className="max-w-xl flex-col items-stretch gap-4">
         <Field label="Notes" hint="Visible to your team only.">
           <Textarea placeholder="Add context for your team…" rows={3} />
         </Field>

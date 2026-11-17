@@ -24,11 +24,11 @@ export function Calendar({ className, classNames, showOutsideDays = true, ...pro
         nav: cn(d.nav, "absolute inset-x-0 top-0 flex h-8 items-center justify-between"),
         button_previous: cn(
           d.button_previous,
-          "inline-flex h-8 w-8 items-center justify-center rounded-md text-fg-muted hover:bg-bg-subtle hover:text-fg-primary transition-colors duration-(--aeros-duration-quick) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring disabled:opacity-40"
+          "inline-flex h-8 w-8 items-center justify-center rounded-md text-fg-muted hover:bg-bg-subtle hover:text-fg-primary transition-colors duration-(--aeros-duration-quick) disabled:opacity-40"
         ),
         button_next: cn(
           d.button_next,
-          "inline-flex h-8 w-8 items-center justify-center rounded-md text-fg-muted hover:bg-bg-subtle hover:text-fg-primary transition-colors duration-(--aeros-duration-quick) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring disabled:opacity-40"
+          "inline-flex h-8 w-8 items-center justify-center rounded-md text-fg-muted hover:bg-bg-subtle hover:text-fg-primary transition-colors duration-(--aeros-duration-quick) disabled:opacity-40"
         ),
         month_grid: cn(d.month_grid, "border-collapse"),
         weekdays: cn(d.weekdays, "flex"),
@@ -39,7 +39,7 @@ export function Calendar({ className, classNames, showOutsideDays = true, ...pro
           d.day_button,
           "inline-flex h-9 w-9 items-center justify-center rounded-md text-[13px] font-medium text-fg-secondary",
           "hover:bg-bg-subtle hover:text-fg-primary transition-colors duration-(--aeros-duration-quick)",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+          ""
         ),
         selected: cn(
           d.selected,
