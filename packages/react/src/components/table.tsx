@@ -53,7 +53,7 @@ export const Tr = React.forwardRef<HTMLTableRowElement, TrProps>(
       aria-selected={selected || undefined}
       data-selected={selected || undefined}
       className={cn(
-        "hover:[&>td]:bg-bg-subtle [&>td]:transition-colors [&>td]:duration-(--aeros-duration-quick)",
+        "hover:[&>td]:bg-bg-subtle [&>td]:transition-colors [&>td]:duration-quick",
         selected && "[&>td]:bg-brand-primary-muted hover:[&>td]:bg-brand-primary-muted",
         className
       )}
@@ -94,7 +94,7 @@ export const Th = React.forwardRef<HTMLTableCellElement, ThProps>(
           onClick={onSort}
           className={cn(
             "flex w-full items-center gap-1 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em]",
-            "transition-colors duration-(--aeros-duration-quick) hover:text-fg-primary",
+            "transition-colors duration-quick hover:text-fg-primary",
             "focus-ring-inset",
             sortDirection ? "text-fg-primary" : "text-fg-muted"
           )}

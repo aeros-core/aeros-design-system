@@ -14,7 +14,7 @@ export const ToastViewport = React.forwardRef<
   <RT.Viewport
     ref={ref}
     className={cn(
-      "fixed bottom-0 right-0 z-(--aeros-z-toast) flex max-h-screen w-full flex-col gap-2 p-5 sm:max-w-[380px]",
+      "fixed bottom-0 right-0 z-toast flex max-h-screen w-full flex-col gap-2 p-4 sm:max-w-sm",
       className
     )}
     {...props}
@@ -22,18 +22,21 @@ export const ToastViewport = React.forwardRef<
 ));
 ToastViewport.displayName = "ToastViewport";
 
+// Every toast is the same elevated surface; the tone only colours the title,
+// so status text never sits on a tinted fill.
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded-lg border p-4 pr-9 shadow-lg " +
-  "data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom-2 data-[state=open]:fade-in-0 " +
-  "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-right-2 " +
-  "data-[state=open]:duration-(--aeros-duration-base) data-[state=open]:ease-(--aeros-ease-entrance) motion-reduce:animate-none",
+  "group pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded-surface bg-bg-elevated p-3 pr-9 text-fg-primary shadow-overlay " +
+    "data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom-2 data-[state=open]:fade-in-0 " +
+    "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-right-2 " +
+    "data-[state=open]:duration-base data-[state=open]:ease-enter data-[state=closed]:duration-fast data-[state=closed]:ease-exit " +
+    "motion-reduce:animate-none",
   {
     variants: {
       variant: {
-        neutral: "bg-bg-elevated border-border-default text-fg-primary",
-        success: "bg-success-bg border-success-border text-success-text",
-        warning: "bg-warning-bg border-warning-border text-warning-text",
-        danger:  "bg-danger-bg border-danger-border text-danger-text"
+        neutral: "",
+        success: "[&_[data-toast-title]]:text-success-text",
+        warning: "[&_[data-toast-title]]:text-warning-text",
+        danger: "[&_[data-toast-title]]:text-danger-text"
       }
     },
     defaultVariants: { variant: "neutral" }
@@ -52,7 +55,7 @@ export const ToastTitle = React.forwardRef<
   React.ElementRef<typeof RT.Title>,
   React.ComponentPropsWithoutRef<typeof RT.Title>
 >(({ className, ...props }, ref) => (
-  <RT.Title ref={ref} className={cn("text-[13px] font-bold", className)} {...props} />
+  <RT.Title ref={ref} data-toast-title="" className={cn("text-label-sm", className)} {...props} />
 ));
 ToastTitle.displayName = "ToastTitle";
 
@@ -60,7 +63,7 @@ export const ToastDescription = React.forwardRef<
   React.ElementRef<typeof RT.Description>,
   React.ComponentPropsWithoutRef<typeof RT.Description>
 >(({ className, ...props }, ref) => (
-  <RT.Description ref={ref} className={cn("text-xs leading-relaxed opacity-90", className)} {...props} />
+  <RT.Description ref={ref} className={cn("text-caption text-fg-secondary", className)} {...props} />
 ));
 ToastDescription.displayName = "ToastDescription";
 
@@ -71,9 +74,8 @@ export const ToastAction = React.forwardRef<
   <RT.Action
     ref={ref}
     className={cn(
-      "ml-auto inline-flex h-7 shrink-0 items-center rounded-md border border-current/25 px-2.5 text-[12px] font-semibold",
-      "transition-colors duration-(--aeros-duration-fast) hover:bg-bg-subtle/60",
-      "",
+      "ml-auto inline-flex h-control-xs shrink-0 items-center rounded-control border border-border-strong px-2 text-label-xs",
+      "transition-colors duration-quick hover:bg-state-hover",
       className
     )}
     {...props}
@@ -88,13 +90,13 @@ export const ToastClose = React.forwardRef<
   <RT.Close
     ref={ref}
     className={cn(
-      "absolute right-2 top-2 rounded-md p-1 opacity-70 transition-opacity hover:opacity-100",
-      "",
+      "absolute right-2 top-2 inline-flex size-control-xs items-center justify-center rounded-control text-fg-muted",
+      "transition-colors duration-quick hover:bg-state-hover hover:text-fg-primary [&_svg]:size-icon-sm",
       className
     )}
     {...props}
   >
-    <X className="h-3.5 w-3.5" />
+    <X />
     <span className="sr-only">Dismiss</span>
   </RT.Close>
 ));

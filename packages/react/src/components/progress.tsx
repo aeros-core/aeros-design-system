@@ -23,7 +23,7 @@ export const Progress = React.forwardRef<React.ElementRef<typeof RP.Root>, Progr
       {...props}
     >
       <RP.Indicator
-        className={cn("h-full w-full transition-transform duration-(--aeros-duration-slow) ease-(--aeros-ease-standard)", variantMap[variant])}
+        className={cn("h-full w-full transition-transform duration-slow ease-standard", variantMap[variant])}
         style={{ transform: `translateX(-${100 - (value ?? 0)}%)` }}
       />
     </RP.Root>

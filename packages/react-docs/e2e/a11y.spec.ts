@@ -30,14 +30,6 @@ const KNOWN_VIOLATIONS: Partial<Record<FixtureSlug, Partial<Record<Theme, string
     dark: ["aria-hidden-focus"],
   },
 
-  // TODO(toast): color-contrast (serious), light theme only. ToastDescription
-  // is `opacity-90`, which drops success-text on success-bg to 3.85:1 and
-  // warning-text on warning-bg to 3.83:1 at 12px (needs 4.5:1). Neutral and
-  // danger pass; dark passes.
-  toast: {
-    light: ["color-contrast"],
-  },
-
   // TODO(command): aria-required-children (critical). cmdk's list is
   // role="listbox"; (1) <CommandSeparator> renders role="separator" as a
   // direct child, which a listbox may not own, and (2) in the empty state the

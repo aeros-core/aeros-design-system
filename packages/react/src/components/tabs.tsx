@@ -48,7 +48,7 @@ export const TabsTrigger = React.forwardRef<
     <RT.Trigger
       ref={ref}
       className={cn(
-        "text-sm font-medium text-fg-muted transition-colors duration-(--aeros-duration-fast) whitespace-nowrap rounded-sm",
+        "text-sm font-medium text-fg-muted transition-colors duration-fast whitespace-nowrap rounded-sm",
         "",
         variant === "underline"
           ? "px-4 py-2.5 border-b-2 border-transparent -mb-px hover:text-fg-primary data-[state=active]:text-fg-primary data-[state=active]:border-fg-primary data-[state=active]:font-semibold"

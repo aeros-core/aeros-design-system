@@ -34,7 +34,7 @@ function pageModel(page: number, count: number, siblings: number): Array<number 
 
 const itemBase =
   "inline-flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-[13px] font-medium " +
-  "transition-colors duration-(--aeros-duration-quick) " +
+  "transition-colors duration-quick " +
   "" +
   "disabled:opacity-40 disabled:cursor-not-allowed";
 

@@ -23,7 +23,7 @@ export const AccordionTrigger = React.forwardRef<
       ref={ref}
       className={cn(
         "flex flex-1 items-center justify-between gap-3 py-3.5 text-left text-sm font-medium text-fg-primary",
-        "transition-colors duration-(--aeros-duration-fast) hover:text-fg-secondary",
+        "transition-colors duration-fast hover:text-fg-secondary",
         "rounded-sm",
         "[&[data-state=open]>svg]:rotate-180",
         className
@@ -31,7 +31,7 @@ export const AccordionTrigger = React.forwardRef<
       {...props}
     >
       {children}
-      <ChevronDown aria-hidden className="h-4 w-4 shrink-0 text-fg-muted transition-transform duration-(--aeros-duration-base) ease-(--aeros-ease-standard)" />
+      <ChevronDown aria-hidden className="h-4 w-4 shrink-0 text-fg-muted transition-transform duration-base ease-standard" />
     </RA.Trigger>
   </RA.Header>
 ));

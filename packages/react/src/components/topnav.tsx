@@ -61,7 +61,7 @@ export const TopNavLink = React.forwardRef<HTMLAnchorElement, TopNavLinkProps>(
         {...(Comp === "button" ? { type: "button" as const } : null)}
         aria-current={active ? "page" : undefined}
         className={cn(
-          "text-[13px] font-medium px-2.5 py-1 rounded-md transition-colors duration-(--aeros-duration-quick)",
+          "text-[13px] font-medium px-2.5 py-1 rounded-md transition-colors duration-quick",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80",
           active ? "bg-white/10 text-white font-semibold" : "text-white/55 hover:bg-white/[0.05] hover:text-white/90",
           className
