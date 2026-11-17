@@ -1,0 +1,7 @@
+# Test tags used by this package.
+#
+# `golden`: pixel baselines under test/golden/. Linux images are canonical and
+# are generated in CI; run them with `flutter test --tags golden` and skip them
+# with `flutter test --exclude-tags golden`.
+tags:
+  golden:
