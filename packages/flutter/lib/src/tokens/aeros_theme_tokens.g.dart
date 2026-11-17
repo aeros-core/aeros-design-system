@@ -124,6 +124,7 @@ class AerosAliasColors {
     required this.fgPrimary,
     required this.fgSecondary,
     required this.fgMuted,
+    required this.fgDisabled,
     required this.fgInverse,
     required this.fgBrand,
     required this.borderDefault,
@@ -135,7 +136,6 @@ class AerosAliasColors {
     required this.brandPrimaryMuted,
     required this.focusRing,
     required this.focusRingOffset,
-    required this.fgDisabled,
     required this.stateHover,
     required this.statePressed,
     required this.stateSelected,
@@ -150,6 +150,7 @@ class AerosAliasColors {
   final Color fgPrimary;
   final Color fgSecondary;
   final Color fgMuted;
+  final Color fgDisabled;
   final Color fgInverse;
   final Color fgBrand;
   final Color borderDefault;
@@ -161,7 +162,6 @@ class AerosAliasColors {
   final Color brandPrimaryMuted;
   final Color focusRing;
   final Color focusRingOffset;
-  final Color fgDisabled;
   final Color stateHover;
   final Color statePressed;
   final Color stateSelected;
@@ -176,6 +176,7 @@ class AerosAliasColors {
     fgPrimary: AerosTokens.aliasLightFgPrimary,
     fgSecondary: AerosTokens.aliasLightFgSecondary,
     fgMuted: AerosTokens.aliasLightFgMuted,
+    fgDisabled: AerosTokens.aliasLightFgDisabled,
     fgInverse: AerosTokens.aliasLightFgInverse,
     fgBrand: AerosTokens.aliasLightFgBrand,
     borderDefault: AerosTokens.aliasLightBorderDefault,
@@ -187,7 +188,6 @@ class AerosAliasColors {
     brandPrimaryMuted: AerosTokens.aliasLightBrandPrimaryMuted,
     focusRing: AerosTokens.aliasLightFocusRing,
     focusRingOffset: AerosTokens.aliasLightFocusRingOffset,
-    fgDisabled: AerosTokens.aliasLightFgDisabled,
     stateHover: AerosTokens.aliasLightStateHover,
     statePressed: AerosTokens.aliasLightStatePressed,
     stateSelected: AerosTokens.aliasLightStateSelected,
@@ -203,6 +203,7 @@ class AerosAliasColors {
     fgPrimary: AerosTokens.aliasDarkFgPrimary,
     fgSecondary: AerosTokens.aliasDarkFgSecondary,
     fgMuted: AerosTokens.aliasDarkFgMuted,
+    fgDisabled: AerosTokens.aliasDarkFgDisabled,
     fgInverse: AerosTokens.aliasDarkFgInverse,
     fgBrand: AerosTokens.aliasDarkFgBrand,
     borderDefault: AerosTokens.aliasDarkBorderDefault,
@@ -214,7 +215,6 @@ class AerosAliasColors {
     brandPrimaryMuted: AerosTokens.aliasDarkBrandPrimaryMuted,
     focusRing: AerosTokens.aliasDarkFocusRing,
     focusRingOffset: AerosTokens.aliasDarkFocusRingOffset,
-    fgDisabled: AerosTokens.aliasDarkFgDisabled,
     stateHover: AerosTokens.aliasDarkStateHover,
     statePressed: AerosTokens.aliasDarkStatePressed,
     stateSelected: AerosTokens.aliasDarkStateSelected,
@@ -233,6 +233,7 @@ class AerosAliasColors {
         fgPrimary: Color.lerp(a.fgPrimary, b.fgPrimary, t)!,
         fgSecondary: Color.lerp(a.fgSecondary, b.fgSecondary, t)!,
         fgMuted: Color.lerp(a.fgMuted, b.fgMuted, t)!,
+        fgDisabled: Color.lerp(a.fgDisabled, b.fgDisabled, t)!,
         fgInverse: Color.lerp(a.fgInverse, b.fgInverse, t)!,
         fgBrand: Color.lerp(a.fgBrand, b.fgBrand, t)!,
         borderDefault: Color.lerp(a.borderDefault, b.borderDefault, t)!,
@@ -244,7 +245,6 @@ class AerosAliasColors {
         brandPrimaryMuted: Color.lerp(a.brandPrimaryMuted, b.brandPrimaryMuted, t)!,
         focusRing: Color.lerp(a.focusRing, b.focusRing, t)!,
         focusRingOffset: Color.lerp(a.focusRingOffset, b.focusRingOffset, t)!,
-        fgDisabled: Color.lerp(a.fgDisabled, b.fgDisabled, t)!,
         stateHover: Color.lerp(a.stateHover, b.stateHover, t)!,
         statePressed: Color.lerp(a.statePressed, b.statePressed, t)!,
         stateSelected: Color.lerp(a.stateSelected, b.stateSelected, t)!,
@@ -263,73 +263,73 @@ class AerosTypeScale {
   static const TextStyle displayXl = TextStyle(
     fontFamily: AerosTokens.fontSans,
     package: 'aeros_design_system',
-    fontSize: 56.0,
-    fontWeight: FontWeight.w800,
-    height: 1.0,
-    letterSpacing: -1.68,
-    fontVariations: [FontVariation('wght', 800.0), FontVariation('opsz', 32.0)],
+    fontSize: 48.0,
+    fontWeight: FontWeight.w600,
+    height: 1.0833,
+    letterSpacing: -1.44,
+    fontVariations: [FontVariation('wght', 600.0), FontVariation('opsz', 32.0)],
   );
   static const TextStyle displayLg = TextStyle(
     fontFamily: AerosTokens.fontSans,
     package: 'aeros_design_system',
-    fontSize: 42.0,
-    fontWeight: FontWeight.w800,
-    height: 1.0,
-    letterSpacing: -1.26,
-    fontVariations: [FontVariation('wght', 800.0), FontVariation('opsz', 32.0)],
+    fontSize: 36.0,
+    fontWeight: FontWeight.w600,
+    height: 1.1111,
+    letterSpacing: -0.9,
+    fontVariations: [FontVariation('wght', 600.0), FontVariation('opsz', 32.0)],
   );
   static const TextStyle displayMd = TextStyle(
     fontFamily: AerosTokens.fontSans,
     package: 'aeros_design_system',
-    fontSize: 32.0,
-    fontWeight: FontWeight.w700,
-    height: 1.05,
-    letterSpacing: -0.8,
-    fontVariations: [FontVariation('wght', 700.0), FontVariation('opsz', 32.0)],
+    fontSize: 30.0,
+    fontWeight: FontWeight.w600,
+    height: 1.2,
+    letterSpacing: -0.6,
+    fontVariations: [FontVariation('wght', 600.0), FontVariation('opsz', 32.0)],
   );
   static const TextStyle h1 = TextStyle(
     fontFamily: AerosTokens.fontSans,
     package: 'aeros_design_system',
-    fontSize: 28.0,
-    fontWeight: FontWeight.w700,
-    height: 1.1,
-    letterSpacing: -0.62,
-    fontVariations: [FontVariation('wght', 700.0), FontVariation('opsz', 32.0)],
+    fontSize: 24.0,
+    fontWeight: FontWeight.w600,
+    height: 1.3333,
+    letterSpacing: -0.48,
+    fontVariations: [FontVariation('wght', 600.0), FontVariation('opsz', 14.0)],
   );
   static const TextStyle h2 = TextStyle(
     fontFamily: AerosTokens.fontSans,
     package: 'aeros_design_system',
-    fontSize: 22.0,
-    fontWeight: FontWeight.w700,
-    height: 1.15,
-    letterSpacing: -0.4,
-    fontVariations: [FontVariation('wght', 700.0), FontVariation('opsz', 14.0)],
+    fontSize: 20.0,
+    fontWeight: FontWeight.w600,
+    height: 1.4,
+    letterSpacing: -0.3,
+    fontVariations: [FontVariation('wght', 600.0), FontVariation('opsz', 14.0)],
   );
   static const TextStyle h3 = TextStyle(
     fontFamily: AerosTokens.fontSans,
     package: 'aeros_design_system',
-    fontSize: 20.0,
-    fontWeight: FontWeight.w700,
-    height: 1.2,
-    letterSpacing: -0.3,
-    fontVariations: [FontVariation('wght', 700.0), FontVariation('opsz', 14.0)],
+    fontSize: 16.0,
+    fontWeight: FontWeight.w600,
+    height: 1.5,
+    letterSpacing: -0.16,
+    fontVariations: [FontVariation('wght', 600.0), FontVariation('opsz', 14.0)],
   );
   static const TextStyle h4 = TextStyle(
     fontFamily: AerosTokens.fontSans,
     package: 'aeros_design_system',
-    fontSize: 16.0,
+    fontSize: 14.0,
     fontWeight: FontWeight.w600,
-    height: 1.3,
-    letterSpacing: -0.13,
+    height: 1.4286,
+    letterSpacing: -0.07,
     fontVariations: [FontVariation('wght', 600.0), FontVariation('opsz', 14.0)],
   );
   static const TextStyle titleLg = TextStyle(
     fontFamily: AerosTokens.fontSans,
     package: 'aeros_design_system',
-    fontSize: 18.0,
+    fontSize: 16.0,
     fontWeight: FontWeight.w600,
-    height: 1.35,
-    letterSpacing: -0.18,
+    height: 1.5,
+    letterSpacing: -0.16,
     fontVariations: [FontVariation('wght', 600.0), FontVariation('opsz', 14.0)],
   );
   static const TextStyle bodyLg = TextStyle(
@@ -346,7 +346,7 @@ class AerosTypeScale {
     package: 'aeros_design_system',
     fontSize: 14.0,
     fontWeight: FontWeight.w400,
-    height: 1.55,
+    height: 1.4286,
     letterSpacing: 0.0,
     fontVariations: [FontVariation('wght', 450.0), FontVariation('opsz', 14.0)],
   );
@@ -355,60 +355,69 @@ class AerosTypeScale {
     package: 'aeros_design_system',
     fontSize: 13.0,
     fontWeight: FontWeight.w400,
-    height: 1.55,
-    letterSpacing: 0.04,
+    height: 1.5385,
+    letterSpacing: 0.0,
     fontVariations: [FontVariation('wght', 450.0), FontVariation('opsz', 14.0)],
   );
   static const TextStyle labelMd = TextStyle(
     fontFamily: AerosTokens.fontSans,
     package: 'aeros_design_system',
     fontSize: 14.0,
-    fontWeight: FontWeight.w600,
-    height: 1.4,
+    fontWeight: FontWeight.w500,
+    height: 1.4286,
     letterSpacing: 0.0,
-    fontVariations: [FontVariation('wght', 600.0), FontVariation('opsz', 14.0)],
+    fontVariations: [FontVariation('wght', 500.0), FontVariation('opsz', 14.0)],
   );
   static const TextStyle labelSm = TextStyle(
     fontFamily: AerosTokens.fontSans,
     package: 'aeros_design_system',
     fontSize: 13.0,
-    fontWeight: FontWeight.w600,
-    height: 1.4,
-    letterSpacing: 0.03,
-    fontVariations: [FontVariation('wght', 600.0), FontVariation('opsz', 14.0)],
+    fontWeight: FontWeight.w500,
+    height: 1.2308,
+    letterSpacing: 0.0,
+    fontVariations: [FontVariation('wght', 500.0), FontVariation('opsz', 14.0)],
+  );
+  static const TextStyle labelXs = TextStyle(
+    fontFamily: AerosTokens.fontSans,
+    package: 'aeros_design_system',
+    fontSize: 11.0,
+    fontWeight: FontWeight.w500,
+    height: 1.4545,
+    letterSpacing: 0.11,
+    fontVariations: [FontVariation('wght', 500.0), FontVariation('opsz', 14.0)],
   );
   static const TextStyle caption = TextStyle(
     fontFamily: AerosTokens.fontSans,
     package: 'aeros_design_system',
     fontSize: 12.0,
-    fontWeight: FontWeight.w500,
-    height: 1.5,
-    letterSpacing: 0.05,
-    fontVariations: [FontVariation('wght', 500.0), FontVariation('opsz', 14.0)],
+    fontWeight: FontWeight.w400,
+    height: 1.3333,
+    letterSpacing: 0.0,
+    fontVariations: [FontVariation('wght', 450.0), FontVariation('opsz', 14.0)],
   );
   static const TextStyle overline = TextStyle(
     fontFamily: AerosTokens.fontSans,
     package: 'aeros_design_system',
     fontSize: 11.0,
-    fontWeight: FontWeight.w700,
-    height: 1.3,
-    letterSpacing: 0.55,
-    fontVariations: [FontVariation('wght', 700.0), FontVariation('opsz', 14.0)],
+    fontWeight: FontWeight.w600,
+    height: 1.4545,
+    letterSpacing: 0.66,
+    fontVariations: [FontVariation('wght', 600.0), FontVariation('opsz', 14.0)],
   );
   static const TextStyle monoLg = TextStyle(
     fontFamily: AerosTokens.fontMono,
     package: 'aeros_design_system',
-    fontSize: 22.0,
-    fontWeight: FontWeight.w500,
-    height: 1.2,
-    letterSpacing: -0.22,
+    fontSize: 20.0,
+    fontWeight: FontWeight.w400,
+    height: 1.4,
+    letterSpacing: 0.0,
   );
   static const TextStyle monoMd = TextStyle(
     fontFamily: AerosTokens.fontMono,
     package: 'aeros_design_system',
-    fontSize: 14.0,
-    fontWeight: FontWeight.w500,
-    height: 1.5,
+    fontSize: 13.0,
+    fontWeight: FontWeight.w400,
+    height: 1.5385,
     letterSpacing: 0.0,
   );
   static const TextStyle monoSm = TextStyle(
@@ -416,7 +425,7 @@ class AerosTypeScale {
     package: 'aeros_design_system',
     fontSize: 12.0,
     fontWeight: FontWeight.w400,
-    height: 1.5,
+    height: 1.3333,
     letterSpacing: 0.0,
   );
   static const TextStyle monoXs = TextStyle(
@@ -424,17 +433,8 @@ class AerosTypeScale {
     package: 'aeros_design_system',
     fontSize: 11.0,
     fontWeight: FontWeight.w400,
-    height: 1.5,
+    height: 1.4545,
     letterSpacing: 0.0,
-  );
-  static const TextStyle labelXs = TextStyle(
-    fontFamily: AerosTokens.fontSans,
-    package: 'aeros_design_system',
-    fontSize: 11.0,
-    fontWeight: FontWeight.w600,
-    height: 1.0,
-    letterSpacing: 0.02,
-    fontVariations: [FontVariation('wght', 600.0), FontVariation('opsz', 14.0)],
   );
 }
 
@@ -653,10 +653,10 @@ class AerosSizeTokens {
 class AerosShapeTokens {
   AerosShapeTokens._();
 
-  static const double item = 6.0;
-  static const double control = 8.0;
-  static const double surface = 12.0;
-  static const double modal = 16.0;
+  static const double item = 4.0;
+  static const double control = 6.0;
+  static const double surface = 8.0;
+  static const double modal = 12.0;
   static const double pill = 9999.0;
 }
 

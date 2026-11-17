@@ -13,7 +13,7 @@ export 'aeros_theme_tokens.g.dart' show AerosAliasColors, AerosSemanticColors;
 class AerosColors {
   AerosColors._();
 
-  // ─── Ink (faint warm neutral — the only ramp; royal/slate were deleted in 2.0) ───
+  // ─── Ink (cool neutral — the only ramp) ───
   static const Color ink0   = AerosTokens.ink0;
   static const Color ink50  = AerosTokens.ink50;
   static const Color ink100 = AerosTokens.ink100;
@@ -24,6 +24,7 @@ class AerosColors {
   static const Color ink600 = AerosTokens.ink600;
   static const Color ink700 = AerosTokens.ink700;
   static const Color ink800 = AerosTokens.ink800;
+  static const Color ink850 = AerosTokens.ink850;
   static const Color ink900 = AerosTokens.ink900;
   static const Color ink950 = AerosTokens.ink950;
 

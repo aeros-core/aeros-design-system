@@ -36,7 +36,16 @@ const pairs = [
   ["fg-muted", "bg-subtle"],
   ["brand-primary", "bg-surface"],
   // Button primary label — must stay readable in both themes.
-  ["fg-inverse", "brand-primary"]
+  ["fg-inverse", "brand-primary"],
+  // Every text tier on every surface it is used on.
+  ["fg-muted", "bg-canvas"],
+  ["fg-muted", "bg-elevated"],
+  ["fg-secondary", "bg-canvas"],
+  ["fg-secondary", "bg-subtle"],
+  ["fg-secondary", "bg-elevated"],
+  ["fg-primary", "bg-subtle"],
+  ["fg-primary", "bg-elevated"],
+  ["fg-inverse", "bg-inverse"]
 ];
 
 let fail = 0;
@@ -66,6 +75,16 @@ for (const theme of ["light", "dark"]) {
     check(`${tone}-text on bg-surface`, text, surface, 4.5);
     check(`${tone} (icon) on ${tone}-bg`, base, bg, 3);
     check(`${tone} (icon) on bg-surface`, base, surface, 3);
+    check(`${tone}-text on bg-canvas`, text, tokens.alias[theme]["bg-canvas"], 4.5);
+  }
+  // Solid danger button: label on the fill, resting and hovered.
+  check("fg-inverse on danger", tokens.alias[theme]["fg-inverse"], sem.danger.$value, 4.5);
+  check("fg-inverse on danger-hover", tokens.alias[theme]["fg-inverse"], sem["danger-hover"].$value, 4.5);
+  // Hover/pressed/selected overlays must not sink body text below AA on a surface.
+  for (const state of ["state-hover", "state-pressed", "state-selected"]) {
+    const over = composite(tokens.alias[theme][state], surface);
+    check(`fg-primary on bg-surface + ${state}`, tokens.alias[theme]["fg-primary"], over, 4.5);
+    check(`fg-secondary on bg-surface + ${state}`, tokens.alias[theme]["fg-secondary"], over, 4.5);
   }
 }
 
