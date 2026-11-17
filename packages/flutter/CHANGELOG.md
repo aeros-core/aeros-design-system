@@ -16,6 +16,94 @@ renaming, but every screen looks different. Review visually when upgrading.
 
 Typography now comes straight from the tokens, weights render, and the package has no runtime dependencies besides Flutter.
 
+### Controls rebuilt on a foundation layer ("Crisp precision", structure)
+
+Buttons, fields and the selection controls are now built on five shared primitives, so they agree on
+height, radius, state and focus. Resting controls are a fill and a 1px hairline with **no shadow**;
+hover and press change **colour only** (no ripple, no lift); there is **one focus ring**.
+
+**Added — foundation (`lib/src/foundation/`, all exported)**
+
+- `AerosPressable` — the one interaction primitive. Reports `AerosInteraction` (`hovered`, `pressed`,
+  `focused` = keyboard focus only, `enabled`) to a builder; hand cursor; Enter / Space activation;
+  semantics (`button`, `checked`, `mixed`, `toggled`, `selected`, `inMutuallyExclusiveGroup`,
+  `semanticLabel`). Its tappable box is at least `AerosSizeTokens.minTarget` for the density (24
+  pointer, 44 touch) without changing the visual's size; `expandHitTarget: false` opts out.
+- `AerosStateLayer.resolve(aliases, base, hovered:, pressed:, selected:, enabled:)` — composites the
+  `stateHover` / `statePressed` / `stateSelected` aliases over a base colour — and `AerosStateFill`,
+  a hairline box that animates between state colours in `AerosMotion.quick`.
+- `AerosFocusRing(focused:, radius:, tone:, placement:)` — a 2px ring painted outside the child by a
+  foreground painter, so focus never shifts layout. `placement`: `outside` (buttons, toggles),
+  `field` (straddles the border), `inset`. `tone: danger` uses the theme's danger colour.
+- `AerosSurface(level: flat | raised | overlay | modal)` — flat = fill + hairline, no shadow;
+  overlay / modal = `bgElevated` + the `AerosElevation` shadow and no border. The only place a
+  `BoxShadow` should be attached.
+- `AerosControlSize { xs, sm, md, lg, xl }` — one size ladder for buttons and fields:
+  `resolveHeight(context)` / `heightFor(density)` (24 / 28 / 32 / 36 / 40 pointer, 32 / 36 / 40 / 44 /
+  48 touch), `padH`, `gap`, `iconSize`, `labelStyle()`, `valueStyle()`, `radius`. `AerosControlSize.of(context)`
+  reads an `AerosControlSizeScope` (default `md`).
+- `AerosFieldFrame` — the shared field look, for composite inputs that should match the text field.
+- Theme access: `AerosThemeExtension.semantic` and `.elevation` (both lerped on a theme change),
+  `context.aerosElevation`; `AerosDensity.sizes` (the `AerosSizeTokens` for a density). The generated
+  `AerosElevation`, `AerosSizeTokens`, `AerosShapeTokens` and `AerosMetricTokens` are exported.
+- `AerosButtonVariant.dangerSubtle`, `AerosButton.icon(icon:, semanticLabel:, …)` (square, icon-only;
+  the label is required for screen readers).
+- A **disabled state** on `AerosCheckbox`, `AerosRadio` and `AerosSwitch`: pass `onChanged: null` or
+  `enabled: false`. Each also takes a `semanticLabel`.
+- `AerosSeverityPalette.of(context, …)`, `AerosSelectionPalette.of(context, …)`,
+  `AerosPricePalette.of(context, …)`.
+
+**Breaking — what an app has to change or re-check**
+
+- **Button heights follow the density tokens**: 24 / 28 / 32 / 36 / 40 inside an
+  `AerosDensityScope(density: pointer)`, 32 / 36 / 40 / 44 / 48 at touch or with no scope (were 28 /
+  32 / 40 / 46 / 52 everywhere). Labels are `labelSm` (xs, sm) / `labelMd`; every size has the 6px
+  control radius; horizontal padding is tighter (8 / 10 / 12 / 14 / 16). A long label now truncates
+  with an ellipsis instead of overflowing.
+- **A control's layout box is at least the density's minimum target** — at touch, a 40px `md` button
+  or a checkbox occupies 44px. The painted control is unchanged; tight rows may grow by a few px.
+- **`AerosButtonVariant.danger` is now solid red** with an inverse label (hover `dangerHover`). For the
+  old tinted look use `AerosButtonVariant.dangerSubtle`. `AerosConfirmDialog(destructive: true)` uses
+  the solid one.
+- **`secondary` has a `borderStrong` hairline; `ghost` has no border** (it had `borderDefault`).
+- **`AerosButtonSize` and `AerosFieldSize` are deprecated aliases of `AerosControlSize`** —
+  `AerosButtonSize.md` still compiles. `AerosFieldSize` therefore gains `xs` and `xl` (an exhaustive
+  `switch` over it needs two more cases), and `sm` / `md` / `lg` are 36 / 40 / 44 at touch (were 32 /
+  40 / 46). The `AerosFieldSizeMetrics` extension is gone (its members are on the enum); `padV` is
+  deprecated; `radius` is the control radius at every size.
+- `AerosButton.size` is nullable (null = `AerosControlSize.of(context)`); the named constructors take
+  `AerosControlSize? size`.
+- **Fields** (`AerosTextField`, `AerosSearchField`, `AerosTagField`): `bgSurface` fill, 1px
+  `borderStrong` that stays 1px when focused (focus is the ring), 6px radius at every size, error
+  colours from the theme (legible in dark mode now), disabled = the whole field at 40% opacity (was a
+  `bgSubtle` fill). `AerosSearchField` is no longer a borderless grey pill. `AerosTagField` fills the
+  width it is given (it used to shrink to its chips). Helper and error text are drawn by the field,
+  not by `InputDecoration`. `AerosTextField` is now a `StatefulWidget` (constructor unchanged).
+- **Selection controls are custom-drawn, not Material wrappers**: checkbox and radio are 16px (were
+  18), the switch is a 32×18 monochrome track on every platform (no Cupertino switch on iOS/macOS).
+  The default hit area is the density minimum target — **44px at touch, where Material padded to
+  48** — and `compact` shrinks it to the glyph. `onChanged` is nullable on all three.
+- **Status palettes no longer default to light.** `AerosSeverityPalette.of(severity, {isDark})` →
+  `AerosSeverityPalette.of(context, severity)` or `.resolve(severity, context.aerosSemantic)`;
+  `AerosSelectionPalette.resolve(state, aliases, {isDark})` → `.of(context, state)` or
+  `.resolve(state, aliases, semantic)`; `AerosPricePalette.resolve(tone, aliases)` → `.of(context,
+  tone)` or `.resolve(tone, aliases, semantic)`.
+- **Every widget reads status colours from the theme** (`context.aerosSemantic`) — required markers,
+  error text and error borders in the configurable-MTO widgets were the light reds in dark mode.
+- **`AerosTheme` (ThemeData)**: `NoSplash` and transparent splash / highlight / hover colours — every
+  Material `InkWell` in your app stops rippling and loses the default hover tint; `surfaceTint`
+  transparent; `onError` / `onSecondary` / `onTertiary` are `fgInverse`; `secondary` / `tertiary`
+  come from the aliases; `scrim` is the alias. Input borders are 1px in every state and
+  `borderStrong` at rest; cards 8px, buttons / inputs 6px, dialogs 12px with **elevation 0** and a
+  hairline. New token-driven themes for divider, icon button, checkbox, radio, switch, popup menu,
+  bottom sheet, tooltip, scrollbar, list tile, progress indicator and text selection.
+- `AerosThemeExtension` has two new fields; a hand-built `AerosThemeExtension(aliases:, isDark:)`
+  still compiles and takes the status colours and elevation for its brightness.
+
+**Not in this release step** (later PRs): cards, badges, tabs, dialogs, data table, sidenav / scaffold
+and the configurable-MTO widgets keep their structure — they only picked up the status-colour fix and
+the theme changes above.
+
 ### Breaking
 
 - **`google_fonts` is no longer a dependency.** IBM Plex Mono (Regular 400 + Medium 500, SIL OFL — `assets/fonts/OFL-IBMPlexMono.txt`) is bundled as the `IBM Plex Mono` family, like Inter, so mono text needs no network on first paint and renders in widget/golden tests. **If your app imports `package:google_fonts` itself and was getting it transitively through this package, add `google_fonts` to your own `pubspec.yaml`.** To use the bundled face outside `AerosTypography`, write `TextStyle(fontFamily: 'IBM Plex Mono', package: 'aeros_design_system')`.

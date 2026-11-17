@@ -182,7 +182,7 @@ class _StepRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final a = context.aerosColors;
     final tone = _tone();
-    final palette = AerosPricePalette.resolve(tone, a);
+    final palette = AerosPricePalette.of(context, tone);
     final amountText = step.perUnit
         ? '${money(step.amount)} /u'
         : money(step.amount);
@@ -263,8 +263,7 @@ class _SubtotalRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final a = context.aerosColors;
-    final palette = AerosPricePalette.resolve(tone, a);
+    final palette = AerosPricePalette.of(context, tone);
     return Row(
       children: [
         Expanded(

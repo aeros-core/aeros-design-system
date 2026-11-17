@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 
@@ -35,6 +34,7 @@ class AerosFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
+    final semantic = context.aerosSemantic;
     final hasLabel = label != null;
     final hasError = errorText != null && errorText!.isNotEmpty;
     final hasHelper = !hasError && helperText != null && helperText!.isNotEmpty;
@@ -53,9 +53,9 @@ class AerosFormField extends StatelessWidget {
                     style: AerosTypography.labelSm(color: a.fgSecondary),
                     children: [
                       if (required)
-                        const TextSpan(
+                        TextSpan(
                           text: ' *',
-                          style: TextStyle(color: AerosColors.danger),
+                          style: TextStyle(color: semantic.danger),
                         ),
                     ],
                   ),
@@ -71,7 +71,7 @@ class AerosFormField extends StatelessWidget {
           const SizedBox(height: AerosSpacing.s1),
           Text(
             errorText!,
-            style: AerosTypography.caption(color: AerosColors.dangerText),
+            style: AerosTypography.caption(color: semantic.dangerText),
           ),
         ] else if (hasHelper) ...[
           const SizedBox(height: AerosSpacing.s1),

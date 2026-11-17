@@ -1,192 +1,207 @@
 import 'package:flutter/material.dart';
+import '../foundation/aeros_control_size.dart';
+import '../foundation/aeros_focus_ring.dart';
+import '../foundation/aeros_pressable.dart';
+import '../foundation/aeros_state_layer.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
-import '../tokens/motion.dart';
-import '../tokens/radii.dart';
-import '../tokens/typography.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
 
-/// 2.0: `dark` was removed — it was byte-identical to `primary`.
-enum AerosButtonVariant { primary, secondary, ghost, danger, link }
-enum AerosButtonSize { xs, sm, md, lg, xl }
+/// 3.0: `danger` is the solid destructive button; `dangerSubtle` carries the
+/// tinted look `danger` had before. 2.0: `dark` was removed (same as `primary`).
+enum AerosButtonVariant { primary, secondary, ghost, danger, dangerSubtle, link }
 
+/// 3.0: buttons and fields share one size ladder.
+@Deprecated('Use AerosControlSize')
+typedef AerosButtonSize = AerosControlSize;
+
+/// A button.
+///
+/// Flat at rest and in every state: no shadow, no lift, no ripple. Hover and
+/// press change the fill only; keyboard focus draws the [AerosFocusRing].
+/// Height comes from the size ladder ([AerosControlSize]) and the input
+/// density, the radius is [AerosShapeTokens.control] at every size.
 class AerosButton extends StatefulWidget {
   const AerosButton({
     super.key,
     required this.label,
     required this.onPressed,
     this.variant = AerosButtonVariant.primary,
-    this.size = AerosButtonSize.md,
+    this.size,
     this.leading,
     this.trailing,
     this.loading = false,
     this.fullWidth = false,
-  });
+  }) : _iconOnly = false;
 
-  factory AerosButton.primary({Key? key, required String label, required VoidCallback? onPressed, Widget? leading, AerosButtonSize size = AerosButtonSize.md}) =>
+  /// A square, icon-only button. [semanticLabel] is what a screen reader
+  /// announces — there is no visible text, so it is required.
+  const AerosButton.icon({
+    super.key,
+    required Widget icon,
+    required String semanticLabel,
+    required this.onPressed,
+    this.variant = AerosButtonVariant.ghost,
+    this.size,
+    this.loading = false,
+  })  : label = semanticLabel,
+        leading = icon,
+        trailing = null,
+        fullWidth = false,
+        _iconOnly = true;
+
+  factory AerosButton.primary({Key? key, required String label, required VoidCallback? onPressed, Widget? leading, AerosControlSize? size}) =>
       AerosButton(key: key, label: label, onPressed: onPressed, leading: leading, size: size);
 
-  factory AerosButton.secondary({Key? key, required String label, required VoidCallback? onPressed, Widget? leading, AerosButtonSize size = AerosButtonSize.md}) =>
+  factory AerosButton.secondary({Key? key, required String label, required VoidCallback? onPressed, Widget? leading, AerosControlSize? size}) =>
       AerosButton(key: key, label: label, onPressed: onPressed, leading: leading, size: size, variant: AerosButtonVariant.secondary);
 
-  factory AerosButton.ghost({Key? key, required String label, required VoidCallback? onPressed, AerosButtonSize size = AerosButtonSize.md}) =>
+  factory AerosButton.ghost({Key? key, required String label, required VoidCallback? onPressed, AerosControlSize? size}) =>
       AerosButton(key: key, label: label, onPressed: onPressed, size: size, variant: AerosButtonVariant.ghost);
 
-  factory AerosButton.danger({Key? key, required String label, required VoidCallback? onPressed, AerosButtonSize size = AerosButtonSize.md}) =>
+  factory AerosButton.danger({Key? key, required String label, required VoidCallback? onPressed, AerosControlSize? size}) =>
       AerosButton(key: key, label: label, onPressed: onPressed, size: size, variant: AerosButtonVariant.danger);
 
+  /// The visible label; for [AerosButton.icon], the screen-reader label.
   final String label;
   final VoidCallback? onPressed;
   final AerosButtonVariant variant;
-  final AerosButtonSize size;
+
+  /// Null takes the size from the nearest [AerosControlSizeScope] (md).
+  final AerosControlSize? size;
   final Widget? leading;
   final Widget? trailing;
   final bool loading;
   final bool fullWidth;
+  final bool _iconOnly;
 
   @override
   State<AerosButton> createState() => _AerosButtonState();
 }
 
 class _AerosButtonState extends State<AerosButton> {
-  bool _focused = false;
-  bool _hovered = false;
+  /// Resolves fill, label and border colours for the variant and state.
+  ({Color bg, Color fg, Color? border}) _colors(
+    AerosAliasColors a,
+    AerosSemanticColors s,
+    AerosInteraction state,
+  ) {
+    final active = state.hovered || state.pressed;
+    Color layer(Color base) =>
+        AerosStateLayer.resolve(a, base, hovered: state.hovered, pressed: state.pressed, enabled: state.enabled);
 
-  EdgeInsets get _padding {
-    switch (widget.size) {
-      case AerosButtonSize.xs: return const EdgeInsets.symmetric(horizontal: 11, vertical: 5);
-      case AerosButtonSize.sm: return const EdgeInsets.symmetric(horizontal: 14, vertical: 7);
-      case AerosButtonSize.md: return const EdgeInsets.symmetric(horizontal: 18, vertical: 9);
-      case AerosButtonSize.lg: return const EdgeInsets.symmetric(horizontal: 26, vertical: 12);
-      case AerosButtonSize.xl: return const EdgeInsets.symmetric(horizontal: 32, vertical: 15);
-    }
-  }
-
-  /// Consistent min-heights so buttons share a vertical rhythm. lg/xl clear
-  /// the 44px comfortable tap target; xs/sm/md meet the WCAG 2.5.8 AA 24px
-  /// floor and are intended for dense desktop surfaces — prefer lg+ on touch.
-  double get _minHeight {
-    switch (widget.size) {
-      case AerosButtonSize.xs: return 28;
-      case AerosButtonSize.sm: return 32;
-      case AerosButtonSize.md: return 40;
-      case AerosButtonSize.lg: return 46;
-      case AerosButtonSize.xl: return 52;
-    }
-  }
-
-  double get _fontSize {
-    switch (widget.size) {
-      case AerosButtonSize.xs: return 11;
-      case AerosButtonSize.sm: return 12;
-      case AerosButtonSize.md: return 14;
-      case AerosButtonSize.lg: return 15;
-      case AerosButtonSize.xl: return 16;
-    }
-  }
-
-  BorderRadius get _radius {
-    switch (widget.size) {
-      case AerosButtonSize.xs:
-      case AerosButtonSize.sm: return AerosRadii.brSm;
-      case AerosButtonSize.md: return AerosRadii.brMd;
-      case AerosButtonSize.lg:
-      case AerosButtonSize.xl: return AerosRadii.brLg;
-    }
-  }
-
-  ({Color bg, Color bgHover, Color fg, Color? border}) _colors(
-      AerosAliasColors a, AerosSemanticColors s) {
     switch (widget.variant) {
       case AerosButtonVariant.primary:
-        return (bg: a.brandPrimary, bgHover: a.brandPrimaryHover, fg: a.fgInverse, border: null);
+        // The state overlays are ink over a light surface and vanish on the
+        // solid brand fill, so the solid variants swap to their hover colour.
+        return (bg: active ? a.brandPrimaryHover : a.brandPrimary, fg: a.fgInverse, border: null);
       case AerosButtonVariant.secondary:
-        return (bg: a.bgSurface, bgHover: a.bgSubtle, fg: a.fgPrimary, border: a.borderDefault);
+        return (bg: layer(a.bgSurface), fg: a.fgPrimary, border: a.borderStrong);
       case AerosButtonVariant.ghost:
-        return (bg: Colors.transparent, bgHover: a.bgSubtle, fg: a.fgPrimary, border: a.borderDefault);
+        return (bg: layer(Colors.transparent), fg: a.fgPrimary, border: null);
       case AerosButtonVariant.danger:
-        return (bg: s.dangerBg, bgHover: s.dangerBorder, fg: s.dangerText, border: s.dangerBorder);
+        return (bg: active ? s.dangerHover : s.danger, fg: a.fgInverse, border: null);
+      case AerosButtonVariant.dangerSubtle:
+        return (bg: layer(s.dangerBg), fg: s.dangerText, border: s.dangerBorder);
       case AerosButtonVariant.link:
-        return (bg: Colors.transparent, bgHover: Colors.transparent, fg: a.brandPrimary, border: null);
+        return (bg: Colors.transparent, fg: a.brandPrimary, border: null);
     }
   }
+
+  bool get _isDanger =>
+      widget.variant == AerosButtonVariant.danger || widget.variant == AerosButtonVariant.dangerSubtle;
 
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final c = _colors(a, context.aerosSemantic);
+    final semantic = context.aerosSemantic;
+    final size = widget.size ?? AerosControlSize.of(context);
+    final height = size.resolveHeight(context);
     final disabled = widget.onPressed == null || widget.loading;
+    final iconOnly = widget._iconOnly;
 
-    // IconTheme makes leading/trailing icons inherit the resolved foreground
-    // color (c.fg) by default. Callers passing `Icon(..., color: X)` still
-    // win — the wrap only fills in a sane default for icons that don't set
-    // their own color, so downstream sites can drop hardcoded colors.
-    final content = IconTheme(
-      data: IconThemeData(color: c.fg, size: _fontSize),
-      child: Row(
-        mainAxisSize: widget.fullWidth ? MainAxisSize.max : MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (widget.loading)
-            SizedBox(
-              width: _fontSize, height: _fontSize,
-              child: CircularProgressIndicator(strokeWidth: 2, color: c.fg),
-            )
-          else if (widget.leading != null) ...[widget.leading!, const SizedBox(width: 8)],
-          Text(widget.label, style: AerosTypography.labelMd(color: c.fg).copyWith(fontSize: _fontSize)),
-          if (widget.trailing != null) ...[const SizedBox(width: 8), widget.trailing!],
-        ],
-      ),
-    );
+    return AerosPressable(
+      onPressed: disabled ? null : widget.onPressed,
+      // The label is announced once: from the visible text, or — for a
+      // loading or icon-only button — from this label, with the subtree's own
+      // semantics dropped.
+      semanticLabel: widget.loading
+          ? '${widget.label}, loading'
+          : iconOnly
+              ? widget.label
+              : null,
+      excludeSemantics: widget.loading || iconOnly,
+      builder: (context, state) {
+        final c = _colors(a, semantic, state);
+        final underline = widget.variant == AerosButtonVariant.link && (state.hovered || state.pressed);
+        final labelStyle = size.labelStyle(color: c.fg).copyWith(
+              decoration: underline ? TextDecoration.underline : TextDecoration.none,
+              decorationColor: c.fg,
+            );
 
-    // Hover shifts the fill (brandPrimaryHover / bgSubtle); keyboard focus
-    // draws a soft ring as an OUTER spread shadow so it never shifts layout
-    // (the variant border stays constant).
-    final bg = (!disabled && _hovered) ? c.bgHover : c.bg;
+        final spinner = SizedBox.square(
+          dimension: size.iconSize,
+          child: CircularProgressIndicator(strokeWidth: AerosMetricTokens.borderThick, color: c.fg),
+        );
 
-    // A disabled InkWell (onTap: null) emits no button semantics at all, so a
-    // screen reader would announce a bare label. The explicit Semantics node
-    // keeps "button, disabled/loading" in the tree in every state.
-    return Semantics(
-      button: true,
-      enabled: !disabled,
-      // While loading, replace the subtree's semantics so the label and the
-      // busy state are announced once, together.
-      label: widget.loading ? '${widget.label}, loading' : null,
-      excludeSemantics: widget.loading,
-      child: Opacity(
-        opacity: disabled ? 0.4 : 1,
-        child: Material(
-          color: bg,
-          borderRadius: _radius,
-          clipBehavior: Clip.none,
-          child: InkWell(
-            onTap: disabled ? null : widget.onPressed,
-            borderRadius: _radius,
-            hoverColor: Colors.transparent,
-            splashColor: c.fg.withValues(alpha: 0.12),
-            onHover: (h) {
-              if (_hovered != h) setState(() => _hovered = h);
-            },
-            onFocusChange: (focused) {
-              if (_focused != focused) setState(() => _focused = focused);
-            },
-            child: AnimatedContainer(
-              duration: AerosMotion.resolve(context, AerosMotion.fast),
-              curve: AerosMotion.standard,
-              constraints: BoxConstraints(minHeight: _minHeight),
-              padding: _padding,
-              decoration: BoxDecoration(
-                borderRadius: _radius,
-                border: c.border != null ? Border.all(color: c.border!) : null,
-                boxShadow: _focused
-                    ? [BoxShadow(color: a.focusRing.withValues(alpha: 0.30), spreadRadius: 3)]
-                    : null,
-              ),
-              child: content,
-            ),
+        // IconTheme gives leading / trailing icons the resolved foreground
+        // and the size's glyph size; an Icon with its own colour still wins.
+        final content = IconTheme.merge(
+          data: IconThemeData(color: c.fg, size: size.iconSize),
+          child: iconOnly
+              ? Center(child: widget.loading ? spinner : widget.leading)
+              : Row(
+                  mainAxisSize: widget.fullWidth ? MainAxisSize.max : MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (widget.loading) ...[
+                      spinner,
+                      SizedBox(width: size.gap),
+                    ] else if (widget.leading != null) ...[
+                      widget.leading!,
+                      SizedBox(width: size.gap),
+                    ],
+                    Flexible(
+                      child: Text(
+                        widget.label,
+                        style: labelStyle,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (widget.trailing != null) ...[
+                      SizedBox(width: size.gap),
+                      widget.trailing!,
+                    ],
+                  ],
+                ),
+        );
+
+        final fill = AerosStateFill(
+          color: c.bg,
+          borderColor: c.border,
+          radius: size.radius,
+          constraints: iconOnly
+              ? BoxConstraints.tightFor(width: height, height: height)
+              : BoxConstraints(minHeight: height),
+          // The hairline is part of the box, so it comes off the padding and
+          // every variant is the same width for the same label.
+          padding: iconOnly
+              ? EdgeInsets.zero
+              : EdgeInsets.symmetric(horizontal: size.padH - AerosMetricTokens.borderHairline),
+          child: content,
+        );
+
+        return Opacity(
+          opacity: disabled ? AerosMetricTokens.opacityDisabled : 1,
+          child: AerosFocusRing(
+            focused: state.focused,
+            radius: size.radius,
+            tone: _isDanger ? AerosFocusRingTone.danger : AerosFocusRingTone.neutral,
+            child: fill,
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

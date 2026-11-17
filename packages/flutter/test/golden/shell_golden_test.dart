@@ -113,7 +113,7 @@ void main() {
             title: 'Order #4821',
             leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () {}),
             actions: [
-              AerosButton.secondary(label: 'Export', onPressed: () {}, size: AerosButtonSize.sm),
+              AerosButton.secondary(label: 'Export', onPressed: () {}, size: AerosControlSize.sm),
               const SizedBox(width: 8),
               IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
             ],

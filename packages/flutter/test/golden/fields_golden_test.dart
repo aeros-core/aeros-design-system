@@ -23,7 +23,7 @@ TextEditingController _text(String value) => TextEditingController(text: value);
 void main() {
   goldenMatrix(
     'fields_text',
-    size: const Size(760, 720),
+    size: const Size(760, 910),
     (context) => Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,7 +31,7 @@ void main() {
         GoldenColumn(
           width: 340,
           children: [
-            for (final size in AerosFieldSize.values)
+            for (final size in AerosControlSize.values)
               GoldenSection(
                 'size ${size.name}',
                 child: AerosTextField(label: 'Company name', hint: 'Acme Packaging', size: size),
@@ -143,7 +143,7 @@ void main() {
 
   goldenMatrix(
     'fields_search_tag_form',
-    size: const Size(760, 720),
+    size: const Size(760, 860),
     (context) => Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,7 +151,7 @@ void main() {
         GoldenColumn(
           width: 340,
           children: [
-            for (final size in AerosFieldSize.values)
+            for (final size in AerosControlSize.values)
               GoldenSection('AerosSearchField ${size.name}', child: AerosSearchField(hint: 'Search orders', size: size)),
             GoldenSection(
               'AerosSearchField with a query',
@@ -191,7 +191,7 @@ void main() {
               'AerosTagField empty',
               child: AerosTagField(label: 'Tags', tags: const [], onChanged: (_) {}),
             ),
-            for (final size in [AerosFieldSize.sm, AerosFieldSize.lg])
+            for (final size in [AerosControlSize.sm, AerosControlSize.lg])
               GoldenSection(
                 'AerosTagField ${size.name}',
                 child: AerosTagField(tags: const ['kraft', 'export'], onChanged: (_) {}, size: size, prefixSymbol: ''),

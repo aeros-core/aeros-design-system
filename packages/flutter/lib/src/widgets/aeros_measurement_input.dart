@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 import '../tokens/radii.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
@@ -87,7 +86,7 @@ class _AerosMeasurementInputState extends State<AerosMeasurementInput> {
   Widget build(BuildContext context) {
     final a = context.aerosColors;
     final hasError = widget.errorText != null && widget.errorText!.isNotEmpty;
-    final borderColor = hasError ? AerosColors.danger : a.borderDefault;
+    final borderColor = hasError ? context.aerosSemantic.danger : a.borderDefault;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,9 +100,9 @@ class _AerosMeasurementInputState extends State<AerosMeasurementInput> {
                   .withWeight(FontWeight.w600),
               children: [
                 if (widget.required)
-                  const TextSpan(
+                  TextSpan(
                     text: ' *',
-                    style: TextStyle(color: AerosColors.danger),
+                    style: TextStyle(color: context.aerosSemantic.danger),
                   ),
               ],
             ),
@@ -179,7 +178,7 @@ class _AerosMeasurementInputState extends State<AerosMeasurementInput> {
           const SizedBox(height: AerosSpacing.s1),
           Text(
             widget.errorText!,
-            style: AerosTypography.caption(color: AerosColors.dangerText),
+            style: AerosTypography.caption(color: context.aerosSemantic.dangerText),
           ),
         ] else if (widget.helperText != null) ...[
           const SizedBox(height: AerosSpacing.s1),

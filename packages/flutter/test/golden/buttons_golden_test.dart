@@ -7,7 +7,7 @@ import 'harness.dart';
 void main() {
   goldenMatrix(
     'buttons',
-    size: const Size(640, 850),
+    size: const Size(640, 1090),
     (context) => GoldenColumn(
       children: [
         // Every variant at every size.
@@ -16,7 +16,7 @@ void main() {
             variant.name,
             child: GoldenRow(
               children: [
-                for (final size in AerosButtonSize.values)
+                for (final size in AerosControlSize.values)
                   AerosButton(label: 'Button ${size.name}', onPressed: () {}, variant: variant, size: size),
               ],
             ),
@@ -52,8 +52,43 @@ void main() {
                 label: 'Delete',
                 onPressed: () {},
                 variant: AerosButtonVariant.danger,
-                size: AerosButtonSize.lg,
+                size: AerosControlSize.lg,
                 leading: const Icon(Icons.delete_outline),
+              ),
+            ],
+          ),
+        ),
+        GoldenSection(
+          'icon only, every size (ghost)',
+          child: GoldenRow(
+            children: [
+              for (final size in AerosControlSize.values)
+                AerosButton.icon(
+                  icon: const Icon(Icons.more_horiz),
+                  semanticLabel: 'More, ${size.name}',
+                  onPressed: () {},
+                  size: size,
+                ),
+            ],
+          ),
+        ),
+        GoldenSection(
+          'icon only, every variant, then disabled and loading',
+          child: GoldenRow(
+            children: [
+              for (final variant in AerosButtonVariant.values)
+                AerosButton.icon(
+                  icon: const Icon(Icons.delete_outline),
+                  semanticLabel: 'Delete, ${variant.name}',
+                  onPressed: () {},
+                  variant: variant,
+                ),
+              const AerosButton.icon(icon: Icon(Icons.delete_outline), semanticLabel: 'Delete, disabled', onPressed: null),
+              AerosButton.icon(
+                icon: const Icon(Icons.add),
+                semanticLabel: 'Add, secondary disabled',
+                onPressed: null,
+                variant: AerosButtonVariant.secondary,
               ),
             ],
           ),
@@ -93,7 +128,13 @@ void main() {
     ),
   );
 
-  for (final variant in [AerosButtonVariant.primary, AerosButtonVariant.secondary, AerosButtonVariant.danger]) {
+  for (final variant in [
+    AerosButtonVariant.primary,
+    AerosButtonVariant.secondary,
+    AerosButtonVariant.ghost,
+    AerosButtonVariant.danger,
+    AerosButtonVariant.dangerSubtle,
+  ]) {
     Widget scene(BuildContext context) => GoldenRow(
           children: [
             AerosButton(key: const Key('target'), label: 'Target', onPressed: () {}, variant: variant),
@@ -105,4 +146,27 @@ void main() {
     goldenMatrix('buttons_${variant.name}_focused', scene, size: size, act: (t) => focus(t, find.byKey(const Key('target'))));
     goldenMatrix('buttons_${variant.name}_pressed', scene, size: size, act: (t) => press(t, find.byKey(const Key('target'))));
   }
+
+  // The icon-only button: hover, keyboard focus, press.
+  Widget iconScene(BuildContext context) => GoldenRow(
+        children: [
+          AerosButton.icon(
+            key: const Key('target'),
+            icon: const Icon(Icons.more_horiz),
+            semanticLabel: 'More',
+            onPressed: () {},
+          ),
+          AerosButton.icon(icon: const Icon(Icons.more_horiz), semanticLabel: 'More, resting', onPressed: () {}),
+          AerosButton.icon(
+            icon: const Icon(Icons.add),
+            semanticLabel: 'Add',
+            onPressed: () {},
+            variant: AerosButtonVariant.secondary,
+          ),
+        ],
+      );
+  const iconSize = Size(200, 80);
+  goldenMatrix('buttons_icon_hovered', iconScene, size: iconSize, act: (t) => hover(t, find.byKey(const Key('target'))));
+  goldenMatrix('buttons_icon_focused', iconScene, size: iconSize, act: (t) => focus(t, find.byKey(const Key('target'))));
+  goldenMatrix('buttons_icon_pressed', iconScene, size: iconSize, act: (t) => press(t, find.byKey(const Key('target'))));
 }

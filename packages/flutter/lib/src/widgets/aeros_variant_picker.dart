@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 import '../tokens/radii.dart';
 import '../tokens/spacing.dart';
 import '../tokens/states.dart';
@@ -54,9 +53,9 @@ class AerosVariantPicker extends StatelessWidget {
                 .withWeight(FontWeight.w600),
             children: [
               if (required)
-                const TextSpan(
+                TextSpan(
                   text: ' *',
-                  style: TextStyle(color: AerosColors.danger),
+                  style: TextStyle(color: context.aerosSemantic.danger),
                 ),
             ],
           ),
@@ -82,7 +81,7 @@ class AerosVariantPicker extends StatelessWidget {
           const SizedBox(height: AerosSpacing.s1),
           Text(
             errorText!,
-            style: AerosTypography.caption(color: AerosColors.dangerText),
+            style: AerosTypography.caption(color: context.aerosSemantic.dangerText),
           ),
         ],
       ],
@@ -123,7 +122,7 @@ class _VariantTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final palette = AerosSelectionPalette.resolve(_state(), a, isDark: context.aeros.isDark);
+    final palette = AerosSelectionPalette.of(context, _state());
 
     Widget tile = switch (style) {
       AerosVariantPickerStyle.chip => Container(
@@ -212,7 +211,7 @@ class _VariantTile extends StatelessWidget {
               if (showStockBadge && !variant.inStock)
                 Text(
                   'Out',
-                  style: AerosTypography.caption(color: AerosColors.dangerText),
+                  style: AerosTypography.caption(color: context.aerosSemantic.dangerText),
                 ),
             ],
           ),
@@ -248,7 +247,7 @@ class _Badge extends StatelessWidget {
     final a = context.aerosColors;
     final (bg, fg) = switch (tone) {
       _BadgeTone.muted => (a.bgSubtle, a.fgMuted),
-      _BadgeTone.amber => (AerosColors.warningBg, AerosColors.warningText),
+      _BadgeTone.amber => (context.aerosSemantic.warningBg, context.aerosSemantic.warningText),
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),

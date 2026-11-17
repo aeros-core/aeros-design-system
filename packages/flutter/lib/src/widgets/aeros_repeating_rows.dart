@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../foundation/aeros_control_size.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 import '../tokens/radii.dart';
 import '../tokens/spacing.dart';
 import 'aeros_button.dart';
@@ -110,7 +110,7 @@ class AerosRepeatingRows<T> extends StatelessWidget {
             child: AerosButton.ghost(
               label: addLabel,
               onPressed: onAdd,
-              size: AerosButtonSize.sm,
+              size: AerosControlSize.sm,
             ),
           ),
         ],
@@ -167,10 +167,10 @@ class _RepeaterRow extends StatelessWidget {
               tooltip: 'Remove',
               splashRadius: 18,
               onPressed: onRemove,
-              icon: const Icon(
+              icon: Icon(
                 Icons.close,
                 size: 18,
-                color: AerosColors.dangerText,
+                color: context.aerosSemantic.dangerText,
               ),
             ),
           ],

@@ -29,7 +29,7 @@ Widget _labelled(BuildContext context, String label, Widget child) => Row(
 void main() {
   goldenMatrix(
     'selection_toggles',
-    size: const Size(620, 380),
+    size: const Size(620, 500),
     (context) => GoldenColumn(
       children: [
         GoldenSection(
@@ -74,6 +74,34 @@ void main() {
             ],
           ),
         ),
+        // 3.0: every toggle has a disabled state (onChanged: null, or enabled: false).
+        GoldenSection(
+          'disabled (onChanged: null)',
+          child: GoldenRow(
+            children: [
+              _labelled(context, 'on', const AerosCheckbox(value: true, onChanged: null)),
+              _labelled(context, 'off', const AerosCheckbox(value: false, onChanged: null)),
+              _labelled(context, 'mixed', const AerosCheckbox(value: null, tristate: true, onChanged: null)),
+              _labelled(context, 'on', const AerosRadio<int>(value: 1, groupValue: 1, onChanged: null)),
+              _labelled(context, 'off', const AerosRadio<int>(value: 2, groupValue: 1, onChanged: null)),
+              _labelled(context, 'on', const AerosSwitch(value: true, onChanged: null)),
+              _labelled(context, 'off', const AerosSwitch(value: false, onChanged: null)),
+            ],
+          ),
+        ),
+        GoldenSection(
+          'disabled (enabled: false), compact',
+          child: GoldenRow(
+            children: [
+              _labelled(context, 'on', AerosCheckbox(value: true, compact: true, enabled: false, onChanged: (_) {})),
+              _labelled(context, 'off', AerosCheckbox(value: false, compact: true, enabled: false, onChanged: (_) {})),
+              _labelled(context, 'on', AerosRadio<int>(value: 1, groupValue: 1, compact: true, enabled: false, onChanged: (_) {})),
+              _labelled(context, 'off', AerosRadio<int>(value: 2, groupValue: 1, compact: true, enabled: false, onChanged: (_) {})),
+              _labelled(context, 'on', AerosSwitch(value: true, compact: true, enabled: false, onChanged: (_) {})),
+              _labelled(context, 'off', AerosSwitch(value: false, compact: true, enabled: false, onChanged: (_) {})),
+            ],
+          ),
+        ),
       ],
     ),
   );
@@ -85,6 +113,28 @@ void main() {
           AerosSwitch(key: const Key('switch'), value: true, onChanged: (_) {}),
         ],
       );
+  // The same row with everything off: the ring on an unchecked control.
+  Widget togglesOff(BuildContext context) => GoldenRow(
+        children: [
+          AerosCheckbox(key: const Key('checkbox'), value: false, onChanged: (_) {}),
+          AerosRadio<int>(key: const Key('radio'), value: 2, groupValue: 1, onChanged: (_) {}),
+          AerosSwitch(key: const Key('switch'), value: false, onChanged: (_) {}),
+        ],
+      );
+  for (final target in ['checkbox', 'radio', 'switch']) {
+    goldenMatrix(
+      'selection_${target}_off_focused',
+      togglesOff,
+      size: const Size(240, 100),
+      act: (t) => focus(t, find.byKey(Key(target))),
+    );
+    goldenMatrix(
+      'selection_${target}_pressed',
+      toggles,
+      size: const Size(240, 100),
+      act: (t) => press(t, find.byKey(Key(target))),
+    );
+  }
   for (final target in ['checkbox', 'radio', 'switch']) {
     goldenMatrix(
       'selection_${target}_hovered',

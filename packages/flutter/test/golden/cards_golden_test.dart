@@ -30,9 +30,9 @@ void main() {
                 footer: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    AerosButton.secondary(label: 'Invoice', onPressed: () {}, size: AerosButtonSize.sm),
+                    AerosButton.secondary(label: 'Invoice', onPressed: () {}, size: AerosControlSize.sm),
                     const SizedBox(width: 8),
-                    AerosButton.primary(label: 'Track', onPressed: () {}, size: AerosButtonSize.sm),
+                    AerosButton.primary(label: 'Track', onPressed: () {}, size: AerosControlSize.sm),
                   ],
                 ),
                 child: _body(context),

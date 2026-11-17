@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 import '../tokens/radii.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
@@ -47,7 +46,7 @@ class AerosEnumDropdown extends StatelessWidget {
     final a = context.aerosColors;
     final picked = _selected;
     final hasError = errorText != null && errorText!.isNotEmpty;
-    final borderColor = hasError ? AerosColors.danger : a.borderDefault;
+    final borderColor = hasError ? context.aerosSemantic.danger : a.borderDefault;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,9 +60,9 @@ class AerosEnumDropdown extends StatelessWidget {
                   .withWeight(FontWeight.w600),
               children: [
                 if (required)
-                  const TextSpan(
+                  TextSpan(
                     text: ' *',
-                    style: TextStyle(color: AerosColors.danger),
+                    style: TextStyle(color: context.aerosSemantic.danger),
                   ),
               ],
             ),
@@ -122,7 +121,7 @@ class AerosEnumDropdown extends StatelessWidget {
           const SizedBox(height: AerosSpacing.s1),
           Text(
             errorText!,
-            style: AerosTypography.caption(color: AerosColors.dangerText),
+            style: AerosTypography.caption(color: context.aerosSemantic.dangerText),
           ),
         ],
       ],

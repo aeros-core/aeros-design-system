@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 import '../tokens/radii.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
@@ -236,9 +235,9 @@ class _AerosDropdownSearchState<T> extends State<AerosDropdownSearch<T>> {
                   .withWeight(FontWeight.w600),
               children: [
                 if (widget.required)
-                  const TextSpan(
+                  TextSpan(
                       text: ' *',
-                      style: TextStyle(color: AerosColors.danger)),
+                      style: TextStyle(color: context.aerosSemantic.danger)),
               ],
             ),
           ),
