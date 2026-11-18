@@ -59,6 +59,12 @@ export 'src/widgets/aeros_dropdown_search.dart';
 export 'src/widgets/aeros_form_field.dart';
 export 'src/widgets/aeros_repeating_rows.dart';
 export 'src/widgets/aeros_page_header.dart';
+// Overlays — every floating layer is built on these.
+export 'src/widgets/aeros_popover.dart';
+export 'src/widgets/aeros_menu.dart';
+export 'src/widgets/aeros_select.dart';
+export 'src/widgets/aeros_dialog.dart';
+export 'src/widgets/aeros_sheet.dart';
 export 'src/widgets/aeros_confirm_dialog.dart';
 export 'src/widgets/aeros_data_table.dart';
 export 'src/widgets/aeros_wordmark.dart';

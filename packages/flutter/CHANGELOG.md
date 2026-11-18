@@ -196,6 +196,106 @@ radii, token sizes per density, colour-only hover and press, the one focus ring,
 - **Material ink is gone** from every widget above: anything that looked for an `InkWell` /
   `Material` inside them (tests, custom themes' `splashColor`) no longer finds one.
 
+### Overlays, the data table and the configurable-MTO widgets restyled — the package is now all on the foundation
+
+Every floating layer is built on five new primitives, the data table no longer wraps Material's, and the
+last widgets leave `InkWell`. Nothing in `lib` uses `InkWell`, `showDialog`, `showModalBottomSheet`,
+`showMenu`, `PopupMenuItem`, `DropdownButton` or `DataTable` any more.
+
+**Added — overlay primitives (all exported)**
+
+- `AerosDialog({title, description, content, actions, size, maxWidth, showClose, scrollable, contentPadding,
+  semanticLabel})` and `AerosDialog.show<T>(context, builder:, barrierDismissible:, useRootNavigator:)`.
+  `bgElevated` + the modal elevation + `shape.modal` corners over the `scrim` alias; a header (title,
+  description, close button), a body that scrolls, a footer with a top hairline and no fill.
+  `AerosDialogSize { sm, md, lg, xl }` is `layout.dialog*` (400 / 520 / 720 / 960), default `md`. Fades in
+  with a slight scale (`AerosMotion.base`; instantly under reduced motion), keeps focus inside, closes on
+  Escape and a scrim tap (neither with `barrierDismissible: false`), and is announced by its title.
+- `AerosSheet({title, description, content, actions, …})` and `AerosSheet.show<T>(context, builder:,
+  side: bottom | right | left, size: sm | md | lg)`. The same header / body / footer. A bottom sheet is full
+  width with a drag handle (drag down to dismiss); a side sheet is full height and `layout.drawer*` wide
+  (360 / 480 / 640).
+- `AerosPopover(trigger:, content:, controller:, side:, align:, matchAnchorWidth:, padding:, constraints:)`
+  and `AerosPopover.show<T>(context, builder:, anchorRect:, …)` — an anchored surface (`bgElevated`, the
+  overlay elevation, `shape.surface`) with any content. Opens below its anchor, flips when there is no
+  room, is clamped to the screen; Escape and an outside tap close it and focus returns to the trigger.
+  `AerosPopoverController` has `open()`, `close()`, `toggle()` and `isOpen`.
+- `AerosMenu(items:, trigger:, …)` and `AerosMenu.show<T>(context, items:, …)` with `AerosMenuItem<T>`
+  (`label`, `onSelected`, `value`, `leading`, `shortcut`, `enabled`, `destructive`),
+  `AerosMenuCheckboxItem`, `AerosMenuRadioItem<T>`, `AerosMenuSeparator` and `AerosMenuLabel`. 4px padding,
+  rows `shape.item` at control-sm height, one highlight shared by mouse and keyboard (the hover state
+  layer; the danger tint for a destructive row). Arrow keys, Home and End move (skipping disabled rows),
+  Enter / Space choose. Callbacks run after the menu has closed. `AerosMenuRow` and `AerosMenuList` are the
+  row and the list on their own; `AerosWholeRows` cuts a scrolling list of equal rows at a whole row.
+- `AerosSelect<T>({items, value, onChanged, placeholder, label, helper, error, enabled, required, size})`
+  with `AerosSelectItem<T>(value:, label:, leading:, detail:, enabled:)` — a field-styled trigger (the
+  shared field frame, so it is the same height as `AerosTextField`) that opens the options with the chosen
+  one checked. `AerosSelect.showOptions<T>(context, …)` opens the same list from any trigger.
+- `AerosPressable.hover(builder:)` — hover tracking only: no taps, no focus, no semantics.
+- `AerosFormField.labelGap` (default unchanged, 8); the field-like widgets use 6, like `AerosTextField`.
+- `AerosDataTable.emptyText` (default `'No data'`) and `rowSemanticLabel`; `AerosMeasurementInput.size`.
+
+**Breaking — what an app has to change or re-check**
+
+- **`AerosConfirmDialog`** is an `AerosDialog` (`size: sm`, 400 wide — was 440): elevated surface, 12px
+  corners, `h3` title, `bodySm` body, buttons in a footer under a hairline. `show(...)` is unchanged and
+  still returns `false` when dismissed.
+- **`AerosDropdownSearch`**: the trigger is a field frame (control `md` high — 32 pointer / 40 touch; it
+  was taller, and the same at both densities) and announces itself as a button. `mode: dialog` opens an `AerosDialog` (`md`, or
+  `dialogMaxWidth`; as tall as its list, capped by `maxHeight` — it was 70% × 60% of the screen),
+  `mode: sheet` an `AerosSheet`, `mode: menu` an anchored surface exactly as wide as the field. **The menu
+  presentation now honours `showSearchBox` and `onFind`** (it ignored both): pass `showSearchBox: false` to
+  keep a plain list. Its viewport ends on a whole row — the last visible row is no longer cut through its
+  text. The chosen option is marked with a check (was bold on a tint). `itemBuilder` rows are wrapped in the
+  shared menu row, which adds 8px horizontal padding and the highlight.
+- **`AerosDataTable`** no longer wraps Material `DataTable` (it is a `StatefulWidget` now; the constructor
+  is unchanged apart from the two additions above).
+  - Header and rows are the `row` token: 40 pointer / 48 touch (header was 44, rows 48–56). A row grows
+    with a taller cell.
+  - The header is plain — no fill — with `labelXs` muted labels; cells default to `bodySm` in `fgPrimary`
+    (was `bodyMd`), and **`numeric` columns are right-aligned in mono**. Cell padding is 12px.
+  - Hover tints a row with the state layer; a selected row takes `stateSelected`. Selection uses
+    `AerosCheckbox`, and the header checkbox is mixed when some rows are selected.
+  - Sortable headers are buttons with a caret, a focus ring and an announced sort state
+    (`"Order, sorted ascending"`). `AerosDataSort.columnIndex` still counts your columns.
+  - **Inside a bounded height the rows now scroll under a header that stays in place** (it used to
+    overflow). In an unbounded height it is as tall as its rows, as before.
+  - The empty state is plain centred text under the header, inside the one frame. If you pass
+    `emptyState: AerosEmptyState(...)` you get its dashed outline inside the frame again — pass plain
+    content, or `emptyText`.
+  - The loading veil is `bgSurface` at `opacity.muted` and no longer covers the `footer`.
+  - Screen readers: header cells are headers, each row checkbox is named for its row
+    (`rowSemanticLabel`), a tappable row is a button that reports `selected`. Flutter's table roles are not
+    used — they need a row / cell tree this layout does not have.
+- **`AerosEnumDropdown`** is an `AerosSelect`: same constructor, the options open in the menu surface, and a
+  disabled option shows its `disabledReason` at the end of its row.
+- **`AerosMeasurementInput`** is one field frame (the inner second border is gone) at control `md` height.
+  The unit is a button at the end of the field that opens the list of units — plain text when there is only
+  one. Disabled dims the whole field. Without `helperText`, the "Allowed: …" line still shows.
+- **`AerosRangeSlider` / `AerosNumericRangeBand`** keep Material's `Slider` / `RangeSlider` under one
+  token-driven theme: 2px track, 14px thumb (`bgSurface` with a `brandPrimary` hairline), no tick marks, no
+  halo; the slider's height is the density's minimum target (24 pointer / 48 touch). Keyboard focus draws
+  the focus ring around the thumb of `AerosRangeSlider`; Material's `RangeSlider` takes no keyboard focus,
+  so the band has none. Disabled dims the whole control.
+- **Mono amounts are 400 / 500 only.** The slider and band values and every `AerosPriceBreakdown` amount
+  no longer ask for w600 / w700 (IBM Plex Mono ships Regular and Medium). The breakdown's header total is
+  `monoLg` (20px) medium; the total row is a hairline above, no fill.
+- **`AerosPriceBreakdown`**, **`AerosRepeatingRows`** rows and the attached-file row of
+  **`AerosFileUploadButton`** are flat surfaces with 8px corners. The upload drop zone is a button (hover
+  tint, focus ring, Enter / Space) with a 1px dashed outline; "Replace" and "Remove" are `AerosButton`s.
+  The repeater's remove button is a neutral ghost icon button (was a red `IconButton`).
+- **`AerosVariantPicker`** chips are the `AerosEnumChips` chip (control `sm`, a hairline that stays 1px, a
+  check on the selected one); stock badges are `AerosBadge`s. Swatch tiles are 56px with a 2px `fgPrimary`
+  border when selected. Both are keyboard-focusable and announce `selected`.
+- **`AerosAttributeSelector`**: a locked BOOLEAN attribute now shows a disabled switch (it looked enabled
+  and ignored taps).
+- **`AerosHoverable`** with `onTap` is now a real button — focusable, Enter / Space, announced, with the
+  focus ring around what the builder returns. Without `onTap` it only tracks the pointer, as before.
+- **`AerosSearchField`**: Escape with an empty query is no longer swallowed, so it closes the dialog or
+  menu the field sits in.
+- **`AerosShadows`** is deprecated (`Use AerosElevation via context.aerosElevation`) and its
+  `card` / `menu` / `dialog` / `popover(bool isDark)` functions are **removed**: use
+  `AerosSurface(level: …)`.
 
 ### Breaking
 

@@ -20,6 +20,7 @@ class AerosFormField extends StatelessWidget {
     this.errorText,
     this.required = false,
     this.trailing,
+    this.labelGap = AerosSpacing.s2,
   });
 
   final Widget child;
@@ -30,6 +31,10 @@ class AerosFormField extends StatelessWidget {
 
   /// Optional widget rendered to the right of the label (e.g. info icon, badge).
   final Widget? trailing;
+
+  /// Space between the label and [child]. Field-like inputs use
+  /// [AerosSpacing.s1_5], the gap [AerosTextField] has.
+  final double labelGap;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +69,7 @@ class AerosFormField extends StatelessWidget {
               if (trailing != null) trailing!,
             ],
           ),
-          const SizedBox(height: AerosSpacing.s2),
+          SizedBox(height: labelGap),
         ],
         child,
         if (hasError) ...[

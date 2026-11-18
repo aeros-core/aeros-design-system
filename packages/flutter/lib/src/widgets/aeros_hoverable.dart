@@ -1,24 +1,27 @@
 import 'package:flutter/widgets.dart';
 
-/// Wraps a builder with `MouseRegion` and a hover-state flag so cards
-/// and list rows can render desktop-only hover affordances without
-/// boilerplate at every call-site.
+import '../foundation/aeros_focus_ring.dart';
+import '../foundation/aeros_pressable.dart';
+
+/// Reports whether a mouse pointer is over it, so cards and list rows can
+/// render desktop-only hover affordances without boilerplate at every
+/// call-site.
+///
+/// A thin wrapper over [AerosPressable]: with [onTap] the whole area is a
+/// button (hand cursor, Enter / Space, announced to screen readers, the focus
+/// ring on keyboard focus). Without one it only tracks the pointer. For
+/// pressed and focus states as well, use [AerosPressable] directly.
 ///
 /// ```dart
 /// AerosHoverable(
 ///   onTap: () => navigate(),
-///   builder: (context, hovered) => AnimatedContainer(
-///     duration: AerosMotion.resolve(context, AerosMotion.fast),
-///     decoration: BoxDecoration(
-///       color: hovered ? aeros.bgSubtle : aeros.bgSurface,
-///       border: Border.all(color: aeros.borderDefault),
-///       borderRadius: AerosRadii.brMd,
-///     ),
+///   builder: (context, hovered) => AerosSurface(
+///     color: AerosStateLayer.resolve(context.aerosColors, context.aerosColors.bgSurface, hovered: hovered),
 ///     child: ...,
 ///   ),
 /// )
 /// ```
-class AerosHoverable extends StatefulWidget {
+class AerosHoverable extends StatelessWidget {
   const AerosHoverable({
     super.key,
     required this.builder,
@@ -34,35 +37,23 @@ class AerosHoverable extends StatefulWidget {
   final MouseCursor? cursor;
 
   @override
-  State<AerosHoverable> createState() => _AerosHoverableState();
-}
-
-class _AerosHoverableState extends State<AerosHoverable> {
-  bool _hovered = false;
-
-  void _setHovered(bool value) {
-    if (_hovered == value) return;
-    setState(() => _hovered = value);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final child = widget.builder(context, _hovered);
-    final cursor = widget.cursor ??
-        (widget.onTap != null
-            ? SystemMouseCursors.click
-            : SystemMouseCursors.basic);
-    return MouseRegion(
+    final onTap = this.onTap;
+    if (onTap == null) {
+      return AerosPressable.hover(
+        cursor: cursor ?? SystemMouseCursors.basic,
+        builder: (context, state) => builder(context, state.hovered),
+      );
+    }
+    return AerosPressable(
+      onPressed: onTap,
       cursor: cursor,
-      onEnter: (_) => _setHovered(true),
-      onExit: (_) => _setHovered(false),
-      child: widget.onTap != null
-          ? GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: widget.onTap,
-              child: child,
-            )
-          : child,
+      // The builder decides the size; nothing is added around it.
+      expandHitTarget: false,
+      builder: (context, state) => AerosFocusRing(
+        focused: state.focused,
+        child: builder(context, state.hovered),
+      ),
     );
   }
 }

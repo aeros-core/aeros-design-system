@@ -1,6 +1,7 @@
 import 'package:aeros_design_system/aeros_design_system.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Test helper: renders a widget that captures the resolved breakpoint
@@ -207,6 +208,59 @@ void main() {
       await tester.pumpAndSettle();
       // Re-rendered with hovered=false at least once after exit.
       expect(renderCount, greaterThan(2));
+    });
+
+    testWidgets('without onTap it only tracks the pointer: no focus stop, no semantics of its own', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AerosTheme.light(),
+          home: Scaffold(
+            body: Center(
+              child: AerosHoverable(builder: (context, hovered) => const Text('Row')),
+            ),
+          ),
+        ),
+      );
+      final node = tester.getSemantics(find.text('Row'));
+      expect(node.flagsCollection.isButton, isFalse);
+      expect(node.flagsCollection.isEnabled.name, 'none');
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(
+        FocusManager.instance.primaryFocus?.context?.findAncestorWidgetOfExactType<AerosHoverable>(),
+        isNull,
+      );
+      handle.dispose();
+    });
+
+    testWidgets('with onTap it is a button: tap, Enter, announced, a focus ring on Tab', (tester) async {
+      final handle = tester.ensureSemantics();
+      var taps = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AerosTheme.light(),
+          home: Scaffold(
+            body: Center(
+              child: AerosHoverable(
+                onTap: () => taps++,
+                builder: (context, hovered) => const SizedBox(width: 120, height: 40, child: Text('Open')),
+              ),
+            ),
+          ),
+        ),
+      );
+      // The builder's size is kept: nothing is added around it.
+      expect(tester.getSize(find.byType(AerosHoverable)), const Size(120, 40));
+      await tester.tap(find.text('Open'));
+      expect(taps, 1);
+      expect(tester.getSemantics(find.byType(AerosHoverable)).flagsCollection.isButton, isTrue);
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(tester.widget<AerosFocusRing>(find.byType(AerosFocusRing)).focused, isTrue);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(taps, 2);
+      handle.dispose();
     });
   });
 }

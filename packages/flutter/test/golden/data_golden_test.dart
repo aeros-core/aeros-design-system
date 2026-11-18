@@ -180,25 +180,38 @@ void main() {
 
   goldenMatrix(
     'data_table_empty',
-    size: const Size(760, 620),
+    size: const Size(760, 700),
     (context) => GoldenColumn(
       width: 720,
       children: [
         GoldenSection(
-          'AerosDataTable no rows, with emptyState',
+          'AerosDataTable no rows, with a custom emptyState',
           child: AerosDataTable<_Order>(
             rows: const [],
             columns: _columns(context),
-            emptyState: const AerosEmptyState(
-              icon: Icons.receipt_long_outlined,
-              title: 'No orders yet',
-              description: 'Orders you receive will show up here.',
+            emptyState: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('No orders match these filters', style: AerosTypography.bodySm(color: context.aerosColors.fgMuted)),
+                const SizedBox(height: AerosSpacing.s3),
+                AerosButton.secondary(label: 'Clear filters', size: AerosControlSize.sm, onPressed: () {}),
+              ],
             ),
           ),
         ),
         GoldenSection(
           'AerosDataTable no rows, no emptyState',
           child: AerosDataTable<_Order>(rows: const [], columns: _columns(context)),
+        ),
+        GoldenSection(
+          'AerosDataTable no rows, with selection',
+          child: AerosDataTable<_Order>(
+            rows: const [],
+            columns: _columns(context),
+            selected: const {},
+            onSelectionChanged: (_) {},
+            emptyText: 'Nothing to select',
+          ),
         ),
       ],
     ),
@@ -223,6 +236,86 @@ void main() {
       child: AerosDataTable<_Order>(rows: _orders, columns: _columns(context), onRowTap: (_) {}),
     ),
     act: (t) => hover(t, find.text('Lorven Foods')),
+  );
+
+  // A selected row under the pointer keeps its selected tint and adds the hover.
+  goldenMatrix(
+    'data_table_selected_row_hovered',
+    size: const Size(760, 320),
+    (context) => SizedBox(
+      width: 720,
+      child: AerosDataTable<_Order>(
+        rows: _orders,
+        columns: _columns(context),
+        selected: {_orders[1]},
+        onSelectionChanged: (_) {},
+      ),
+    ),
+    act: (t) => hover(t, find.text('Lorven Foods')),
+  );
+
+  goldenMatrix(
+    'data_table_sort_focused',
+    size: const Size(760, 320),
+    (context) => SizedBox(
+      width: 720,
+      child: AerosDataTable<_Order>(
+        rows: _orders,
+        columns: _columns(context),
+        sort: const AerosDataSort(columnIndex: 1, ascending: false),
+        onSortChanged: (_) {},
+      ),
+    ),
+    act: (t) => focus(t, find.bySemanticsLabel('Buyer, sorted descending')),
+  );
+
+  goldenMatrix(
+    'data_table_row_focused',
+    size: const Size(760, 320),
+    (context) => SizedBox(
+      width: 720,
+      child: AerosDataTable<_Order>(rows: _orders, columns: _columns(context), onRowTap: (_) {}),
+    ),
+    act: (t) => focus(t, find.bySemanticsLabel('Row 2')),
+  );
+
+  // In a bounded height the rows scroll under a header that stays in place.
+  goldenMatrix(
+    'data_table_scrolled',
+    size: const Size(760, 340),
+    (context) => SizedBox(
+      width: 720,
+      height: 300,
+      child: AerosDataTable<_Order>(
+        rows: [
+          for (var i = 0; i < 6; i++)
+            for (final o in _orders) _Order('${o.id}-$i', o.buyer, o.status, o.tone, o.total),
+        ],
+        columns: _columns(context),
+        selected: const {},
+        onSelectionChanged: (_) {},
+      ),
+    ),
+    act: (t) => t.drag(find.text('#4819-0'), const Offset(0, -130)),
+  );
+
+  // More columns than fit: the table scrolls sideways, header and all.
+  goldenMatrix(
+    'data_table_wide',
+    size: const Size(520, 320),
+    (context) => SizedBox(
+      width: 480,
+      child: AerosDataTable<_Order>(
+        rows: _orders,
+        columns: [
+          ..._columns(context),
+          AerosDataColumn(label: 'Placed', cell: (o) => const Text('12 Nov 2026')),
+          AerosDataColumn(label: 'Ship to', cell: (o) => const Text('Ahmedabad, Gujarat')),
+          AerosDataColumn(label: 'Units', numeric: true, cell: (o) => const Text('12,000')),
+        ],
+      ),
+    ),
+    act: (t) => t.drag(find.text('Boson Machines'), const Offset(-180, 0)),
   );
 
   goldenMatrix(
@@ -521,6 +614,6 @@ void main() {
         onPickFile: () => pending.future,
       ),
     ),
-    act: (t) => t.tap(find.byType(InkWell).first),
+    act: (t) => t.tap(find.text('Upload artwork')),
   );
 }

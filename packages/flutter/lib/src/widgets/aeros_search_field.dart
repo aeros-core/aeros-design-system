@@ -138,10 +138,10 @@ class _AerosSearchFieldState extends State<AerosSearchField> {
           Expanded(
             child: CallbackShortcuts(
               // Escape clears the query — expected desktop-search behavior.
+              // With nothing to clear the key is left alone, so it still
+              // closes the dialog or menu the field sits in.
               bindings: {
-                const SingleActivator(LogicalKeyboardKey.escape): () {
-                  if (_hasText) _clear();
-                },
+                if (_hasText) const SingleActivator(LogicalKeyboardKey.escape): _clear,
               },
               child: TextField(
                 controller: _controller,

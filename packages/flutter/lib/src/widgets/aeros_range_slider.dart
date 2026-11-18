@@ -3,10 +3,15 @@ import '../theme/aeros_theme_extension.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 import 'aeros_attribute_models.dart';
+import 'aeros_form_field.dart';
+import 'aeros_slider_theme.dart';
 
 /// Single-value slider for a MEASUREMENT attribute backed by a continuous
 /// RANGE option-source. Renders the current value above the track with the
 /// unit appended (e.g. "250 gsm").
+///
+/// A Material [Slider] in the design system's slider look: a 2px track, a 14px
+/// thumb with a hairline, no halo, and the focus ring on keyboard focus.
 ///
 /// For discrete numeric chips, use [AerosEnumChips] with `unitSuffix` instead.
 class AerosRangeSlider extends StatelessWidget {
@@ -51,81 +56,45 @@ class AerosRangeSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final hasError = errorText != null && errorText!.isNotEmpty;
     final divisions = ((range.max - range.min) / range.step).round();
     final current = (value ?? range.min).clamp(range.min, range.max).toDouble();
+    final active = enabled && onChanged != null;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (label != null)
+    return AerosFormField(
+      label: label,
+      required: required,
+      errorText: errorText,
+      labelGap: AerosSpacing.s1,
+      // Mono ships at 400 and 500 only: the value is the medium face.
+      trailing: Text(_format(value), style: AerosTypography.monoMd(color: a.fgPrimary, weight: FontWeight.w500)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AerosSliderTheme(
+            enabled: active,
+            child: Slider(
+              value: current,
+              min: range.min.toDouble(),
+              max: range.max.toDouble(),
+              divisions: divisions > 0 ? divisions : null,
+              onChanged: active
+                  ? (v) {
+                      final stepped = (v / range.step).round() * range.step;
+                      onChanged!(stepped);
+                    }
+                  : null,
+            ),
+          ),
           Row(
-            children: [
-              Expanded(
-                child: RichText(
-                  text: TextSpan(
-                    text: label!,
-                    style: AerosTypography.bodySm(color: a.fgSecondary)
-                        .withWeight(FontWeight.w600),
-                    children: [
-                      if (required)
-                        TextSpan(
-                          text: ' *',
-                          style: TextStyle(color: context.aerosSemantic.danger),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              Text(
-                _format(value),
-                style: AerosTypography.monoMd(color: a.fgPrimary)
-                    .withWeight(FontWeight.w600),
-              ),
-            ],
-          ),
-        SliderTheme(
-          data: SliderThemeData(
-            activeTrackColor: a.brandPrimary,
-            inactiveTrackColor: a.borderDefault,
-            thumbColor: a.brandPrimary,
-            overlayColor: a.brandPrimary.withAlpha(40),
-            trackHeight: 3,
-          ),
-          child: Slider(
-            value: current,
-            min: range.min.toDouble(),
-            max: range.max.toDouble(),
-            divisions: divisions > 0 ? divisions : null,
-            onChanged: enabled && onChanged != null
-                ? (v) {
-                    final stepped = (v / range.step).round() * range.step;
-                    onChanged!(stepped);
-                  }
-                : null,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s2),
-          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(_format(range.min),
-                  style: AerosTypography.caption(color: a.fgMuted)),
-              Text(_format(range.max),
-                  style: AerosTypography.caption(color: a.fgMuted)),
+              Text(_format(range.min), style: AerosTypography.caption(color: a.fgMuted)),
+              Text(_format(range.max), style: AerosTypography.caption(color: a.fgMuted)),
             ],
           ),
-        ),
-        if (hasError) ...[
-          const SizedBox(height: AerosSpacing.s1),
-          Text(
-            errorText!,
-            style: AerosTypography.caption(color: context.aerosSemantic.dangerText),
-          ),
         ],
-      ],
+      ),
     );
   }
 }

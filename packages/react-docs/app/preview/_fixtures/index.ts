@@ -49,6 +49,22 @@ import SidebarRailFixture from "./sidebar-rail";
  * `next build` fails. The Playwright specs iterate `FIXTURE_SLUGS`, so a
  * registered fixture is always screenshotted and axe-scanned.
  */
+import DataTableFixture from "./data-table";
+import ToggleFixture from "./toggle";
+import SegmentedControlFixture from "./segmented-control";
+import CollapsibleFixture from "./collapsible";
+import ScrollAreaFixture from "./scroll-area";
+import CountBadgeFixture from "./count-badge";
+import FilterChipFixture from "./filter-chip";
+import KbdFixture from "./kbd";
+import PageHeaderFixture from "./page-header";
+import FileUploadFixture from "./file-upload";
+import StepperFixture from "./stepper";
+import ComboboxFixture from "./combobox";
+import ComboboxOpenFixture from "./combobox-open";
+import DatePickerFixture from "./date-picker";
+import DatePickerOpenFixture from "./date-picker-open";
+import NumberInputFixture from "./number-input";
 export const FIXTURES: Record<FixtureSlug, ComponentType> = {
   "foundations-type": FoundationsTypeFixture,
   "foundations-surfaces": FoundationsSurfacesFixture,
@@ -93,4 +109,20 @@ export const FIXTURES: Record<FixtureSlug, ComponentType> = {
   pagination: PaginationFixture,
   command: CommandFixture,
   calendar: CalendarFixture,
+  "data-table": DataTableFixture,
+  "toggle": ToggleFixture,
+  "segmented-control": SegmentedControlFixture,
+  "collapsible": CollapsibleFixture,
+  "scroll-area": ScrollAreaFixture,
+  "count-badge": CountBadgeFixture,
+  "filter-chip": FilterChipFixture,
+  "kbd": KbdFixture,
+  "page-header": PageHeaderFixture,
+  "file-upload": FileUploadFixture,
+  "stepper": StepperFixture,
+  "combobox": ComboboxFixture,
+  "combobox-open": ComboboxOpenFixture,
+  "date-picker": DatePickerFixture,
+  "date-picker-open": DatePickerOpenFixture,
+  "number-input": NumberInputFixture,
 };
