@@ -1,282 +1,54 @@
 /**
  * Aeros token builder — zero-dep.
- * Reads tokens.json, emits CSS vars, TypeScript, Tailwind v4 preset, Dart constants.
+ *
+ * tokens.json is the only source. This script resolves its references and
+ * emits every platform artefact from the result:
+ *
+ *   dist/css/tokens.css              --aeros-* custom properties (light/dark/system)
+ *   dist/css/theme.css               the Tailwind v4 theme (@theme + @theme inline)
+ *   dist/js/tokens.{js,d.ts}         resolved + raw trees, typed
+ *   dist/dart/*.dart                 Dart constants + typed theme classes
+ *   ../flutter/lib/src/tokens/*.g.dart   the same Dart, committed (CI checks freshness)
+ *   ../../docs/tokens.md             the written token reference, committed (CI checks freshness)
+ *
  * Run: `pnpm --filter @aeros-core/tokens build`
  */
-import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildCss } from "./emit/css";
+import { buildDartTheme, buildDartTokens } from "./emit/dart";
+import { buildTokenDocs } from "./emit/docs";
+import { buildDts, buildJs } from "./emit/js";
+import { buildTheme } from "./emit/theme";
+import { resolveTokens } from "./resolve.mjs";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = resolve(__dirname, "..");
-const tokens = JSON.parse(readFileSync(resolve(__dirname, "tokens.json"), "utf8"));
+const here = dirname(fileURLToPath(import.meta.url));
+const root = resolve(here, "..");
+const raw = JSON.parse(readFileSync(resolve(here, "tokens.json"), "utf8"));
+const tokens = resolveTokens(raw);
 
-function ensure(p: string) { mkdirSync(dirname(p), { recursive: true }); }
-function write(p: string, body: string) { ensure(p); writeFileSync(p, body); console.log("✓", p.replace(root + "/", "")); }
-
-// ── helpers ───────────────────────────────────────────────
-const kebab = (s: string) => s.replace(/([A-Z])/g, "-$1").toLowerCase();
-
-function flattenColor(): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const [group, ramp] of Object.entries(tokens.color)) {
-    if (group === "semanticDark") continue; // dark overrides are emitted in the [data-theme='dark'] block
-    for (const [stop, v] of Object.entries(ramp as any)) {
-      out[`${group}-${stop}`] = (v as any).$value;
-    }
-  }
-  return out;
+function write(path: string, body: string) {
+  const file = resolve(root, path);
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, body);
+  console.log("✓", path);
 }
 
-const COLOR = flattenColor();
-const ALIAS_LIGHT = tokens.alias.light as Record<string, string>;
-const ALIAS_DARK  = tokens.alias.dark  as Record<string, string>;
+const dartTokens = buildDartTokens(tokens);
+const dartTheme = buildDartTheme(tokens);
 
-// ── CSS ───────────────────────────────────────────────────
-function buildCss(): string {
-  const lines: string[] = [];
-  lines.push("/* Aeros Design Tokens — generated. Do not edit. */");
-  lines.push(":root {");
-  lines.push(`  --aeros-font-sans: ${tokens.font.family.sans};`);
-  lines.push(`  --aeros-font-mono: ${tokens.font.family.mono};`);
-  lines.push(`  --aeros-font-logo: ${tokens.font.family.logo};`);
-  for (const [k, v] of Object.entries(COLOR)) lines.push(`  --aeros-color-${k}: ${v};`);
-  for (const [k, v] of Object.entries(ALIAS_LIGHT)) lines.push(`  --aeros-${k}: ${v};`);
-  for (const [k, v] of Object.entries(tokens.radius)) lines.push(`  --aeros-radius-${k}: ${typeof v === "number" ? v + "px" : v};`);
-  for (const [k, v] of Object.entries(tokens.space)) {
-    // CSS custom property idents can't contain '.' — lightningcss rejects it.
-    const safe = String(k).replace(/\./g, "_");
-    lines.push(`  --aeros-space-${safe}: ${typeof v === "number" ? v + "px" : v};`);
-  }
-  for (const [k, v] of Object.entries(tokens.shadow)) lines.push(`  --aeros-shadow-${k}: ${v};`);
-  for (const [k, v] of Object.entries(tokens.motion.duration)) lines.push(`  --aeros-duration-${k}: ${v}ms;`);
-  for (const [k, v] of Object.entries(tokens.motion.ease)) lines.push(`  --aeros-ease-${k}: ${v};`);
-  for (const [k, v] of Object.entries(tokens.z)) lines.push(`  --aeros-z-${k}: ${v};`);
-  for (const [k, v] of Object.entries(tokens.breakpoint)) lines.push(`  --aeros-breakpoint-${k}: ${v}px;`);
-  lines.push("}");
-  lines.push("");
-  lines.push("[data-theme='dark'] {");
-  for (const [k, v] of Object.entries(ALIAS_DARK)) lines.push(`  --aeros-${k}: ${v};`);
-  // Status colors get true dark counterparts (light chips on dark canvas otherwise).
-  for (const [k, v] of Object.entries(tokens.color.semanticDark as Record<string, any>)) {
-    lines.push(`  --aeros-color-semantic-${k}: ${v.$value};`);
-  }
-  // In dark mode rgba-black shadows vanish on near-black surfaces, so elevation
-  // is carried by a deeper key + a faint light hairline ring for separation.
-  for (const [k, v] of Object.entries(tokens.shadowDark)) lines.push(`  --aeros-shadow-${k}: ${v};`);
-  lines.push("}");
-  lines.push("");
-  lines.push("@media (prefers-reduced-motion: reduce) {");
-  lines.push("  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }");
-  lines.push("}");
-  return lines.join("\n") + "\n" + buildTextCss();
-}
-
-// ── Type scale (CSS utility classes) ──────────────────────
-const fontFamilyVar = (fam?: string) => (fam === "mono" ? "var(--aeros-font-mono)" : "var(--aeros-font-sans)");
-
-function buildTextCss(): string {
-  const lines: string[] = [];
-  lines.push("");
-  lines.push("/* Type scale — utility classes (.aeros-text-<role>) */");
-  for (const [name, s] of Object.entries(tokens.text as Record<string, any>)) {
-    lines.push(`.aeros-text-${name} {`);
-    lines.push(`  font-family: ${fontFamilyVar(s.family)};`);
-    lines.push(`  font-size: ${s.size}px;`);
-    lines.push(`  font-weight: ${s.weight};`);
-    lines.push(`  line-height: ${s.lineHeight};`);
-    lines.push(`  letter-spacing: ${s.tracking};`);
-    if (s.transform) lines.push(`  text-transform: ${s.transform};`);
-    lines.push("}");
-  }
-  return lines.join("\n") + "\n";
-}
-
-// ── TS ────────────────────────────────────────────────────
-function buildTs(): string {
-  return `// Aeros Design Tokens — generated. Do not edit.\n\nexport const tokens = ${JSON.stringify(tokens, null, 2)} as const;\n\nexport type AerosTokens = typeof tokens;\nexport default tokens;\n`;
-}
-
-// ── Tailwind v4 preset ────────────────────────────────────
-function buildTailwind(): string {
-  // Tailwind v4 uses CSS-first config via @theme, but we also expose a JS preset
-  // for v3 users or programmatic access. Keep it minimal.
-  const colors: Record<string, any> = {};
-  for (const [group, ramp] of Object.entries(tokens.color)) {
-    if (group === "semantic" || group === "semanticDark") continue;
-    const obj: Record<string, string> = {};
-    for (const [stop, v] of Object.entries(ramp as any)) obj[stop] = (v as any).$value;
-    colors[group] = obj;
-  }
-  // semantic via CSS vars (theme-aware — dark values come from tokens.css)
-  for (const k of Object.keys((tokens.color as any).semantic)) {
-    colors[k] = `var(--aeros-color-semantic-${k})`;
-  }
-  // alias via CSS vars (theme-aware)
-  for (const k of Object.keys(tokens.alias.light)) {
-    colors[k] = `var(--aeros-${k})`;
-  }
-
-  const spacing: Record<string, string> = {};
-  for (const [k, v] of Object.entries(tokens.space)) spacing[k] = typeof v === "number" ? `${v}px` : String(v);
-
-  const radius: Record<string, string> = {};
-  for (const [k, v] of Object.entries(tokens.radius)) radius[k] = typeof v === "number" ? `${v}px` : String(v);
-
-  const shadow: Record<string, string> = {};
-  for (const [k, v] of Object.entries(tokens.shadow)) shadow[k] = String(v);
-
-  const durations: Record<string, string> = {};
-  for (const [k, v] of Object.entries(tokens.motion.duration)) durations[k] = `${v}ms`;
-
-  const screens: Record<string, string> = {};
-  for (const [k, v] of Object.entries(tokens.breakpoint)) screens[k] = `${v}px`;
-
-  const preset = {
-    theme: {
-      extend: {
-        colors,
-        spacing,
-        borderRadius: radius,
-        boxShadow: shadow,
-        screens,
-        zIndex: Object.fromEntries(Object.entries(tokens.z).map(([k, v]) => [k, String(v)])),
-        fontFamily: {
-          sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
-          mono: ["IBM Plex Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"]
-        },
-        transitionDuration: durations,
-        transitionTimingFunction: { ...tokens.motion.ease }
-      }
-    }
-  };
-
-  return `// Aeros Tailwind preset — generated. Do not edit.\n/** @type {import('tailwindcss').Config} */\nconst preset = ${JSON.stringify(preset, null, 2)};\nexport default preset;\n`;
-}
-
-// ── Dart ──────────────────────────────────────────────────
-function hexToDartColor(hex: string): string {
-  const h = hex.replace("#", "");
-  return `Color(0xFF${h.toUpperCase()})`;
-}
-
-// Flutter's FontWeight only has w100..w900; round non-standard weights (e.g. book 450) down.
-function dartFontWeight(w: number): string {
-  const hundred = Math.min(900, Math.max(100, Math.floor(w / 100) * 100));
-  return `FontWeight.w${hundred}`;
-}
-
-// CSS tracking is in em; Flutter letterSpacing is logical px = em × fontSize.
-function trackingToLetterSpacing(tracking: string, size: number): number {
-  if (!tracking || tracking === "0") return 0;
-  const em = parseFloat(String(tracking).replace("em", ""));
-  return Math.round(em * size * 100) / 100;
-}
-
-const camel = (s: string) => s.replace(/-([a-z0-9])/g, (_m, c) => String(c).toUpperCase());
-
-function buildDart(): string {
-  const lines: string[] = [];
-  lines.push("// Aeros Design Tokens — generated. Do not edit.");
-  lines.push("// ignore_for_file: constant_identifier_names");
-  lines.push("");
-  lines.push("import 'package:flutter/material.dart';");
-  lines.push("");
-  lines.push("class AerosTokens {");
-  lines.push("  AerosTokens._();");
-  lines.push("");
-  lines.push("  // ─── Color ramps ───");
-  for (const [group, ramp] of Object.entries(tokens.color)) {
-    if (group === "semantic" || group === "semanticDark") continue;
-    for (const [stop, v] of Object.entries(ramp as any)) {
-      lines.push(`  static const Color ${group}${stop} = ${hexToDartColor((v as any).$value)};`);
-    }
-  }
-  lines.push("");
-  lines.push("  // ─── Semantic (light / dark) ───");
-  for (const [k, v] of Object.entries((tokens.color as any).semantic)) {
-    const name = k.replace(/-([a-z])/g, (_m, c) => c.toUpperCase());
-    lines.push(`  static const Color ${name} = ${hexToDartColor((v as any).$value)};`);
-  }
-  for (const [k, v] of Object.entries((tokens.color as any).semanticDark)) {
-    const name = k.replace(/-([a-z])/g, (_m, c) => c.toUpperCase());
-    lines.push(`  static const Color ${name}Dark = ${hexToDartColor((v as any).$value)};`);
-  }
-  lines.push("");
-  lines.push("  // ─── Breakpoints (logical px) ───");
-  for (const [k, v] of Object.entries(tokens.breakpoint)) {
-    const key = `breakpoint${k.charAt(0).toUpperCase() + k.slice(1).replace("2xl", "2Xl")}`;
-    lines.push(`  static const double ${key} = ${Number(v).toFixed(1)};`);
-  }
-  lines.push("");
-  lines.push("  // ─── Motion (ms + curves) ───");
-  for (const [k, v] of Object.entries(tokens.motion.duration)) {
-    const key = `duration${k.charAt(0).toUpperCase() + k.slice(1)}`;
-    lines.push(`  static const Duration ${key} = Duration(milliseconds: ${v});`);
-  }
-  for (const [k, v] of Object.entries(tokens.motion.ease)) {
-    const m = String(v).match(/cubic-bezier\(([^)]+)\)/);
-    if (!m) continue;
-    const args = m[1].split(",").map((n) => Number(n.trim())).join(", ");
-    const key = `ease${k.charAt(0).toUpperCase() + k.slice(1)}`;
-    lines.push(`  static const Cubic ${key} = Cubic(${args});`);
-  }
-  lines.push("");
-  lines.push("  // ─── Theme aliases (light / dark) ───");
-  for (const [theme, aliases] of [["Light", ALIAS_LIGHT], ["Dark", ALIAS_DARK]] as const) {
-    for (const [k, v] of Object.entries(aliases)) {
-      const name = `alias${theme}${k.charAt(0).toUpperCase() + camel(k).slice(1)}`;
-      lines.push(`  static const Color ${name} = ${hexToDartColor(v)};`);
-    }
-  }
-  lines.push("");
-  lines.push("  // ─── Spacing (dp) ───");
-  for (const [k, v] of Object.entries(tokens.space)) {
-    const key = `space${k.replace(".", "_")}`;
-    lines.push(`  static const double ${key} = ${Number(v).toFixed(1)};`);
-  }
-  lines.push("");
-  lines.push("  // ─── Radii ───");
-  for (const [k, v] of Object.entries(tokens.radius)) {
-    const key = `radius${k.charAt(0).toUpperCase() + k.slice(1).replace("2xl", "2Xl")}`;
-    lines.push(`  static const double ${key} = ${Number(v).toFixed(1)};`);
-  }
-  lines.push("");
-  lines.push("  // ─── Font families ───");
-  lines.push(`  static const String fontSans = 'Inter';`);
-  lines.push(`  static const String fontMono = 'IBM Plex Mono';`);
-  lines.push("}");
-  lines.push("");
-  lines.push("/// Type scale — mirrors the `text` block in tokens.json.");
-  lines.push("/// `overline` is uppercased by the consumer (TextStyle has no transform).");
-  lines.push("class AerosTextStyles {");
-  lines.push("  AerosTextStyles._();");
-  lines.push("");
-  for (const [name, s] of Object.entries(tokens.text as Record<string, any>)) {
-    const fam = s.family === "mono" ? "IBM Plex Mono" : "Inter";
-    const ls = trackingToLetterSpacing(s.tracking, s.size);
-    lines.push(`  static const TextStyle ${camel(name)} = TextStyle(`);
-    lines.push(`    fontFamily: '${fam}',`);
-    lines.push(`    fontSize: ${Number(s.size).toFixed(1)},`);
-    lines.push(`    fontWeight: ${dartFontWeight(s.weight)},`);
-    lines.push(`    height: ${Number(s.lineHeight).toFixed(2)},`);
-    lines.push(`    letterSpacing: ${ls.toFixed(2)},`);
-    lines.push(`  );`);
-  }
-  lines.push("}");
-  return lines.join("\n") + "\n";
-}
-
-// ── emit ─────────────────────────────────────────────────
-const dart = buildDart();
-write(resolve(root, "dist/css/tokens.css"),           buildCss());
-write(resolve(root, "dist/js/tokens.js"),             buildTs().replace("export type AerosTokens = typeof tokens;\n", ""));
-write(resolve(root, "dist/js/tokens.d.ts"),           `declare const tokens: any;\nexport type AerosTokens = typeof tokens;\nexport { tokens };\nexport default tokens;\n`);
-write(resolve(root, "dist/tailwind/preset.js"),       buildTailwind());
-write(resolve(root, "dist/tailwind/preset.d.ts"),     `declare const preset: any;\nexport default preset;\n`);
-write(resolve(root, "dist/dart/aeros_tokens.dart"),   dart);
-// The Flutter package consumes the generated constants directly — this copy is
-// committed, and CI fails if it goes stale (build + git diff).
-write(resolve(root, "../flutter/lib/src/tokens/aeros_tokens.g.dart"), dart);
+write("dist/css/tokens.css", buildCss(tokens));
+write("dist/css/theme.css", buildTheme(tokens));
+write("dist/js/tokens.js", buildJs(tokens, raw));
+write("dist/js/tokens.d.ts", buildDts(tokens, raw));
+write("dist/dart/aeros_tokens.dart", dartTokens);
+write("dist/dart/aeros_theme_tokens.dart", dartTheme.replace("import 'aeros_tokens.g.dart';", "import 'aeros_tokens.dart';"));
+// The Flutter package consumes the generated Dart directly — these copies are
+// committed, and CI fails if they go stale (build + git diff).
+write("../flutter/lib/src/tokens/aeros_tokens.g.dart", dartTokens);
+write("../flutter/lib/src/tokens/aeros_theme_tokens.g.dart", dartTheme);
+// The written reference is generated too, so it cannot disagree with the values.
+write("../../docs/tokens.md", buildTokenDocs(tokens, raw));
 
 console.log("\n✨ Aeros tokens built.");

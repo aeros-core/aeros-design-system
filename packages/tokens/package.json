@@ -1,6 +1,6 @@
 {
   "name": "@aeros-core/tokens",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Aeros design tokens — source of truth.",
   "type": "module",
   "main": "./dist/js/tokens.js",
@@ -11,11 +11,9 @@
       "import": "./dist/js/tokens.js"
     },
     "./css": "./dist/css/tokens.css",
-    "./tailwind": {
-      "types": "./dist/tailwind/preset.d.ts",
-      "import": "./dist/tailwind/preset.js"
-    },
+    "./theme.css": "./dist/css/theme.css",
     "./dart": "./dist/dart/aeros_tokens.dart",
+    "./dart-theme": "./dist/dart/aeros_theme_tokens.dart",
     "./source": "./src/tokens.json"
   },
   "files": [
@@ -33,10 +31,12 @@
   },
   "scripts": {
     "build": "tsx src/build.ts",
-    "dev": "tsx watch src/build.ts"
+    "dev": "tsx watch src/build.ts",
+    "test": "vitest run"
   },
   "devDependencies": {
     "tsx": "^4.19.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "vitest": "^4.0.0"
   }
 }

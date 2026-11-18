@@ -1,13 +1,28 @@
 import 'package:flutter/material.dart';
+import '../foundation/aeros_control_size.dart';
+import '../foundation/aeros_focus_ring.dart';
+import '../foundation/aeros_pressable.dart';
+import '../foundation/aeros_state_layer.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
-import '../tokens/radii.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
 import '../tokens/spacing.dart';
 import '../tokens/states.dart';
-import '../tokens/typography.dart';
 import 'aeros_attribute_models.dart';
+import 'aeros_form_field.dart';
 
 /// Chip group for an ENUM-source attribute. Single-select.
+///
+/// Each chip is a small control ([AerosControlSize.sm] high for the density,
+/// [AerosShapeTokens.control] corners) with a 1px hairline that stays 1px:
+/// the selected chip takes the selected tint, an `fgPrimary` hairline and a
+/// check. Hover and press change the fill only; keyboard focus draws the
+/// focus ring.
+///
+/// Disabled ([enabled] false or a null [onChanged]) the whole group is dimmed
+/// to [AerosMetricTokens.opacityDisabled]; its chips do not answer the
+/// pointer, take no keyboard focus and are announced as disabled. The chosen
+/// chip keeps its check, so a locked value still reads. One option can be
+/// disabled on its own with [AerosAttributeOption.disabled].
 ///
 /// Use this for short option lists (2–6 items) and where labels are short
 /// enough to fit a chip. Picks up [AerosAttributeOption.swatchColor] to render
@@ -23,6 +38,7 @@ class AerosEnumChips extends StatelessWidget {
     this.requiredButMissing = false,
     this.unitSuffix,
     this.errorText,
+    this.enabled = true,
   });
 
   final List<AerosAttributeOption> options;
@@ -43,56 +59,36 @@ class AerosEnumChips extends StatelessWidget {
 
   final String? errorText;
 
+  /// False disables every chip, like a null [onChanged].
+  final bool enabled;
+
   @override
   Widget build(BuildContext context) {
-    final a = context.aerosColors;
-    final hasError = errorText != null && errorText!.isNotEmpty;
+    final active = enabled && onChanged != null;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
+    Widget chips = Wrap(
+      spacing: AerosSpacing.s2,
+      runSpacing: AerosSpacing.s2,
       children: [
-        if (label != null) ...[
-          RichText(
-            text: TextSpan(
-              text: label!,
-              style: AerosTypography.bodySm(color: a.fgSecondary)
-                  .copyWith(fontWeight: FontWeight.w600),
-              children: [
-                if (required)
-                  const TextSpan(
-                    text: ' *',
-                    style: TextStyle(color: AerosColors.danger),
-                  ),
-              ],
-            ),
+        for (final o in options)
+          _Chip(
+            option: o,
+            selected: o.id == selectedId,
+            requiredButMissing: requiredButMissing && selectedId == null,
+            unitSuffix: unitSuffix,
+            onTap: o.disabled || !active ? null : () => onChanged!(o.id == selectedId ? null : o.id),
           ),
-          const SizedBox(height: AerosSpacing.s2),
-        ],
-        Wrap(
-          spacing: AerosSpacing.s2,
-          runSpacing: AerosSpacing.s2,
-          children: [
-            for (final o in options)
-              _Chip(
-                option: o,
-                selected: o.id == selectedId,
-                requiredButMissing: requiredButMissing && selectedId == null,
-                unitSuffix: unitSuffix,
-                onTap: o.disabled || onChanged == null
-                    ? null
-                    : () => onChanged!(o.id == selectedId ? null : o.id),
-              ),
-          ],
-        ),
-        if (hasError) ...[
-          const SizedBox(height: AerosSpacing.s1),
-          Text(
-            errorText!,
-            style: AerosTypography.caption(color: AerosColors.dangerText),
-          ),
-        ],
       ],
+    );
+    if (!active) chips = Opacity(opacity: AerosMetricTokens.opacityDisabled, child: chips);
+
+    // Hugs the chips: a group is as wide as what it holds.
+    return AerosFormField(
+      label: label,
+      required: required,
+      errorText: errorText,
+      expand: false,
+      child: chips,
     );
   }
 }
@@ -112,6 +108,8 @@ class _Chip extends StatelessWidget {
   final String? unitSuffix;
   final VoidCallback? onTap;
 
+  static const AerosControlSize _size = AerosControlSize.sm;
+
   AerosSelectionState _state() {
     if (selected) return AerosSelectionState.selected;
     if (option.disabled) return AerosSelectionState.disabled;
@@ -122,63 +120,62 @@ class _Chip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final palette = AerosSelectionPalette.resolve(_state(), a, isDark: context.aeros.isDark);
+    final palette = AerosSelectionPalette.of(context, _state());
     final labelText =
         unitSuffix == null ? option.label : '${option.label} $unitSuffix';
 
-    final chip = Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AerosSpacing.s3,
-        vertical: AerosSpacing.s2,
-      ),
-      decoration: BoxDecoration(
-        color: palette.background,
-        borderRadius: AerosRadii.brMd,
-        border: Border.all(color: palette.border, width: palette.borderWidth),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (option.swatchColor != null) ...[
-            Container(
-              width: 14,
-              height: 14,
-              decoration: BoxDecoration(
-                color: Color(option.swatchColor!),
-                shape: BoxShape.circle,
-                border: Border.all(color: a.borderDefault),
-              ),
-            ),
-            const SizedBox(width: AerosSpacing.s2),
-          ],
-          Text(
-            labelText,
-            style: AerosTypography.bodySm(color: palette.foreground)
-                .copyWith(fontWeight: FontWeight.w600),
+    final chip = AerosPressable(
+      onPressed: onTap,
+      selected: selected,
+      inMutuallyExclusiveGroup: true,
+      builder: (context, state) => AerosFocusRing(
+        focused: state.focused,
+        radius: _size.radius,
+        child: AerosStateFill(
+          color: AerosStateLayer.resolve(
+            a,
+            palette.background,
+            hovered: state.hovered,
+            pressed: state.pressed,
           ),
-          if (selected) ...[
-            const SizedBox(width: AerosSpacing.s2),
-            Icon(Icons.check_rounded, size: 14, color: palette.foreground),
-          ],
-        ],
-      ),
-    );
-
-    return Tooltip(
-      message: option.disabled && option.disabledReason != null
-          ? option.disabledReason!
-          : '',
-      triggerMode: option.disabled && option.disabledReason != null
-          ? TooltipTriggerMode.tap
-          : TooltipTriggerMode.manual,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: AerosRadii.brMd,
-          child: chip,
+          borderColor: palette.border,
+          radius: _size.radius,
+          constraints: BoxConstraints.tightFor(height: _size.resolveHeight(context)),
+          padding: EdgeInsets.symmetric(horizontal: _size.padH - AerosMetricTokens.borderHairline),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (option.swatchColor != null) ...[
+                Container(
+                  width: _size.iconSize,
+                  height: _size.iconSize,
+                  decoration: BoxDecoration(
+                    color: Color(option.swatchColor!),
+                    shape: BoxShape.circle,
+                    // borderStrong, so a dark sample still has an edge in dark mode.
+                    border: Border.all(color: a.borderStrong, width: AerosMetricTokens.borderHairline),
+                  ),
+                ),
+                SizedBox(width: _size.gap),
+              ],
+              Text(
+                labelText,
+                maxLines: 1,
+                softWrap: false,
+                style: _size.labelStyle(color: palette.foreground),
+              ),
+              if (selected) ...[
+                SizedBox(width: _size.gap),
+                Icon(Icons.check_rounded, size: _size.iconSize, color: palette.foreground),
+              ],
+            ],
+          ),
         ),
       ),
     );
+
+    final reason = option.disabled ? option.disabledReason : null;
+    if (reason == null || reason.isEmpty) return chip;
+    return Tooltip(message: reason, triggerMode: TooltipTriggerMode.tap, child: chip);
   }
 }

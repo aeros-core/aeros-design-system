@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 
@@ -9,9 +8,10 @@ import '../tokens/typography.dart';
 ///
 /// Use it for inputs that don't already include their own label rendering
 /// (e.g. [AerosCheckbox], [AerosRadio], [AerosSwitch], date pickers,
-/// composite controls). [AerosTextField] and [AerosDropdownSearch] already
-/// render their own labels; passing them through this widget will double
-/// up — pass them directly instead.
+/// composite controls). [AerosTextField], [AerosSelect] and
+/// [AerosDropdownSearch] take `label` / `helperText` / `errorText` / `required`
+/// themselves (and draw them with this widget); passing them through it as
+/// well will double up — pass them directly instead.
 class AerosFormField extends StatelessWidget {
   const AerosFormField({
     super.key,
@@ -21,6 +21,8 @@ class AerosFormField extends StatelessWidget {
     this.errorText,
     this.required = false,
     this.trailing,
+    this.labelGap = AerosSpacing.s2,
+    this.expand = true,
   });
 
   final Widget child;
@@ -32,30 +34,43 @@ class AerosFormField extends StatelessWidget {
   /// Optional widget rendered to the right of the label (e.g. info icon, badge).
   final Widget? trailing;
 
+  /// Space between the label and [child]. Field-like inputs use
+  /// [AerosSpacing.s1_5], the gap [AerosTextField] has.
+  final double labelGap;
+
+  /// True (the default) fills the width given, [child] included. False hugs
+  /// the content, start-aligned — for a group that is as wide as what it
+  /// holds (a row of chips), and the only form that works where the width is
+  /// unbounded.
+  final bool expand;
+
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
+    final semantic = context.aerosSemantic;
     final hasLabel = label != null;
     final hasError = errorText != null && errorText!.isNotEmpty;
     final hasHelper = !hasError && helperText != null && helperText!.isNotEmpty;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: expand ? CrossAxisAlignment.stretch : CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         if (hasLabel) ...[
           Row(
+            mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
             children: [
-              Expanded(
+              Flexible(
+                fit: expand ? FlexFit.tight : FlexFit.loose,
                 child: RichText(
                   text: TextSpan(
                     text: label!,
                     style: AerosTypography.labelSm(color: a.fgSecondary),
                     children: [
                       if (required)
-                        const TextSpan(
+                        TextSpan(
                           text: ' *',
-                          style: TextStyle(color: AerosColors.danger),
+                          style: TextStyle(color: semantic.danger),
                         ),
                     ],
                   ),
@@ -64,14 +79,14 @@ class AerosFormField extends StatelessWidget {
               if (trailing != null) trailing!,
             ],
           ),
-          const SizedBox(height: AerosSpacing.s2),
+          SizedBox(height: labelGap),
         ],
         child,
         if (hasError) ...[
           const SizedBox(height: AerosSpacing.s1),
           Text(
             errorText!,
-            style: AerosTypography.caption(color: AerosColors.dangerText),
+            style: AerosTypography.caption(color: semantic.dangerText),
           ),
         ] else if (hasHelper) ...[
           const SizedBox(height: AerosSpacing.s1),

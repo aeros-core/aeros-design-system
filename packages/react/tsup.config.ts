@@ -1,7 +1,8 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src/index.ts"],
+  // `cn` is its own entry without "use client", so Server Components can call it.
+  entry: { index: "src/index.ts", cn: "src/lib/cn.ts" },
   format: ["esm"],
   dts: false,
   sourcemap: true,

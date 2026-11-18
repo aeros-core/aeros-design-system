@@ -1,9 +1,10 @@
 "use client";
 import * as React from "react";
 import { cn } from "../lib/cn";
+import { fieldBase, fieldSize, fieldState, type FieldSize, type FieldState } from "../internal/recipes";
 
-type InputState = "default" | "error" | "success";
-export type FieldControlSize = "sm" | "md" | "lg";
+type InputState = FieldState;
+export type FieldControlSize = FieldSize;
 
 // ── Field context ─────────────────────────────────────────
 // Field provides generated ids + validation state; Input/Textarea/SelectTrigger
@@ -58,31 +59,12 @@ export function useFieldControl(
 export interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "prefix" | "size"> {
   state?: InputState;
-  /** Control height — matches the Button ladder (sm 32 / md 36 / lg 40). */
+  /** Control height — the shared ladder (sm 28 / md 32 / lg 36; larger under touch density). */
   size?: FieldControlSize;
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
   containerClassName?: string;
 }
-
-const base =
-  "w-full font-medium rounded-md border bg-bg-surface text-fg-primary " +
-  "placeholder:text-fg-muted placeholder:font-normal " +
-  "transition-[border-color,box-shadow] duration-(--aeros-duration-fast) " +
-  "disabled:opacity-40 disabled:cursor-not-allowed " +
-  "focus:outline-none focus-visible:outline-none";
-
-const sizeClasses: Record<FieldControlSize, string> = {
-  sm: "h-8 px-3 text-[13px]",
-  md: "h-9 px-3.5 text-sm",
-  lg: "h-10 px-4 text-sm"
-};
-
-const stateClasses: Record<InputState, string> = {
-  default: "border-border-default hover:border-border-strong focus:border-border-focus focus:shadow-focus",
-  error:   "border-danger focus:shadow-focus-danger",
-  success: "border-success focus:shadow-focus-success"
-};
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, state, size = "md", prefix, suffix, containerClassName, ...props }, ref) => {
@@ -90,7 +72,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const input = (extra?: string) => (
       <input
         ref={ref}
-        className={cn(base, sizeClasses[size], stateClasses[resolvedState], extra, className)}
+        className={cn(fieldBase, fieldSize[size], fieldState[resolvedState], extra, className)}
         {...props}
         {...fieldProps}
       />
@@ -99,13 +81,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cn("relative", containerClassName)}>
         {prefix && (
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-fg-muted">
+          <span className="pointer-events-none absolute left-2.5 top-1/2 flex -translate-y-1/2 items-center text-fg-muted [&_svg]:size-icon-md">
             {prefix}
           </span>
         )}
-        {input(cn(prefix && "pl-[38px]", suffix && "pr-[44px]"))}
+        {input(cn(prefix && "pl-8", suffix && "pr-9"))}
         {suffix && (
-          <span className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
+          <span className="absolute right-1.5 top-1/2 flex -translate-y-1/2 items-center text-fg-muted [&_svg]:size-icon-md">
             {suffix}
           </span>
         )}
@@ -139,18 +121,18 @@ export const Field = React.forwardRef<HTMLDivElement, FieldProps>(
     };
     return (
       <FieldContext.Provider value={ctx}>
-        <div ref={ref} className={cn("mb-4", className)} {...props}>
+        <div ref={ref} className={cn("grid content-start gap-1.5", className)} {...props}>
           {label && (
-            <label htmlFor={ctx.inputId} className="mb-1.5 block text-[13px] font-medium text-fg-primary">
+            <label htmlFor={ctx.inputId} className="text-label-sm text-fg-primary">
               {label}
               {required && <span aria-hidden className="text-danger ml-0.5">*</span>}
             </label>
           )}
           {children}
           {error ? (
-            <p id={ctx.errorId} className="mt-1.5 text-xs font-medium text-danger-text">{error}</p>
+            <p id={ctx.errorId} className="text-caption text-danger-text">{error}</p>
           ) : hint ? (
-            <p id={ctx.hintId} className="mt-1.5 text-xs text-fg-muted leading-relaxed">{hint}</p>
+            <p id={ctx.hintId} className="text-caption text-fg-muted">{hint}</p>
           ) : null}
         </div>
       </FieldContext.Provider>
@@ -158,3 +140,14 @@ export const Field = React.forwardRef<HTMLDivElement, FieldProps>(
   }
 );
 Field.displayName = "Field";
+
+// ── Field group ───────────────────────────────────────────
+
+/**
+ * Stacks fields with the standard gap. `Field` carries no outer margin of its
+ * own, so spacing is always the parent's decision.
+ */
+export const FieldGroup = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => <div ref={ref} className={cn("grid gap-4", className)} {...props} />
+);
+FieldGroup.displayName = "FieldGroup";

@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
+import '../foundation/aeros_focus_ring.dart';
+import '../foundation/aeros_pressable.dart';
+import '../foundation/aeros_state_layer.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/radii.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
+import '../tokens/density.dart';
 import '../tokens/spacing.dart';
 import '../tokens/states.dart';
 import '../tokens/typography.dart';
 import 'aeros_attribute_models.dart';
 
-/// Pill that surfaces one [AerosRoutingSignal] from the
-/// `cart.preview.routing_signals` array. Severity drives colour; the icon is
-/// inferred from severity but can be overridden via [iconOverride].
+/// Surfaces one [AerosRoutingSignal] from the `cart.preview.routing_signals`
+/// array. Severity drives colour; the icon is inferred from severity but can
+/// be overridden via [iconOverride].
+///
+/// One of the badge family: a tinted fill, a 1px border in the severity's
+/// border colour, [AerosShapeTokens.item] corners and a `labelXs` label.
+/// [dense] is the badge height ([AerosSizeTokens.badge]); the default is one
+/// step up ([AerosSizeTokens.controlXs]).
 ///
 /// For multiple signals, render a [Wrap] of these.
 class AerosRoutingSignalBadge extends StatelessWidget {
@@ -25,62 +34,52 @@ class AerosRoutingSignalBadge extends StatelessWidget {
   /// Override the auto-picked icon (info / warning / error).
   final IconData? iconOverride;
 
-  /// `true` ⇒ smaller pill suitable for inline use next to a button.
+  /// `true` ⇒ badge-height, suitable for inline use next to a button.
   final bool dense;
 
   /// Tap callback (e.g. open a sheet with the [AerosRoutingSignal.detail]).
   final VoidCallback? onTap;
 
+  static const BorderRadius _radius = BorderRadius.all(Radius.circular(AerosShapeTokens.item));
+
   @override
   Widget build(BuildContext context) {
-    final palette = AerosSeverityPalette.of(_mapSeverity(signal.severity), isDark: context.aeros.isDark);
-    final pad = dense
-        ? const EdgeInsets.symmetric(horizontal: 8, vertical: 3)
-        : const EdgeInsets.symmetric(
-            horizontal: AerosSpacing.s3,
-            vertical: 6,
-          );
+    final a = context.aerosColors;
+    final palette = AerosSeverityPalette.of(context, _mapSeverity(signal.severity));
+    final sizes = AerosDensity.of(context).sizes;
 
-    final pill = Container(
-      padding: pad,
-      decoration: BoxDecoration(
-        color: palette.background,
-        borderRadius: AerosRadii.brSm,
-        border: Border.all(color: palette.border),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            iconOverride ?? palette.icon,
-            size: dense ? 12 : 14,
-            color: palette.foreground,
+    Widget frame({bool hovered = false, bool pressed = false}) => AerosStateFill(
+          color: AerosStateLayer.resolve(a, palette.background, hovered: hovered, pressed: pressed),
+          borderColor: palette.border,
+          radius: _radius,
+          constraints: BoxConstraints.tightFor(height: dense ? sizes.badge : sizes.controlXs),
+          padding: EdgeInsets.symmetric(
+            horizontal: (dense ? AerosSpacing.s1_5 : AerosSpacing.s2) - AerosMetricTokens.borderHairline,
           ),
-          const SizedBox(width: 6),
-          Flexible(
-            child: Text(
-              signal.label,
-              style: AerosTypography.caption(color: palette.foreground)
-                  .copyWith(
-                    fontSize: dense ? 11 : 12,
-                    fontWeight: FontWeight.w700,
-                    height: 1.2,
-                  ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(iconOverride ?? palette.icon, size: AerosSizeTokens.iconXs, color: palette.foreground),
+              const SizedBox(width: AerosSpacing.s1),
+              Flexible(
+                child: Text(
+                  signal.label,
+                  style: AerosTypography.labelXs(color: palette.foreground),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        );
 
-    if (onTap == null) return pill;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: AerosRadii.brSm,
-        child: pill,
+    if (onTap == null) return frame();
+    return AerosPressable(
+      onPressed: onTap,
+      builder: (context, state) => AerosFocusRing(
+        focused: state.focused,
+        radius: _radius,
+        child: frame(hovered: state.hovered, pressed: state.pressed),
       ),
     );
   }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
-import '../tokens/radii.dart';
+import '../foundation/aeros_control_size.dart';
+import '../foundation/aeros_surface.dart';
 import '../tokens/spacing.dart';
 import 'aeros_button.dart';
 import 'aeros_form_field.dart';
@@ -9,7 +8,7 @@ import 'aeros_form_field.dart';
 /// Generic add/remove repeater for arrays of form rows.
 ///
 /// Caller owns the model list and passes an [itemBuilder] that renders one
-/// row's editor; the widget wraps each row in a card with a trailing remove
+/// row's editor; the widget wraps each row in a flat surface with a trailing remove
 /// affordance and renders a single Add button below the list.
 ///
 /// Typical use: heterogeneous box-group editor on the connected-carrier
@@ -88,8 +87,6 @@ class AerosRepeatingRows<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final a = context.aerosColors;
-
     final list = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
@@ -97,20 +94,27 @@ class AerosRepeatingRows<T> extends StatelessWidget {
         for (int i = 0; i < items.length; i++) ...[
           if (i > 0) SizedBox(height: rowGap),
           _RepeaterRow(
-            child: itemBuilder(context, i, items[i]),
             onRemove: _canRemove ? () => onRemove!(i) : null,
-            color: a.bgSurface,
-            border: a.borderDefault,
+            child: itemBuilder(context, i, items[i]),
           ),
         ],
         if (_canAdd) ...[
           SizedBox(height: rowGap),
           Align(
-            alignment: Alignment.centerLeft,
-            child: AerosButton.ghost(
-              label: addLabel,
-              onPressed: onAdd,
-              size: AerosButtonSize.sm,
+            alignment: AlignmentDirectional.centerStart,
+            // A ghost button has no edge of its own: pulled back by its
+            // padding, its plus sits on the rows' leading edge.
+            child: Transform.translate(
+              offset: Offset(
+                (Directionality.of(context) == TextDirection.rtl ? 1 : -1) * AerosControlSize.sm.padH,
+                0,
+              ),
+              child: AerosButton.ghost(
+                label: addLabel,
+                leading: const Icon(Icons.add),
+                onPressed: onAdd,
+                size: AerosControlSize.sm,
+              ),
             ),
           ),
         ],
@@ -131,27 +135,15 @@ class AerosRepeatingRows<T> extends StatelessWidget {
 }
 
 class _RepeaterRow extends StatelessWidget {
-  const _RepeaterRow({
-    required this.child,
-    required this.onRemove,
-    required this.color,
-    required this.border,
-  });
+  const _RepeaterRow({required this.child, required this.onRemove});
 
   final Widget child;
   final VoidCallback? onRemove;
-  final Color color;
-  final Color border;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: AerosRadii.brLg,
-        border: Border.all(color: border),
-      ),
-      padding: const EdgeInsets.fromLTRB(
+    return AerosSurface(
+      padding: const EdgeInsetsDirectional.fromSTEB(
         AerosSpacing.s4,
         AerosSpacing.s3,
         AerosSpacing.s2,
@@ -163,15 +155,11 @@ class _RepeaterRow extends StatelessWidget {
           Expanded(child: child),
           if (onRemove != null) ...[
             const SizedBox(width: AerosSpacing.s2),
-            IconButton(
-              tooltip: 'Remove',
-              splashRadius: 18,
+            AerosButton.icon(
+              icon: const Icon(Icons.close),
+              semanticLabel: 'Remove',
+              size: AerosControlSize.sm,
               onPressed: onRemove,
-              icon: const Icon(
-                Icons.close,
-                size: 18,
-                color: AerosColors.dangerText,
-              ),
             ),
           ],
         ],

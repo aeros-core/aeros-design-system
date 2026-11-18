@@ -2,12 +2,16 @@
 // Verifies WCAG AA contrast for core foreground/background pairs in both themes.
 // Run: `node scripts/check-contrast.mjs`
 import { readFileSync } from "node:fs";
+import { composite, parseHex, resolveTokens } from "../packages/tokens/src/resolve.mjs";
 
-const tokens = JSON.parse(readFileSync(new URL("../packages/tokens/src/tokens.json", import.meta.url)));
+// Aliases may be references ({color.ink.900}) — check the resolved values.
+const tokens = resolveTokens(
+  JSON.parse(readFileSync(new URL("../packages/tokens/src/tokens.json", import.meta.url), "utf8"))
+);
 
 function hexToRgb(hex) {
-  const h = hex.replace("#", "");
-  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+  const { r, g, b } = parseHex(hex);
+  return [r, g, b];
 }
 function lum([r, g, b]) {
   const c = [r, g, b].map(v => {
@@ -17,7 +21,8 @@ function lum([r, g, b]) {
   return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
 }
 function ratio(fg, bg) {
-  const l1 = lum(hexToRgb(fg));
+  // A translucent foreground is judged as it renders: flattened over the background.
+  const l1 = lum(hexToRgb(composite(fg, bg)));
   const l2 = lum(hexToRgb(bg));
   const [a, b] = l1 > l2 ? [l1, l2] : [l2, l1];
   return (a + 0.05) / (b + 0.05);
@@ -31,7 +36,19 @@ const pairs = [
   ["fg-muted", "bg-subtle"],
   ["brand-primary", "bg-surface"],
   // Button primary label — must stay readable in both themes.
-  ["fg-inverse", "brand-primary"]
+  ["fg-inverse", "brand-primary"],
+  // Every text tier on every surface it is used on.
+  ["fg-muted", "bg-canvas"],
+  ["fg-muted", "bg-elevated"],
+  ["fg-secondary", "bg-canvas"],
+  ["fg-secondary", "bg-subtle"],
+  ["fg-secondary", "bg-elevated"],
+  ["fg-primary", "bg-subtle"],
+  ["fg-primary", "bg-elevated"],
+  ["fg-inverse", "bg-inverse"],
+  // Recessed tracks (segmented tabs): the idle label sits on the inset fill.
+  ["fg-muted", "bg-inset"],
+  ["fg-primary", "bg-inset"]
 ];
 
 let fail = 0;
@@ -61,6 +78,16 @@ for (const theme of ["light", "dark"]) {
     check(`${tone}-text on bg-surface`, text, surface, 4.5);
     check(`${tone} (icon) on ${tone}-bg`, base, bg, 3);
     check(`${tone} (icon) on bg-surface`, base, surface, 3);
+    check(`${tone}-text on bg-canvas`, text, tokens.alias[theme]["bg-canvas"], 4.5);
+  }
+  // Solid danger button: label on the fill, resting and hovered.
+  check("fg-inverse on danger", tokens.alias[theme]["fg-inverse"], sem.danger.$value, 4.5);
+  check("fg-inverse on danger-hover", tokens.alias[theme]["fg-inverse"], sem["danger-hover"].$value, 4.5);
+  // Hover/pressed/selected overlays must not sink body text below AA on a surface.
+  for (const state of ["state-hover", "state-pressed", "state-selected"]) {
+    const over = composite(tokens.alias[theme][state], surface);
+    check(`fg-primary on bg-surface + ${state}`, tokens.alias[theme]["fg-primary"], over, 4.5);
+    check(`fg-secondary on bg-surface + ${state}`, tokens.alias[theme]["fg-secondary"], over, 4.5);
   }
 }
 

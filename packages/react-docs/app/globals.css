@@ -1,12 +1,5 @@
 @import "@aeros-core/react/styles.css";
+@import "@aeros-core/react/fonts.css";
 
-html { scroll-behavior: smooth; }
+/* A wide fixture or table scrolls inside its own container, never the page. */
 body { overflow-x: hidden; }
-
-/* Docs-only: subtle black hairline grid */
-.bg-grid {
-  background-image:
-    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
-  background-size: 64px 64px;
-}

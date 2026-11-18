@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import '../theme/aeros_theme_extension.dart';
 import 'colors.dart';
 
 /// Semantic state tokens for configurable-MTO surfaces.
 ///
-/// These extend the base [AerosColors] / [AerosAliasColors] with intent-named
-/// colours for the new states introduced by attribute / variant pickers and
-/// pricing surfaces. Keeping them in their own file avoids changing the
-/// existing `AerosAliasColors` constructor (which would be a breaking API).
+/// These extend [AerosAliasColors] / [AerosSemanticColors] with intent-named
+/// colours for the states introduced by attribute / variant pickers and
+/// pricing surfaces.
 ///
-/// Tokens are theme-aware where they need to be (selection states), and use
-/// fixed semantic ramps where intent is fixed (severity, price tones).
+/// Every palette resolves from the theme: pass the build context (`of`), or
+/// the theme's alias and status colour sets (`resolve`). None of them falls
+/// back to the light set.
 
 // ─── Severity ────────────────────────────────────────────────────────────
 
 /// Severity scale used by constraint messages and routing-signal badges.
-/// Maps to the existing semantic ramps in [AerosColors].
+/// Maps to the status ramps in [AerosSemanticColors].
 enum AerosSeverity { info, warn, error }
 
 /// Background / foreground / border colour set for a [AerosSeverity].
@@ -32,10 +33,13 @@ class AerosSeverityPalette {
   final Color border;
   final IconData icon;
 
-  /// Pass `isDark: context.aeros.isDark` so status chips keep contrast on
-  /// dark surfaces (defaults to the light set).
-  static AerosSeverityPalette of(AerosSeverity severity, {bool isDark = false}) {
-    final s = AerosSemanticColors.resolve(isDark);
+  /// The palette for [severity] in the theme of [context].
+  static AerosSeverityPalette of(BuildContext context, AerosSeverity severity) =>
+      resolve(severity, context.aerosSemantic);
+
+  /// The palette for [severity] from an explicit status colour set
+  /// (`context.aerosSemantic`, or `AerosSemanticColors.light` / `.dark`).
+  static AerosSeverityPalette resolve(AerosSeverity severity, AerosSemanticColors s) {
     switch (severity) {
       case AerosSeverity.info:
         return AerosSeverityPalette(
@@ -96,13 +100,16 @@ class AerosSelectionPalette {
   /// `requiredButMissing`).
   final IconData? iconOverlay;
 
-  /// Pass `isDark: context.aeros.isDark` so the error state keeps contrast on
-  /// dark surfaces (defaults to the light set).
+  /// The palette for [state] in the theme of [context].
+  static AerosSelectionPalette of(BuildContext context, AerosSelectionState state) =>
+      resolve(state, context.aerosColors, context.aerosSemantic);
+
+  /// The palette for [state] from explicit alias and status colour sets.
   static AerosSelectionPalette resolve(
     AerosSelectionState state,
-    AerosAliasColors a, {
-    bool isDark = false,
-  }) {
+    AerosAliasColors a,
+    AerosSemanticColors s,
+  ) {
     switch (state) {
       case AerosSelectionState.unselected:
         return AerosSelectionPalette(
@@ -131,7 +138,6 @@ class AerosSelectionPalette {
           iconOverlay: Icons.lock_outline,
         );
       case AerosSelectionState.requiredButMissing:
-        final s = AerosSemanticColors.resolve(isDark);
         return AerosSelectionPalette(
           background: s.dangerBg,
           foreground: s.dangerText,
@@ -159,9 +165,15 @@ class AerosPricePalette {
   /// Inline label (e.g. "fixed", "discount") rendered alongside the amount.
   final String? label;
 
+  /// The palette for [tone] in the theme of [context].
+  static AerosPricePalette of(BuildContext context, AerosPriceTone tone) =>
+      resolve(tone, context.aerosColors, context.aerosSemantic);
+
+  /// The palette for [tone] from explicit alias and status colour sets.
   static AerosPricePalette resolve(
     AerosPriceTone tone,
     AerosAliasColors a,
+    AerosSemanticColors s,
   ) {
     switch (tone) {
       case AerosPriceTone.discountable:
@@ -172,8 +184,8 @@ class AerosPricePalette {
           label: 'fixed',
         );
       case AerosPriceTone.discount:
-        return const AerosPricePalette(
-          foreground: AerosColors.success,
+        return AerosPricePalette(
+          foreground: s.success,
           label: 'discount',
         );
     }

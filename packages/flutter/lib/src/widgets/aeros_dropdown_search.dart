@@ -1,11 +1,20 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../foundation/aeros_control_size.dart';
+import '../foundation/aeros_field_frame.dart';
+import '../foundation/aeros_pressable.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
-import '../tokens/radii.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
+import 'aeros_dialog.dart';
+import 'aeros_form_field.dart';
+import 'aeros_menu.dart';
+import 'aeros_popover.dart';
+import 'aeros_search_field.dart';
+import 'aeros_sheet.dart';
 
 enum AerosDropdownMode { dialog, sheet, menu }
 
@@ -19,8 +28,14 @@ typedef AerosDropdownItemBuilder<T> = Widget Function(
 
 /// Searchable dropdown with dialog / bottom-sheet / inline-menu modes.
 ///
-/// API parity with the legacy `DropdownSearch` widget in aeros-admin, restyled
-/// onto Aeros tokens. Pass either a static [items] list or an async [onFind].
+/// The trigger is a field ([AerosFieldFrame]) under an optional [label], with
+/// [helperText] or [errorText] below it, like every other field. The options open in an
+/// [AerosDialog], a bottom [AerosSheet] or an anchored menu surface, by
+/// [mode]; each holds an optional search box and a list of [AerosMenuRow]s
+/// with the chosen one checked. Arrow keys move the highlight and Enter
+/// chooses, while the search box keeps the focus.
+///
+/// Pass either a static [items] list or an async [onFind].
 class AerosDropdownSearch<T> extends StatefulWidget {
   const AerosDropdownSearch({
     super.key,
@@ -30,6 +45,8 @@ class AerosDropdownSearch<T> extends StatefulWidget {
     this.onFind,
     required this.itemAsString,
     this.label,
+    this.helperText,
+    this.errorText,
     this.hint,
     this.popupTitle,
     this.mode = AerosDropdownMode.dialog,
@@ -52,6 +69,13 @@ class AerosDropdownSearch<T> extends StatefulWidget {
   final AerosDropdownItemAsString<T> itemAsString;
 
   final String? label;
+
+  /// Help text under the field. Hidden while there is an [errorText].
+  final String? helperText;
+
+  /// Turns the border and the focus ring to the danger colour and shows this
+  /// message under the field.
+  final String? errorText;
   final String? hint;
   final String? popupTitle;
 
@@ -73,7 +97,10 @@ class AerosDropdownSearch<T> extends StatefulWidget {
 }
 
 class _AerosDropdownSearchState<T> extends State<AerosDropdownSearch<T>> {
+  final GlobalKey _frameKey = GlobalKey(debugLabel: 'AerosDropdownSearch frame');
   T? _selected;
+
+  static const AerosControlSize _size = AerosControlSize.md;
 
   @override
   void initState() {
@@ -91,125 +118,88 @@ class _AerosDropdownSearchState<T> extends State<AerosDropdownSearch<T>> {
 
   Future<void> _open() async {
     if (!widget.enabled) return;
-    T? picked;
-    switch (widget.mode) {
-      case AerosDropdownMode.dialog:
-        picked = await _openDialog();
-        break;
-      case AerosDropdownMode.sheet:
-        picked = await _openSheet();
-        break;
-      case AerosDropdownMode.menu:
-        picked = await _openMenu();
-        break;
-    }
+    final picked = await switch (widget.mode) {
+      AerosDropdownMode.dialog => _openDialog(),
+      AerosDropdownMode.sheet => _openSheet(),
+      AerosDropdownMode.menu => _openMenu(),
+    };
+    if (!mounted) return;
     if (picked != null && picked != _selected) {
       setState(() => _selected = picked);
       widget.onChanged?.call(picked);
     }
   }
 
+  Widget _body(BuildContext context, {required bool inMenu}) {
+    Widget body = _PopupBody<T>(
+      showSearchBox: widget.showSearchBox,
+      searchHint: widget.searchHint,
+      emptyText: widget.emptyText,
+      items: widget.items,
+      onFind: widget.onFind,
+      itemAsString: widget.itemAsString,
+      itemBuilder: widget.itemBuilder,
+      selected: _selected,
+      inMenu: inMenu,
+      onPicked: (item) => Navigator.of(context).pop(item),
+    );
+    final maxHeight = widget.maxHeight;
+    if (maxHeight != null) {
+      body = ConstrainedBox(constraints: BoxConstraints(maxHeight: maxHeight), child: body);
+    }
+    return body;
+  }
+
   Future<T?> _openDialog() {
-    return showDialog<T>(
-      context: context,
-      builder: (ctx) {
-        final a = ctx.aerosColors;
-        final width =
-            widget.dialogMaxWidth ?? MediaQuery.of(ctx).size.width * 0.7;
-        final height =
-            widget.maxHeight ?? MediaQuery.of(ctx).size.height * 0.6;
-        return Dialog(
-          backgroundColor: a.bgSurface,
-          shape: RoundedRectangleBorder(borderRadius: AerosRadii.brLg),
-          child: SizedBox(
-            width: width,
-            height: height,
-            child: _PopupBody<T>(
-              title: widget.popupTitle ?? widget.label,
-              showSearchBox: widget.showSearchBox,
-              searchHint: widget.searchHint,
-              emptyText: widget.emptyText,
-              items: widget.items,
-              onFind: widget.onFind,
-              itemAsString: widget.itemAsString,
-              itemBuilder: widget.itemBuilder,
-              selected: _selected,
-            ),
-          ),
-        );
-      },
+    return AerosDialog.show<T>(
+      context,
+      builder: (context) => AerosDialog(
+        title: widget.popupTitle ?? widget.label,
+        maxWidth: widget.dialogMaxWidth,
+        scrollable: false,
+        content: _body(context, inMenu: false),
+      ),
     );
   }
 
   Future<T?> _openSheet() {
-    return showModalBottomSheet<T>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        final a = ctx.aerosColors;
-        final height =
-            widget.maxHeight ?? MediaQuery.of(ctx).size.height * 0.7;
-        return Container(
-          height: height,
-          decoration: BoxDecoration(
-            color: a.bgSurface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(AerosRadii.lg)),
-          ),
-          child: _PopupBody<T>(
-            title: widget.popupTitle ?? widget.label,
-            showSearchBox: widget.showSearchBox,
-            searchHint: widget.searchHint,
-            emptyText: widget.emptyText,
-            items: widget.items,
-            onFind: widget.onFind,
-            itemAsString: widget.itemAsString,
-            itemBuilder: widget.itemBuilder,
-            selected: _selected,
-          ),
-        );
-      },
+    return AerosSheet.show<T>(
+      context,
+      builder: (context) => AerosSheet(
+        title: widget.popupTitle ?? widget.label,
+        scrollable: false,
+        content: _body(context, inMenu: false),
+      ),
     );
   }
 
-  Future<T?> _openMenu() async {
-    final renderBox = context.findRenderObject() as RenderBox?;
-    final overlay =
-        Overlay.of(context).context.findRenderObject() as RenderBox?;
-    if (renderBox == null || overlay == null) return null;
-
-    final position = RelativeRect.fromRect(
-      Rect.fromPoints(
-        renderBox.localToGlobal(renderBox.size.bottomLeft(Offset.zero),
-            ancestor: overlay),
-        renderBox.localToGlobal(renderBox.size.bottomRight(Offset.zero),
-            ancestor: overlay),
-      ),
-      Offset.zero & overlay.size,
-    );
-
-    final a = context.aerosColors;
-    final menuItems = widget.items ?? const [];
-    return showMenu<T>(
-      context: context,
-      position: position,
-      color: a.bgSurface,
-      shape: RoundedRectangleBorder(borderRadius: AerosRadii.brMd),
+  Future<T?> _openMenu() {
+    final anchor = _frameKey.currentContext!;
+    final rect = AerosPopover.anchorRectOf(anchor);
+    return AerosPopover.show<T>(
+      anchor,
+      anchorRect: rect,
+      padding: EdgeInsets.zero,
+      // Exactly as wide as the field; no taller than the small drawer is wide
+      // (there is no menu-height token yet).
       constraints: BoxConstraints(
-        maxHeight: widget.maxHeight ?? 320,
-        minWidth: renderBox.size.width,
-        maxWidth: renderBox.size.width,
+        minWidth: rect.width,
+        maxWidth: rect.width,
+        maxHeight: widget.maxHeight ?? AerosMetricTokens.layoutDrawerSm,
       ),
-      items: [
-        for (final item in menuItems)
-          PopupMenuItem<T>(
-            value: item,
-            child: Text(
-              widget.itemAsString(item),
-              style: AerosTypography.bodyMd(color: a.fgPrimary),
-            ),
-          ),
-      ],
+      semanticLabel: widget.popupTitle ?? widget.label,
+      builder: (context) => _PopupBody<T>(
+        showSearchBox: widget.showSearchBox,
+        searchHint: widget.searchHint,
+        emptyText: widget.emptyText,
+        items: widget.items,
+        onFind: widget.onFind,
+        itemAsString: widget.itemAsString,
+        itemBuilder: widget.itemBuilder,
+        selected: _selected,
+        inMenu: true,
+        onPicked: (item) => Navigator.of(context).pop(item),
+      ),
     );
   }
 
@@ -222,72 +212,90 @@ class _AerosDropdownSearchState<T> extends State<AerosDropdownSearch<T>> {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final selectedText =
-        _selected != null ? widget.itemAsString(_selected as T) : null;
+    final selectedText = _selected != null ? widget.itemAsString(_selected as T) : null;
+    final error = widget.errorText;
+    final hasError = error != null && error.isNotEmpty;
+    final showClear = widget.showClearButton && _selected != null && widget.enabled;
+    final height = _size.resolveHeight(context);
+    // The clear button is as wide as the field is tall, like the search
+    // field's, and sits just before the chevron.
+    final chevronSlot = _size.padH + _size.iconSize;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    final field = Stack(
       children: [
-        if (widget.label != null) ...[
-          RichText(
-            text: TextSpan(
-              text: widget.label!,
-              style: AerosTypography.bodySm(color: a.fgSecondary)
-                  .copyWith(fontWeight: FontWeight.w600),
-              children: [
-                if (widget.required)
-                  const TextSpan(
-                      text: ' *',
-                      style: TextStyle(color: AerosColors.danger)),
-              ],
-            ),
-          ),
-          const SizedBox(height: AerosSpacing.s2),
-        ],
-        InkWell(
-          onTap: _open,
-          borderRadius: AerosRadii.brMd,
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: AerosSpacing.s3, vertical: AerosSpacing.s3),
-            decoration: BoxDecoration(
-              borderRadius: AerosRadii.brMd,
-              border: Border.all(color: a.borderDefault),
-              color: widget.enabled ? a.bgSurface : a.bgSubtle,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    selectedText ?? widget.hint ?? '',
-                    style: AerosTypography.bodyMd(
-                      color: selectedText != null ? a.fgPrimary : a.fgMuted,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                if (widget.showClearButton && _selected != null)
-                  InkWell(
-                    onTap: _clear,
-                    borderRadius: AerosRadii.brSm,
-                    child: Padding(
-                      padding: const EdgeInsets.all(AerosSpacing.s1),
-                      child: Icon(Icons.close, size: 16, color: a.fgMuted),
+        CallbackShortcuts(
+          bindings: <ShortcutActivator, VoidCallback>{
+            const SingleActivator(LogicalKeyboardKey.arrowDown): _open,
+            const SingleActivator(LogicalKeyboardKey.arrowUp): _open,
+          },
+          child: AerosPressable(
+            onPressed: widget.enabled ? _open : null,
+            expandHitTarget: false,
+            semanticLabel: widget.label,
+            builder: (context, state) => AerosFieldFrame(
+              key: _frameKey,
+              size: _size,
+              focused: state.focused,
+              hasError: hasError,
+              enabled: widget.enabled,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      selectedText ?? widget.hint ?? '',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: _size.valueStyle(color: selectedText != null ? a.fgPrimary : a.fgMuted),
                     ),
                   ),
-                Icon(Icons.keyboard_arrow_down, size: 18, color: a.fgMuted),
-              ],
+                  SizedBox(width: showClear ? height : _size.gap),
+                  Icon(Icons.keyboard_arrow_down, size: _size.iconSize, color: a.fgMuted),
+                ],
+              ),
             ),
           ),
         ),
+        if (showClear)
+          PositionedDirectional(
+            end: chevronSlot,
+            top: 0,
+            bottom: 0,
+            child: AerosPressable(
+              onPressed: _clear,
+              semanticLabel: 'Clear',
+              excludeSemantics: true,
+              // Inside the field: the field's own height is the target.
+              expandHitTarget: false,
+              builder: (context, state) => SizedBox(
+                width: height,
+                child: Center(
+                  child: Icon(
+                    Icons.close,
+                    size: _size.iconSize,
+                    color: state.hovered || state.pressed || state.focused ? a.fgPrimary : a.fgMuted,
+                  ),
+                ),
+              ),
+            ),
+          ),
       ],
+    );
+
+    if (widget.label == null && widget.helperText == null && !hasError) return field;
+    return AerosFormField(
+      label: widget.label,
+      required: widget.required,
+      helperText: widget.helperText,
+      errorText: error,
+      labelGap: AerosSpacing.s1_5,
+      child: field,
     );
   }
 }
 
+/// The search box and the list of options, shared by the three presentations.
 class _PopupBody<T> extends StatefulWidget {
   const _PopupBody({
-    required this.title,
     required this.showSearchBox,
     required this.searchHint,
     required this.emptyText,
@@ -296,9 +304,10 @@ class _PopupBody<T> extends StatefulWidget {
     required this.itemAsString,
     required this.itemBuilder,
     required this.selected,
+    required this.inMenu,
+    required this.onPicked,
   });
 
-  final String? title;
   final bool showSearchBox;
   final String searchHint;
   final String emptyText;
@@ -308,6 +317,10 @@ class _PopupBody<T> extends StatefulWidget {
   final AerosDropdownItemBuilder<T>? itemBuilder;
   final T? selected;
 
+  /// On the menu surface (tight padding) rather than in a dialog or a sheet.
+  final bool inMenu;
+  final ValueChanged<T> onPicked;
+
   @override
   State<_PopupBody<T>> createState() => _PopupBodyState<T>();
 }
@@ -316,12 +329,22 @@ class _PopupBodyState<T> extends State<_PopupBody<T>> {
   late List<T> _filtered;
   bool _loading = false;
   Timer? _debounce;
+  int? _highlight;
   final TextEditingController _query = TextEditingController();
+  final Map<int, GlobalKey> _keys = <int, GlobalKey>{};
 
   @override
   void initState() {
     super.initState();
     _filtered = widget.items ?? const [];
+    final selected = widget.selected;
+    if (selected != null) {
+      final index = _filtered.indexOf(selected);
+      if (index >= 0) {
+        _highlight = index;
+        WidgetsBinding.instance.addPostFrameCallback((_) => _reveal(centre: true));
+      }
+    }
     if (widget.onFind != null) {
       _runFind('');
     }
@@ -348,14 +371,16 @@ class _PopupBodyState<T> extends State<_PopupBody<T>> {
   void _localFilter(String value) {
     final all = widget.items ?? const [];
     if (value.isEmpty) {
-      setState(() => _filtered = all);
+      setState(() {
+        _filtered = all;
+        _highlight = null;
+      });
       return;
     }
     final lower = value.toLowerCase();
     setState(() {
-      _filtered = all
-          .where((it) => widget.itemAsString(it).toLowerCase().contains(lower))
-          .toList();
+      _filtered = all.where((it) => widget.itemAsString(it).toLowerCase().contains(lower)).toList();
+      _highlight = _filtered.isEmpty ? null : 0;
     });
   }
 
@@ -366,6 +391,7 @@ class _PopupBodyState<T> extends State<_PopupBody<T>> {
       if (!mounted) return;
       setState(() {
         _filtered = results;
+        _highlight = null;
         _loading = false;
       });
     } catch (_) {
@@ -374,93 +400,127 @@ class _PopupBodyState<T> extends State<_PopupBody<T>> {
     }
   }
 
+  void _move(int step) {
+    final count = _filtered.length;
+    if (count == 0 || _loading) return;
+    final from = _highlight ?? (step > 0 ? -1 : count);
+    setState(() => _highlight = (from + step) % count);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _reveal());
+  }
+
+  void _reveal({bool centre = false}) {
+    final target = _keys[_highlight]?.currentContext;
+    if (target == null) return;
+    if (centre) {
+      Scrollable.ensureVisible(target, alignment: 0.5);
+      return;
+    }
+    Scrollable.ensureVisible(target, alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd);
+    Scrollable.ensureVisible(target, alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtStart);
+  }
+
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (event is KeyUpEvent) return KeyEventResult.ignored;
+    final key = event.logicalKey;
+    if (key == LogicalKeyboardKey.arrowDown) {
+      _move(1);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowUp) {
+      _move(-1);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
+      final index = _highlight;
+      if (index != null && index < _filtered.length && !_loading) widget.onPicked(_filtered[index]);
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  Widget _message(Widget child) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s3, vertical: AerosSpacing.s10),
+        child: Center(child: child),
+      );
+
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (widget.title != null)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-                AerosSpacing.s4, AerosSpacing.s4, AerosSpacing.s4, AerosSpacing.s2),
-            child: Text(widget.title!,
-                style: AerosTypography.h4(color: a.fgPrimary)),
-          ),
-        if (widget.showSearchBox)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-                AerosSpacing.s4, AerosSpacing.s2, AerosSpacing.s4, AerosSpacing.s3),
-            child: TextField(
-              controller: _query,
-              autofocus: true,
-              onChanged: _onQueryChanged,
-              style: AerosTypography.bodyMd(color: a.fgPrimary),
-              decoration: InputDecoration(
-                hintText: widget.searchHint,
-                prefixIcon: Icon(Icons.search, size: 18, color: a.fgMuted),
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: AerosSpacing.s3, vertical: AerosSpacing.s2),
-                border: OutlineInputBorder(
-                  borderRadius: AerosRadii.brMd,
-                  borderSide: BorderSide(color: a.borderDefault),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: AerosRadii.brMd,
-                  borderSide: BorderSide(color: a.borderDefault),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: AerosRadii.brMd,
-                  borderSide: BorderSide(color: a.borderFocus),
-                ),
+    // In a dialog or a sheet the rows' text lines up with the title.
+    final side = widget.inMenu ? AerosMenu.panelPadding : AerosSpacing.s5 - AerosSpacing.s2;
+    final bottom = widget.inMenu ? AerosMenu.panelPadding : AerosSpacing.s3;
+
+    Widget list;
+    if (_loading) {
+      list = _message(
+        SizedBox.square(
+          dimension: AerosSizeTokens.iconLg,
+          child: CircularProgressIndicator(strokeWidth: AerosMetricTokens.borderThick, color: a.fgMuted),
+        ),
+      );
+    } else if (_filtered.isEmpty) {
+      list = _message(Text(widget.emptyText, style: AerosTypography.bodySm(color: a.fgMuted)));
+    } else {
+      final builder = widget.itemBuilder;
+      list = SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: side),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < _filtered.length; i++)
+              AerosMenuRow(
+                key: _keys.putIfAbsent(i, GlobalKey.new),
+                label: builder == null ? widget.itemAsString(_filtered[i]) : null,
+                mark: builder == null ? AerosMenuRowMark.selection : AerosMenuRowMark.none,
+                checked: _filtered[i] == widget.selected,
+                highlighted: i == _highlight,
+                onTap: () => widget.onPicked(_filtered[i]),
+                onHighlight: () {
+                  if (_highlight != i) setState(() => _highlight = i);
+                },
+                child: builder?.call(context, _filtered[i], _filtered[i] == widget.selected),
+              ),
+          ],
+        ),
+      );
+      if (builder == null) {
+        // Rows are all one height: cut the viewport at a whole row.
+        list = AerosWholeRows(rowHeight: AerosMenuRow.heightOf(context), child: list);
+      }
+      // Outside the scroll view, so the padding stays at both ends of a
+      // scrolled list (as in AerosMenu).
+      list = Padding(
+        padding: EdgeInsets.only(top: AerosMenu.panelPadding, bottom: bottom),
+        child: list,
+      );
+    }
+
+    return Focus(
+      autofocus: !widget.showSearchBox,
+      onKeyEvent: _onKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (widget.showSearchBox)
+            Padding(
+              padding: widget.inMenu
+                  ? const EdgeInsets.all(AerosSpacing.s2)
+                  : const EdgeInsets.fromLTRB(AerosSpacing.s5, AerosSpacing.s0, AerosSpacing.s5, AerosSpacing.s2),
+              child: AerosSearchField(
+                controller: _query,
+                autofocus: true,
+                hint: widget.searchHint,
+                onChanged: _onQueryChanged,
+                size: widget.inMenu ? AerosControlSize.sm : AerosControlSize.md,
               ),
             ),
-          ),
-        Divider(height: 1, color: a.borderDefault),
-        Expanded(
-          child: _loading
-              ? const Center(child: CircularProgressIndicator())
-              : _filtered.isEmpty
-                  ? Center(
-                      child: Text(widget.emptyText,
-                          style: AerosTypography.bodyMd(color: a.fgMuted)),
-                    )
-                  : ListView.builder(
-                      itemCount: _filtered.length,
-                      itemBuilder: (ctx, i) {
-                        final item = _filtered[i];
-                        final isSelected = item == widget.selected;
-                        if (widget.itemBuilder != null) {
-                          return InkWell(
-                            onTap: () => Navigator.of(ctx).pop(item),
-                            child: widget.itemBuilder!(ctx, item, isSelected),
-                          );
-                        }
-                        return InkWell(
-                          onTap: () => Navigator.of(ctx).pop(item),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: AerosSpacing.s4,
-                                vertical: AerosSpacing.s3),
-                            color: isSelected
-                                ? a.brandPrimaryMuted
-                                : Colors.transparent,
-                            child: Text(
-                              widget.itemAsString(item),
-                              style: AerosTypography.bodyMd(color: a.fgPrimary)
-                                  .copyWith(
-                                fontWeight: isSelected
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-        ),
-      ],
+          if (widget.showSearchBox && widget.inMenu)
+            Container(height: AerosMetricTokens.borderHairline, color: a.borderDefault),
+          Flexible(child: list),
+        ],
+      ),
     );
   }
 }

@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
+import '../foundation/aeros_focus_ring.dart';
+import '../foundation/aeros_pressable.dart';
+import '../foundation/aeros_state_layer.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/radii.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
+import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
+import 'aeros_badge.dart';
 
 /// Large tappable choice card used in onboarding intent screens
 /// ("buying for myself" / "buying for my business").
+///
+/// Flat: a fill and a 1px hairline that stays 1px. Hover and press tint the
+/// fill and strengthen the hairline; [selected] draws the hairline in
+/// `fgPrimary` over the selected tint and is announced as selected.
 class AerosIntentCard extends StatelessWidget {
   const AerosIntentCard({
     super.key,
@@ -23,75 +32,78 @@ class AerosIntentCard extends StatelessWidget {
   final String? badge;
   final bool selected;
 
+  static const BorderRadius _radius = BorderRadius.all(Radius.circular(AerosShapeTokens.surface));
+
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final borderColor = selected ? a.fgPrimary : a.borderDefault;
-    final borderWidth = selected ? 2.0 : 1.0;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: AerosRadii.brXl,
-        child: Container(
-          decoration: BoxDecoration(
-            color: a.bgSurface,
-            borderRadius: AerosRadii.brXl,
-            border: Border.all(color: borderColor, width: borderWidth),
-          ),
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (icon != null) ...[
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: a.bgSubtle,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(icon, size: 22, color: a.fgPrimary),
-                ),
-                const SizedBox(width: 14),
-              ],
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(title, style: AerosTypography.h4(color: a.fgPrimary).copyWith(fontSize: 16)),
-                        ),
-                        if (badge != null) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: a.bgSubtle,
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: Text(
-                              badge!,
-                              style: AerosTypography.caption(color: a.fgSecondary).copyWith(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                        ],
-                      ],
+    return AerosPressable(
+      onPressed: onTap,
+      expandHitTarget: false,
+      selected: selected,
+      builder: (context, state) {
+        final active = state.hovered || state.pressed;
+        return AerosFocusRing(
+          focused: state.focused,
+          radius: _radius,
+          child: AerosStateFill(
+            color: AerosStateLayer.resolve(
+              a,
+              a.bgSurface,
+              hovered: state.hovered,
+              pressed: state.pressed,
+              selected: selected,
+            ),
+            borderColor: selected ? a.fgPrimary : (active ? a.borderStrong : a.borderDefault),
+            radius: _radius,
+            padding: const EdgeInsets.all(AerosSpacing.s4 - AerosMetricTokens.borderHairline),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (icon != null) ...[
+                  Container(
+                    width: AerosSizeTokens.avatarLg,
+                    height: AerosSizeTokens.avatarLg,
+                    decoration: BoxDecoration(
+                      color: a.bgSubtle,
+                      borderRadius: const BorderRadius.all(Radius.circular(AerosShapeTokens.control)),
+                      border: Border.all(color: a.borderDefault, width: AerosMetricTokens.borderHairline),
                     ),
-                    const SizedBox(height: 6),
-                    Text(subtitle, style: AerosTypography.bodyMd(color: a.fgSecondary)),
-                  ],
+                    child: Icon(icon, size: AerosSizeTokens.iconLg, color: a.fgPrimary),
+                  ),
+                  const SizedBox(width: AerosSpacing.s3),
+                ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(child: Text(title, style: AerosTypography.h4(color: a.fgPrimary))),
+                          if (badge != null) ...[
+                            const SizedBox(width: AerosSpacing.s2),
+                            AerosBadge(label: badge!, showDot: false),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: AerosSpacing.s0_5),
+                      Text(subtitle, style: AerosTypography.bodySm(color: a.fgSecondary)),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Icon(Icons.chevron_right, color: a.fgMuted),
-            ],
+                const SizedBox(width: AerosSpacing.s2),
+                Icon(
+                  Directionality.of(context) == TextDirection.rtl ? Icons.chevron_left : Icons.chevron_right,
+                  size: AerosSizeTokens.iconLg,
+                  color: active || selected ? a.fgPrimary : a.fgMuted,
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

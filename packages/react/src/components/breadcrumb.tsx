@@ -22,14 +22,14 @@ export const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
           return (
             <li key={i} className="flex items-center gap-1">
               {item.href && !last ? (
-                <a href={item.href} className="text-[13px] font-medium text-fg-muted hover:text-fg-primary">
+                <a href={item.href} className="rounded-item text-body-sm text-fg-muted transition-colors duration-quick hover:text-fg-primary">
                   {item.label}
                 </a>
               ) : (
                 <span
                   className={cn(
-                    "text-[13px] font-medium",
-                    last ? "text-fg-primary font-semibold" : "text-fg-muted"
+                    "text-body-sm",
+                    last ? "font-medium text-fg-primary" : "text-fg-muted"
                   )}
                   aria-current={last ? "page" : undefined}
                 >
@@ -38,7 +38,7 @@ export const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
               )}
               {!last && (
                 <span aria-hidden className="text-border-strong flex items-center">
-                  {separator ?? <ChevronRight className="h-3.5 w-3.5" />}
+                  {separator ?? <ChevronRight className="size-icon-sm" />}
                 </span>
               )}
             </li>

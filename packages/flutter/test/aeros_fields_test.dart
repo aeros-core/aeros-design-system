@@ -27,16 +27,21 @@ class _TagHarnessState extends State<_TagHarness> {
 }
 
 void main() {
-  group('AerosFieldSize ladder', () {
-    test('heights match the AerosButton min-height ladder', () {
-      expect(AerosFieldSize.sm.height, 32);
-      expect(AerosFieldSize.md.height, 40);
-      expect(AerosFieldSize.lg.height, 46);
+  group('AerosControlSize ladder', () {
+    // 3.0: the ladder is the `size.control*` tokens, per density; with no
+    // density scope a control is touch-sized.
+    test('heights are the control size tokens', () {
+      expect(AerosControlSize.sm.height, AerosSizeTokens.touch.controlSm);
+      expect(AerosControlSize.md.height, AerosSizeTokens.touch.controlMd);
+      expect(AerosControlSize.lg.height, AerosSizeTokens.touch.controlLg);
+      expect(AerosControlSize.sm.heightFor(AerosDensity.pointer), AerosSizeTokens.pointer.controlSm);
+      expect(AerosControlSize.md.heightFor(AerosDensity.pointer), AerosSizeTokens.pointer.controlMd);
+      expect(AerosControlSize.lg.heightFor(AerosDensity.pointer), AerosSizeTokens.pointer.controlLg);
     });
 
     test('value text is w500', () {
-      expect(AerosFieldSize.md.valueStyle().fontWeight, FontWeight.w500);
-      expect(AerosFieldSize.sm.valueStyle().fontWeight, FontWeight.w500);
+      expect(AerosControlSize.md.valueStyle().fontWeight, FontWeight.w500);
+      expect(AerosControlSize.sm.valueStyle().fontWeight, FontWeight.w500);
     });
   });
 
@@ -45,20 +50,20 @@ void main() {
       await t.pumpWidget(_wrap(Column(
         mainAxisSize: MainAxisSize.min,
         children: const [
-          AerosTextField(hint: 'md', size: AerosFieldSize.md),
+          AerosTextField(hint: 'md', size: AerosControlSize.md),
           SizedBox(height: 8),
-          AerosTextField(hint: 'sm', size: AerosFieldSize.sm),
+          AerosTextField(hint: 'sm', size: AerosControlSize.sm),
         ],
       )));
-      expect(t.getSize(find.byType(AerosTextField).at(0)).height, closeTo(40, 3));
-      expect(t.getSize(find.byType(AerosTextField).at(1)).height, closeTo(32, 3));
+      expect(t.getSize(find.byType(AerosTextField).at(0)).height, AerosSizeTokens.touch.controlMd);
+      expect(t.getSize(find.byType(AerosTextField).at(1)).height, AerosSizeTokens.touch.controlSm);
     });
   });
 
   group('AerosSearchField', () {
     testWidgets('renders at its size height', (t) async {
       await t.pumpWidget(_wrap(const AerosSearchField(hint: 'Search')));
-      expect(t.getSize(find.byType(AerosSearchField)).height, 40);
+      expect(t.getSize(find.byType(AerosSearchField)).height, AerosSizeTokens.touch.controlMd);
     });
 
     testWidgets('shows a clear affix only after typing, and clears', (t) async {

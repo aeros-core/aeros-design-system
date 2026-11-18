@@ -2,72 +2,87 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../lib/cn";
+import { slotChildWith } from "../internal/as-child";
+import { colorTransition, controlSize, controlSquare, disabledControl } from "../internal/recipes";
+import { Spinner } from "./spinner";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 font-medium whitespace-nowrap select-none " +
-  "transition-[background-color,border-color,color,transform,box-shadow] duration-(--aeros-duration-fast) ease-(--aeros-ease-standard) " +
-  "active:scale-[0.985] disabled:opacity-40 disabled:pointer-events-none " +
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas",
+  `inline-flex shrink-0 items-center justify-center whitespace-nowrap select-none rounded-control ${colorTransition} ${disabledControl}`,
   {
     variants: {
       variant: {
-        // brand-primary / fg-inverse are theme-aware: dark button + light text in light mode,
-        // light button + dark text in dark mode. Subtle rest→hover lift, grounded on press.
-        primary:   "bg-brand-primary text-fg-inverse shadow-sm hover:bg-brand-primary-hover hover:shadow-md hover:-translate-y-px active:translate-y-0 active:shadow-sm",
-        secondary: "bg-bg-surface text-fg-primary border border-border-default shadow-xs hover:bg-bg-subtle hover:border-border-strong hover:shadow-sm hover:-translate-y-px active:translate-y-0",
-        ghost:     "bg-transparent text-fg-secondary hover:bg-bg-subtle hover:text-fg-primary",
-        danger:    "bg-danger-bg text-danger-text border border-danger-border shadow-xs hover:bg-danger-border hover:shadow-sm",
-        link:      "bg-transparent text-fg-primary underline-offset-4 hover:underline"
+        // Solid ink. brand-primary / fg-inverse are theme-aware (dark on light, light on dark).
+        primary: "bg-brand-primary text-fg-inverse hover:bg-brand-primary-hover",
+        // Hairline on surface.
+        secondary: "border border-border-strong bg-bg-surface text-fg-primary hover:bg-bg-subtle active:bg-border-default",
+        // No chrome until hovered.
+        ghost: "bg-transparent text-fg-secondary hover:bg-state-hover hover:text-fg-primary active:bg-state-pressed",
+        // Destructive, solid — the one place a status colour fills a control.
+        danger: "bg-danger text-fg-inverse hover:bg-danger-hover",
+        // Destructive, quiet — for secondary placement next to a primary action.
+        "danger-subtle": "border border-danger-border bg-danger-bg text-danger-text hover:border-danger",
+        link: "bg-transparent text-fg-primary underline-offset-4 hover:underline"
       },
-      size: {
-        xs: "h-7 px-2.5 gap-1.5 text-[11px] rounded-md",
-        sm: "h-8 px-3 gap-1.5 text-[13px] rounded-md",
-        md: "h-9 px-4 text-sm rounded-md",
-        lg: "h-10 px-5 text-sm rounded-md",
-        xl: "h-12 px-6 text-[15px] rounded-lg",
-        "icon-sm": "h-8 w-8 rounded-md",
-        "icon-md": "h-9 w-9 rounded-md",
-        "icon-lg": "h-10 w-10 rounded-md"
-      }
+      size: controlSize,
+      iconOnly: { true: "", false: "" }
     },
-    // Emitted after variant/size classes, so tailwind-merge lets the link
-    // box-reset win over the size ladder's height/padding.
     compoundVariants: [
-      { variant: "link", class: "h-auto w-auto px-0 py-0" }
+      // Emitted after the size classes, so tailwind-merge lets these win.
+      { variant: "link", class: "h-auto px-0" },
+      { iconOnly: true, size: "xs", class: controlSquare.xs },
+      { iconOnly: true, size: "sm", class: controlSquare.sm },
+      { iconOnly: true, size: "md", class: controlSquare.md },
+      { iconOnly: true, size: "lg", class: controlSquare.lg },
+      { iconOnly: true, size: "xl", class: controlSquare.xl }
     ],
-    defaultVariants: { variant: "primary", size: "md" }
+    defaultVariants: { variant: "primary", size: "md", iconOnly: false }
   }
 );
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
+  /** Render the child element (e.g. a router `<Link>`) with the button's styles. */
   asChild?: boolean;
   loading?: boolean;
   leadingIcon?: React.ReactNode;
   trailingIcon?: React.ReactNode;
+  /** Square button holding a single icon. Give it an `aria-label`. */
+  iconOnly?: boolean;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild, loading, leadingIcon, trailingIcon, children, disabled, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
+  ({ className, variant, size, iconOnly, asChild, loading, leadingIcon, trailingIcon, children, disabled, ...props }, ref) => {
+    const leading = loading ? <Spinner size="sm" className="text-current" /> : leadingIcon;
+    const shared = {
+      ref,
+      className: cn(buttonVariants({ variant, size, iconOnly }), className),
+      disabled: disabled || loading,
+      "aria-busy": loading || undefined,
+      ...props
+    };
+    if (asChild) {
+      // The caller's element becomes the button and the icons render inside it.
+      // The child is resolved first: from a Server Component it can arrive as a
+      // lazy reference, which Slot only unwraps as its direct child.
+      return (
+        <Slot {...shared}>
+          {slotChildWith(children, (label) => (
+            <>
+              {leading}
+              {label}
+              {trailingIcon}
+            </>
+          ))}
+        </Slot>
+      );
+    }
     return (
-      <Comp
-        ref={ref}
-        className={cn(buttonVariants({ variant, size }), className)}
-        disabled={disabled || loading}
-        aria-busy={loading || undefined}
-        {...props}
-      >
-        {loading ? (
-          <>
-            <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-r-transparent" aria-hidden />
-            <span className="sr-only">Loading</span>
-          </>
-        ) : leadingIcon}
+      <button {...shared}>
+        {leading}
         {children}
         {trailingIcon}
-      </Comp>
+      </button>
     );
   }
 );

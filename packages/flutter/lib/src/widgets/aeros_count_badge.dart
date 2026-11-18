@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
 import '../tokens/density.dart';
-import '../tokens/radii.dart';
+import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 
 /// A count that something is waiting — unread messages, pending items.
 ///
-/// A filled pill, at least as wide as it is tall: 18px at [AerosDensity.pointer], 20px at
-/// [AerosDensity.touch] (from the nearest [AerosDensityScope] unless [density] is given). Counts
-/// above 99 read "99+". Set [floor] when the number is a lower bound (more exist than were
-/// counted), and it reads "6+". Set [muted] when the source is muted: the count still shows, it
-/// just stops shouting (the WhatsApp grey badge).
+/// A filled pill, at least as wide as it is tall and never wider than its
+/// number needs: [AerosSizeTokens.badge] high — 18px at [AerosDensity.pointer],
+/// 20px at [AerosDensity.touch] (from the nearest [AerosDensityScope] unless
+/// [density] is given). Counts above 99 read "99+". Set [floor] when the number
+/// is a lower bound (more exist than were counted), and it reads "6+". Set
+/// [muted] when the source is muted: the count still shows, it just stops
+/// shouting (the WhatsApp grey badge).
 class AerosCountBadge extends StatelessWidget {
   const AerosCountBadge({
     super.key,
@@ -44,26 +47,29 @@ class AerosCountBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final d = density ?? AerosDensity.of(context);
-    final h = d.badgeHeight;
+    final h = (density ?? AerosDensity.of(context)).sizes.badge;
     return Semantics(
       label: semanticsLabel,
       excludeSemantics: semanticsLabel != null,
       child: Container(
         constraints: BoxConstraints(minWidth: h),
         height: h,
-        padding: EdgeInsets.symmetric(horizontal: d.isPointer ? 5 : 6),
-        alignment: Alignment.center,
+        // Tight enough that one digit stays a circle.
+        padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s1),
         decoration: BoxDecoration(
           color: muted ? a.fgMuted : a.brandPrimary,
-          borderRadius: AerosRadii.brFull,
+          borderRadius: const BorderRadius.all(Radius.circular(AerosShapeTokens.pill)),
         ),
-        child: Text(
-          label(count, floor: floor),
-          maxLines: 1,
-          style: AerosTypography.labelXs(color: a.fgInverse)
-              .copyWith(fontSize: d.isPointer ? 11 : 12, height: 1.0)
-              .withWeight(FontWeight.w700),
+        // Shrink-wraps: an Align with no width factor would fill whatever
+        // width a Wrap or a Column offers.
+        child: Center(
+          widthFactor: 1,
+          child: Text(
+            label(count, floor: floor),
+            maxLines: 1,
+            softWrap: false,
+            style: AerosTypography.labelXs(color: a.fgInverse, weight: FontWeight.w600),
+          ),
         ),
       ),
     );

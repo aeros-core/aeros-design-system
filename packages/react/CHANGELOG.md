@@ -1,5 +1,111 @@
 # @aeros-core/react
 
+## 3.0.0
+
+### Also in 3.0.0
+
+- `@aeros-core/react/cn` — the `cn()` helper as its own entry without `"use client"`, so Server Components can call it.
+- `AppHeaderTitle` takes `as` (`"h1"` default, `"h2"`, `"div"`) so a page with its own `h1` keeps a single one.
+- `SidebarGroup` opens when it comes to hold the current page, not only on mount; a `Sidebar` inside a `SidebarProvider` is hidden below `md` in CSS, so a phone never paints the desktop column first.
+- `Alert` accepts `role={undefined}` to opt out of the live region. `Field` no longer stretches a shorter control beside a taller field.
+- Fixed: a `DatePicker` inside a `Field` could keep a dangling `aria-labelledby` after hydration.
+- Fixed: `asChild` rendered nothing when the child came from a Server Component — `<Button asChild leadingIcon={…}><Link href="…">…</Link></Button>` in a server page produced no HTML. `Button`, `SidebarItem`, `SidebarSubItem`, `AppHeaderLink` and `FilterChip` now resolve the child (which React can hand over as a lazy reference) before composing it.
+- `SidebarItem asChild` behaves like the default row: the icon, the label and `count` render inside your element, the label truncates, and in the rail it is visually hidden, stays the accessible name and is the default tooltip. Pass only the label as the child's content — the `useSidebar()` label-hiding workaround is no longer needed.
+- `Card`: `interactive` with `onClick` is now a keyboard-operable button (focusable, Enter and Space, `role="button"`); give such a card no other control inside. `interactive` without `onClick` is unchanged (styling only). New `asChild` renders the card as your element, e.g. a link.
+- `Command`: `aria-activedescendant` now names the option that is actually active after filtering; the empty message renders beside the listbox in a polite live region (so it is announced) and the listbox is hidden while empty; `CommandSeparator` is decorative (`role="none"`) — a listbox may only own options and groups.
+- `Calendar` / date pickers: day buttons are named with the visible number first — "26, Sunday, July 2026" (plus ", today" / ", selected") instead of "Sunday, July 26th, 2026" — so the label is part of the name (WCAG 2.5.3). Tests that find days by name need updating; pass `labels={{ labelDayButton }}` to change it.
+- `DataTable` and `FileUpload` take a `labels` prop (a partial `DataTableLabels` / `FileUploadLabels`) to localise their built-in strings; the defaults (`defaultDataTableLabels`, `defaultFileUploadLabels`) keep the English text.
+- Fixed: `DotMatrix rings={0}` rendered its dot with `r="NaN"`.
+- `DataTable` keeps cells on one line and scrolls sideways when it is wider than its container; pass `wrapCells` to let text wrap.
+
+### Major Changes
+
+- b516f24: **3.0 — new token blocks, self-hosted fonts.** No existing token value changes here.
+
+  - **Breaking:** `@aeros-core/react/styles.css` no longer fetches fonts from Google Fonts. Import the new `@aeros-core/react/fonts.css` (self-hosted Inter with its optical-size axis, Nunito Sans with its width axis, IBM Plex Mono 400/500) or load the faces yourself. The font tokens now lead with the variable family names (`'Inter Variable'`, `'Nunito Sans Variable'`) and fall back to the plain ones.
+  - New tokens: control sizes and density (`size`, with `data-density="touch"`), elevation intents (`raised` / `overlay` / `modal`, light + dark), semantic radii (`item` / `control` / `surface` / `modal` / `pill`), focus ring metrics, opacity, border widths, layout widths, state colours (`state-hover` / `state-pressed` / `state-selected`), `scrim`, `fg-disabled`, `danger-hover`, and `enter` / `exit` easings.
+  - New Tailwind utilities from those tokens: `text-<role>` (size + line height + tracking + weight in one class), `h-control-md`, `size-icon-md`, `rounded-control`, `shadow-overlay`, `z-modal`, `duration-fast`, `max-w-dialog-md`, `w-sidebar`, `bg-state-hover`, `bg-scrim`, `opacity-disabled`, `outline-offset-field`.
+  - `cn()` understands the Aeros class names (tailwind-merge v3 configured from the tokens), so `text-body-sm text-fg-muted` keeps both and `rounded-md rounded-control` resolves to the latter.
+  - The default transition timing is the token `fast` / `standard`, not Tailwind's 150ms.
+
+- be3b3c5: **3.0 — the app shell.** The sidebar and header follow the theme (they were permanently dark) and are built for real app frames.
+
+  - **Sidebar:** `SidebarProvider` + `useSidebar` (rail state, optional `storageKey` persistence, Cmd/Ctrl+B), a 56px icon rail with tooltips, one level of nesting (`SidebarGroup` / `SidebarSubItem`), and a left sheet at touch density below the `md` breakpoint. New parts: `SidebarHeader`, `SidebarContent`, `SidebarFooter`, `SidebarTrigger`. Width is 240 (was 228).
+  - **Shell:** `AppShell`, `AppMain`, `AppHeader` (48px, full width, hairline), `AppHeaderBrand`, `AppHeaderTitle`, `AppHeaderNav`, `AppHeaderLink`, `AppHeaderActions`, `AppContent`, `AppFooter`.
+  - **Breaking:** `TopNav` → `AppHeader`, `TopNavBrand` → `AppHeaderBrand`, `TopNavLinks` → `AppHeaderNav`, `TopNavLink` → `AppHeaderLink`, `TopNavRight` → `AppHeaderActions`. The header is no longer a rounded dark bar.
+  - **Breaking:** put `SidebarBrand` inside `SidebarHeader` and the sections inside `SidebarContent`. For dark chrome in a light app, theme the subtree: `<Sidebar data-theme="dark">`.
+  - Fixed: `SidebarItem asChild` threw, so a framework `<Link>` could not be used as a row.
+
+- b594ca4: **3.0 — new components.**
+
+  - **DataTable** — sorting, row selection with a selection bar, density (`compact` / `default` / `comfortable`), sticky header, loading and empty states, client or server pagination, clickable rows. Built on `@tanstack/react-table` v9 and the existing `Table` parts; `createDataTableColumnHelper` gives typed cells.
+  - **Combobox** and **MultiCombobox** — a select with search (groups, descriptions, clear, async options).
+  - **DatePicker** and **DateRangePicker** — field-styled triggers over `Calendar`, with min/max, presets and form posting.
+  - **NumberInput** — keyboard stepping, clamping, precision, unit prefix/suffix.
+  - **Toggle**, **ToggleGroup**, **SegmentedControl**.
+  - **Collapsible**, **ScrollArea**, **CountBadge**, **FilterChip**, **Kbd**, **PageHeader**, **FileUpload**, **Stepper**.
+
+  Changed: `Tr selected` no longer sets `aria-selected` (invalid on a plain table row) — it sets `data-selected`; `Th` aligns with `text-start`; `TableLoadingRow` takes `statusLabel`.
+
+- 4ba5904: **3.0 — removals.** Everything the restyle replaced is gone.
+
+  - Shadows: the `xs`–`xl`, `hairline` and `focus*` shadow tokens (`--aeros-shadow-*`, `shadow-sm` …) are removed. Use the elevation intents `shadow-raised` / `shadow-overlay` / `shadow-modal`; resting surfaces take a hairline border.
+  - Radius: `2xl` / `3xl` / `4xl` are removed. Use `rounded-item|control|surface|modal|pill`.
+  - Motion: the `emphasized`, `decelerate`, `entrance` and `spring` easings are removed. Use `ease-standard`, `ease-enter`, `ease-exit`.
+  - Aliases: `focus-ring-offset` is removed (the focus ring has a transparent offset).
+  - CSS: the `.aeros-text-<role>` classes are removed. Use the Tailwind utilities `text-<role>`.
+
+- 535bfb2: **3.0 — every component except the app shell is restyled on shared recipes.** Resting surfaces are a hairline with no shadow; only floating layers have elevation; nothing lifts or scales on hover; one focus ring everywhere.
+
+  Breaking changes to act on:
+
+  - **Button:** `size="icon-sm|icon-md|icon-lg"` → `size="sm|md|lg" iconOnly`. `variant="danger"` is now solid; use `variant="danger-subtle"` for the old tinted look. Heights are 24 / 28 / 32 / 36 / 40 (were 28 / 32 / 36 / 40 / 48). `asChild` now works with `leadingIcon` / `trailingIcon`.
+  - **Field:** no longer has a bottom margin — wrap fields in the new `FieldGroup`, or space them yourself. Inputs, textareas and select triggers are 28 / 32 / 36 high.
+  - **Tabs:** `TabsContent` no longer has a top margin.
+  - **Dialog:** default width is 520 (was 420); pass `size="sm"` for 400. `AlertDialog` defaults to 400 (was 420) and `Drawer` to 480 (was 448). New `size` prop on `DialogContent`, `AlertDialogContent` and `DrawerContent`. Modal footers have no fill.
+  - **Card / StatCard:** no shadow. `interactive` cards change border and fill on hover instead of lifting.
+  - **Toast:** tones colour the title; the surface is always the neutral elevated one.
+  - **Avatar:** sizes are 20 / 24 / 32 / 40 / 56. **Checkbox / Radio:** 16px. **Switch:** 36×20.
+  - **Focus:** components no longer draw a ring; the global `:focus-visible` outline does. Remove any `ring-offset-*` overrides you added to match the old ring.
+
+  New: `DropdownMenuCheckboxItem`, `DropdownMenuRadioGroup` / `RadioItem`, `DropdownMenuSub` / `SubTrigger` / `SubContent`, `DropdownMenuShortcut`, `TooltipContent arrow`, `FieldGroup`, styled `DrawerTitle` / `DrawerDescription`.
+
+  Fixed: `Button asChild` threw; toast success / warning text failed contrast in light mode; `StatCard` did not announce the delta direction; `CommandInput` had no focus indicator.
+
+- 9e3525e: **3.0 — tokens.json is the only source.** The Tailwind v4 theme is now generated (`@aeros-core/tokens/theme.css`) instead of hand-copied into `@aeros-core/react/styles.css`.
+
+  - **Breaking:** the theme resets Tailwind's default palette, radii, shadows and easings. Classes such as `bg-blue-500`, `shadow-2xl` or `ease-out` no longer generate CSS in an app that imports `@aeros-core/react/styles.css` — use the Aeros alias classes (`bg-bg-surface`, `text-fg-muted`, `shadow-overlay`, `ease-standard`, …). `white`, `black` and the `ink-*` ramp remain.
+  - **Breaking:** the unused Tailwind v3 preset export `@aeros-core/tokens/tailwind` is removed.
+  - New: `data-theme="system"` follows the OS colour scheme; `data-theme` now works on any element, so a subtree can be themed on its own; a `dark:` variant is available.
+  - New: token references (`{color.ink.900}`, `{color.ink.900 / 0.05}`); the JS export is fully typed and adds `rawTokens`.
+  - Fix: `styles.css` scans the published `dist/`, so installed (non-monorepo) consumers get the component classes.
+
+- b71425a: **3.0 — the "Crisp precision" values.** Everything shifts; review each app visually when upgrading.
+
+  - **Colour:** the warm stone ink ramp is replaced by a cool neutral one (`ink-0` … `ink-950`, plus a new `ink-850`). Aliases are now references into the ramp: canvas `ink-50`, surface white, text `ink-900`, borders `ink-200` / `ink-300`; dark mode is near-black (`ink-950` canvas, `ink-900` surface, `ink-850` elevated). `info` status colours are ramp references.
+  - **Radius:** the scale tightens — `xs` 2, `sm` 4, `md` 6, `lg` 8, `xl` 12 (were 4 / 6 / 8 / 12 / 16). `2xl` / `3xl` / `4xl` are removed; use the semantic radii (`rounded-control`, `rounded-surface`, `rounded-modal`).
+  - **Motion:** durations are `quick` 80, `fast` 120, `base` 180, `slow` 260 ms (were 90 / 120 / 200 / 320).
+  - **Type scale:** display 48 / 36 / 30, h1 24, h2 20, h3 16, h4 14 — all weight 600; body 16 / 14 / 13 at 450; labels 14 / 13 / 11 at 500; caption 12; mono 20 / 13 / 12 / 11. The `light` and `extrabold` weight tokens are removed.
+  - The contrast gate now also checks every text tier on every surface, the solid danger button, and text over the hover / pressed / selected overlays.
+
+### Minor Changes
+
+- 5350b28: The sidebar spec, shared by web and Flutter.
+
+  **Sidebar (react)**: rows are a fixed 32px (`h-8`) with 16px icons; `SidebarSection` labels are sentence case, 12px medium (were 10px uppercase tracked); `SidebarItem` gains `count`, a pill announced with the label. (Superseded in 3.0: the sidebar now follows the theme — see the app-shell entry.)
+
+  Flutter `AerosSidenav` moves to the same spec in `aeros_design_system` 2.3.0 (see `packages/flutter/CHANGELOG.md`).
+
+### Patch Changes
+
+- c60dd68: The `aeros-logo` wordmark class matches the reference logo artwork: Nunito Sans wdth-125 at weight 500 with +0.01em tracking (was weight 800, −0.02em). Flutter `AerosWordmark` moves to the same spec in `aeros_design_system` 2.5.0.
+- Updated dependencies [b516f24]
+- Updated dependencies [4ba5904]
+- Updated dependencies [5350b28]
+- Updated dependencies [9e3525e]
+- Updated dependencies [b71425a]
+  - @aeros-core/tokens@3.0.0
+
 ## 2.1.0
 
 ### Minor Changes

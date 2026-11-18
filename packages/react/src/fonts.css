@@ -1,0 +1,19 @@
+/* Aeros web fonts — self-hosted, no network request to a font CDN.
+ *
+ * Opt in once, next to the main stylesheet:
+ *
+ *   @import "@aeros-core/react/styles.css";
+ *   @import "@aeros-core/react/fonts.css";
+ *
+ * Skip this file if the app loads the faces itself (e.g. next/font) — the
+ * font tokens fall back to the plain family names "Inter" / "Nunito Sans" /
+ * "IBM Plex Mono".
+ *
+ *   Inter (variable, with the optical-size axis)      — UI
+ *   Nunito Sans (variable, with the width axis)       — the wordmark only
+ *   IBM Plex Mono 400 / 500                           — data
+ */
+@import "@fontsource-variable/inter/opsz.css";
+@import "@fontsource-variable/nunito-sans/wdth.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";

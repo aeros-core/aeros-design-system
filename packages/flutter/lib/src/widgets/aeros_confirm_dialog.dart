@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/radii.dart';
-import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 import 'aeros_button.dart';
+import 'aeros_dialog.dart';
 
 /// Reusable confirmation dialog for destructive or otherwise-significant
 /// actions. Returns `true` if the user confirms, `false` if they cancel
 /// or dismiss.
+///
+/// A small [AerosDialog]: the title, the body (which scrolls when it is long)
+/// and a footer with the two buttons. [destructive] makes the confirm button
+/// the solid danger button.
 ///
 /// ```dart
 /// final ok = await AerosConfirmDialog.show(
@@ -45,8 +48,8 @@ class AerosConfirmDialog extends StatelessWidget {
     /// Set false to force an explicit answer (no scrim-tap / Escape dismiss).
     bool barrierDismissible = true,
   }) async {
-    final result = await showDialog<bool>(
-      context: context,
+    final result = await AerosDialog.show<bool>(
+      context,
       barrierDismissible: barrierDismissible,
       builder: (_) => AerosConfirmDialog._(
         title: title,
@@ -62,51 +65,22 @@ class AerosConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    return Dialog(
-      backgroundColor: a.bgSurface,
-      shape: RoundedRectangleBorder(borderRadius: AerosRadii.brLg),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: 440,
-          // Long bodies scroll inside the dialog instead of overflowing short
-          // viewports.
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
+    return AerosDialog(
+      size: AerosDialogSize.sm,
+      title: title,
+      showClose: false,
+      content: Text(body, style: AerosTypography.bodySm(color: a.fgSecondary)),
+      actions: [
+        AerosButton.secondary(
+          label: cancelLabel,
+          onPressed: () => Navigator.of(context).pop(false),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(AerosSpacing.s5),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(title, style: AerosTypography.h3(color: a.fgPrimary)),
-              const SizedBox(height: AerosSpacing.s3),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Text(body, style: AerosTypography.bodyMd(color: a.fgSecondary)),
-                ),
-              ),
-              const SizedBox(height: AerosSpacing.s5),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  AerosButton.secondary(
-                    label: cancelLabel,
-                    onPressed: () => Navigator.of(context).pop(false),
-                  ),
-                  const SizedBox(width: AerosSpacing.s2),
-                  AerosButton(
-                    label: confirmLabel,
-                    onPressed: () => Navigator.of(context).pop(true),
-                    variant: destructive
-                        ? AerosButtonVariant.danger
-                        : AerosButtonVariant.primary,
-                  ),
-                ],
-              ),
-            ],
-          ),
+        AerosButton(
+          label: confirmLabel,
+          onPressed: () => Navigator.of(context).pop(true),
+          variant: destructive ? AerosButtonVariant.danger : AerosButtonVariant.primary,
         ),
-      ),
+      ],
     );
   }
 }

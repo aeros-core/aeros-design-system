@@ -15,18 +15,18 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
     <div
       ref={ref}
       className={cn(
-        "rounded-xl border border-border-default bg-bg-surface shadow-sm p-5",
+        "rounded-surface border border-border-default bg-bg-surface p-4",
         className
       )}
       {...props}
     >
-      <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-fg-muted mb-2">
+      <div className="mb-2 text-caption text-fg-muted">
         {label}
       </div>
       <div
         className={cn(
-          "text-[28px] font-bold tracking-[-0.02em] text-fg-primary leading-none",
-          mono && "font-mono font-medium text-[26px] text-fg-primary"
+          "text-h1 leading-none text-fg-primary",
+          mono && "font-mono text-mono-lg leading-none"
         )}
       >
         {value}
@@ -34,15 +34,18 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
       {delta && (
         <div
           className={cn(
-            "mt-3 inline-flex items-center gap-1 text-xs font-semibold",
+            "mt-2 inline-flex items-center gap-1 text-caption font-medium",
             delta.direction === "up" && "text-success-text",
             delta.direction === "down" && "text-danger-text",
-            (!delta.direction || delta.direction === "flat") && "text-fg-muted font-normal"
+            (!delta.direction || delta.direction === "flat") && "text-fg-muted"
           )}
         >
-          {delta.direction === "up" && <ArrowUp className="h-3 w-3" strokeWidth={3} />}
-          {delta.direction === "down" && <ArrowDown className="h-3 w-3" strokeWidth={3} />}
-          {(!delta.direction || delta.direction === "flat") && <Minus className="h-3 w-3" />}
+          {delta.direction === "up" && <ArrowUp aria-hidden className="size-icon-xs" strokeWidth={2.5} />}
+          {delta.direction === "down" && <ArrowDown aria-hidden className="size-icon-xs" strokeWidth={2.5} />}
+          {(!delta.direction || delta.direction === "flat") && <Minus aria-hidden className="size-icon-xs" />}
+          {/* The arrow and colour are decorative; say the direction in words too. */}
+          {delta.direction === "up" && <span className="sr-only">Up </span>}
+          {delta.direction === "down" && <span className="sr-only">Down </span>}
           {delta.value}
         </div>
       )}

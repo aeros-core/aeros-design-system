@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 import 'aeros_attribute_models.dart';
+import 'aeros_form_field.dart';
+import 'aeros_slider_theme.dart';
 
 /// Two-thumb band picker for a NUMERIC RANGE attribute. Renders both the
 /// low and high values above the track with optional unit suffix. Snaps
@@ -25,6 +27,13 @@ import 'aeros_attribute_models.dart';
 ///   - low ≤ high invariant is enforced — if the caller passes inverted
 ///     values, the lower one becomes start and the higher becomes end
 ///   - both thumbs snap to step boundaries on every change
+///
+/// A Material [RangeSlider] in the design system's slider look (2px track,
+/// 14px thumbs with a hairline, no halo). Material's range slider takes no
+/// keyboard focus, so unlike [AerosRangeSlider] it has no focus ring.
+///
+/// Disabled ([enabled] false or a null [onChanged]), the track, the thumbs
+/// and the value readout are all dimmed to [AerosMetricTokens.opacityDisabled].
 ///
 /// For a single-thumb measurement input, use [AerosRangeSlider].
 class AerosNumericRangeBand extends StatelessWidget {
@@ -81,7 +90,6 @@ class AerosNumericRangeBand extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final hasError = errorText != null && errorText!.isNotEmpty;
     final divisions = ((range.max - range.min) / range.step).round();
 
     // Clamp + invariant-repair the incoming RangeValues so the widget
@@ -93,89 +101,54 @@ class AerosNumericRangeBand extends StatelessWidget {
     final safeStart = start <= end ? start : end;
     final safeEnd = start <= end ? end : start;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (label != null)
-          Row(
-            children: [
-              Expanded(
-                child: RichText(
-                  text: TextSpan(
-                    text: label!,
-                    style: AerosTypography.bodySm(color: a.fgSecondary)
-                        .copyWith(fontWeight: FontWeight.w600),
-                    children: [
-                      if (required)
-                        const TextSpan(
-                          text: ' *',
-                          style: TextStyle(color: AerosColors.danger),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              Text(
-                '${_format(safeStart)} – ${_format(safeEnd)}',
-                style: AerosTypography.monoMd(color: a.fgPrimary)
-                    .copyWith(fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-        SliderTheme(
-          data: SliderThemeData(
-            activeTrackColor: a.brandPrimary,
-            inactiveTrackColor: a.borderDefault,
-            thumbColor: a.brandPrimary,
-            overlayColor: a.brandPrimary.withAlpha(40),
-            trackHeight: 3,
-            rangeThumbShape: const RoundRangeSliderThumbShape(
-              enabledThumbRadius: 8,
+    final active = enabled && onChanged != null;
+
+    return AerosFormField(
+      label: label,
+      required: required,
+      errorText: errorText,
+      labelGap: AerosSpacing.s1,
+      // Mono ships at 400 and 500 only: the value is the medium face.
+      trailing: AerosSliderValue(
+        enabled: active,
+        child: Text(
+          '${_format(safeStart)} – ${_format(safeEnd)}',
+          style: AerosTypography.monoMd(color: a.fgPrimary, weight: FontWeight.w500),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AerosSliderTheme(
+            enabled: active,
+            child: RangeSlider(
+              values: RangeValues(safeStart, safeEnd),
+              min: range.min.toDouble(),
+              max: range.max.toDouble(),
+              divisions: divisions > 0 ? divisions : null,
+              onChanged: active
+                  ? (v) {
+                      final snappedStart = _snap(v.start);
+                      final snappedEnd = _snap(v.end);
+                      // Defensive: enforce low ≤ high after snapping in case
+                      // step boundaries collapse the band.
+                      final s = snappedStart <= snappedEnd ? snappedStart : snappedEnd;
+                      final e = snappedStart <= snappedEnd ? snappedEnd : snappedStart;
+                      onChanged!(RangeValues(s, e));
+                    }
+                  : null,
             ),
           ),
-          child: RangeSlider(
-            values: RangeValues(safeStart, safeEnd),
-            min: range.min.toDouble(),
-            max: range.max.toDouble(),
-            divisions: divisions > 0 ? divisions : null,
-            onChanged: enabled && onChanged != null
-                ? (v) {
-                    final snappedStart = _snap(v.start);
-                    final snappedEnd = _snap(v.end);
-                    // Defensive: enforce low ≤ high after snapping in case
-                    // step boundaries collapse the band.
-                    final s = snappedStart <= snappedEnd
-                        ? snappedStart
-                        : snappedEnd;
-                    final e = snappedStart <= snappedEnd
-                        ? snappedEnd
-                        : snappedStart;
-                    onChanged!(RangeValues(s, e));
-                  }
-                : null,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s2),
-          child: Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(_format(range.min),
-                  style: AerosTypography.caption(color: a.fgMuted)),
-              Text(_format(range.max),
-                  style: AerosTypography.caption(color: a.fgMuted)),
+              Text(_format(range.min), style: AerosTypography.caption(color: a.fgMuted)),
+              Text(_format(range.max), style: AerosTypography.caption(color: a.fgMuted)),
             ],
           ),
-        ),
-        if (hasError) ...[
-          const SizedBox(height: AerosSpacing.s1),
-          Text(
-            errorText!,
-            style: AerosTypography.caption(color: AerosColors.dangerText),
-          ),
         ],
-      ],
+      ),
     );
   }
 }

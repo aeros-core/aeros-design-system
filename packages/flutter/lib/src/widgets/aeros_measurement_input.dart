@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../foundation/aeros_control_size.dart';
+import '../foundation/aeros_field_frame.dart';
+import '../foundation/aeros_pressable.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
-import '../tokens/radii.dart';
 import '../tokens/spacing.dart';
-import '../tokens/typography.dart';
 import 'aeros_attribute_models.dart';
+import 'aeros_form_field.dart';
+import 'aeros_popover.dart';
+import 'aeros_select.dart';
 
 /// Number-with-unit input for a MEASUREMENT attribute.
 ///
-/// Renders a numeric text field on the left and a unit dropdown on the
-/// right, joined visually as a single control. Use this when the buyer
+/// One field ([AerosFieldFrame]) holding the number and, at its end, the
+/// unit: a button that opens the list of units when there is more than one.
+/// A disabled input dims as a whole. Use this when the buyer
 /// needs free-form numeric entry inside an allowed range. For discrete
 /// values, prefer [AerosEnumChips]; for continuous selection along a track,
 /// prefer [AerosRangeSlider].
@@ -28,6 +32,7 @@ class AerosMeasurementInput extends StatefulWidget {
     this.enabled = true,
     this.range,
     this.errorText,
+    this.size = AerosControlSize.md,
   });
 
   final List<AerosMeasurementUnit> units;
@@ -43,12 +48,19 @@ class AerosMeasurementInput extends StatefulWidget {
   final AerosNumericRange? range;
   final String? errorText;
 
+  /// Control size — the same ladder as [AerosTextField].
+  final AerosControlSize size;
+
   @override
   State<AerosMeasurementInput> createState() => _AerosMeasurementInputState();
 }
 
 class _AerosMeasurementInputState extends State<AerosMeasurementInput> {
   late final TextEditingController _controller;
+  final FocusNode _focus = FocusNode(debugLabel: 'AerosMeasurementInput');
+  final FocusNode _unitFocus = FocusNode(debugLabel: 'AerosMeasurementInput unit');
+  final GlobalKey _frameKey = GlobalKey(debugLabel: 'AerosMeasurementInput frame');
+  bool _focused = false;
 
   @override
   void initState() {
@@ -56,6 +68,11 @@ class _AerosMeasurementInputState extends State<AerosMeasurementInput> {
     _controller = TextEditingController(
       text: widget.numericValue?.toString() ?? '',
     );
+    _focus.addListener(_onFocus);
+  }
+
+  void _onFocus() {
+    if (_focus.hasFocus != _focused) setState(() => _focused = _focus.hasFocus);
   }
 
   @override
@@ -71,6 +88,8 @@ class _AerosMeasurementInputState extends State<AerosMeasurementInput> {
   @override
   void dispose() {
     _controller.dispose();
+    _focus.dispose();
+    _unitFocus.dispose();
     super.dispose();
   }
 
@@ -83,119 +102,106 @@ class _AerosMeasurementInputState extends State<AerosMeasurementInput> {
     widget.onChanged(_parse(raw), widget.unitCode);
   }
 
+  String? get _unitLabel {
+    for (final unit in widget.units) {
+      if (unit.code == widget.unitCode) return unit.label;
+    }
+    return widget.unitCode;
+  }
+
+  Future<void> _pickUnit() async {
+    final frame = _frameKey.currentContext!;
+    final code = await AerosSelect.showOptions<String>(
+      // From the unit button, so focus comes back to it.
+      _unitFocus.context ?? context,
+      // Lined up with the end of the field, under it.
+      anchorRect: AerosPopover.anchorRectOf(frame),
+      align: AerosPopoverAlign.end,
+      matchAnchorWidth: false,
+      value: widget.unitCode,
+      semanticLabel: 'Unit',
+      items: [for (final unit in widget.units) AerosSelectItem<String>(value: unit.code, label: unit.label)],
+    );
+    if (code != null && code != widget.unitCode) widget.onChanged(widget.numericValue, code);
+  }
+
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
+    final size = widget.size;
     final hasError = widget.errorText != null && widget.errorText!.isNotEmpty;
-    final borderColor = hasError ? AerosColors.danger : a.borderDefault;
+    final range = widget.range;
+    final helper = widget.helperText ??
+        (range == null
+            ? null
+            : 'Allowed: ${range.min}–${range.max}'
+                '${widget.unitCode != null ? ' ${widget.unitCode}' : ''}');
+    final unitLabel = _unitLabel;
+    final choosable = widget.units.length > 1;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (widget.label != null) ...[
-          RichText(
-            text: TextSpan(
-              text: widget.label!,
-              style: AerosTypography.bodySm(color: a.fgSecondary)
-                  .copyWith(fontWeight: FontWeight.w600),
-              children: [
-                if (widget.required)
-                  const TextSpan(
-                    text: ' *',
-                    style: TextStyle(color: AerosColors.danger),
-                  ),
+    Widget? unit;
+    if (widget.units.isNotEmpty && unitLabel != null) {
+      Widget label(Color color) => Text(unitLabel, maxLines: 1, style: size.valueStyle(color: color));
+      unit = !choosable
+          ? label(a.fgSecondary)
+          : AerosPressable(
+              onPressed: widget.enabled ? _pickUnit : null,
+              focusNode: _unitFocus,
+              // Inside the field: the field's own height is the target.
+              expandHitTarget: false,
+              semanticLabel: 'Unit',
+              builder: (context, state) => Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  label(state.hovered || state.pressed || state.focused ? a.fgPrimary : a.fgSecondary),
+                  Icon(Icons.keyboard_arrow_down, size: size.iconSize, color: a.fgMuted),
+                ],
+              ),
+            );
+    }
+
+    final field = AerosFieldFrame(
+      key: _frameKey,
+      size: size,
+      focused: _focused,
+      hasError: hasError,
+      enabled: widget.enabled,
+      onTap: _focus.requestFocus,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              focusNode: _focus,
+              enabled: widget.enabled,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
               ],
+              onChanged: _emit,
+              style: size.valueStyle(color: a.fgPrimary),
+              cursorColor: a.fgPrimary,
+              decoration: AerosFieldFrame.bareDecoration(
+                hintText: widget.hint,
+                hintStyle: size.valueStyle(color: a.fgMuted),
+              ),
             ),
           ),
-          const SizedBox(height: AerosSpacing.s2),
+          if (unit != null) ...[
+            SizedBox(width: size.gap),
+            unit,
+          ],
         ],
-        Container(
-          decoration: BoxDecoration(
-            color: widget.enabled ? a.bgSurface : a.bgSubtle,
-            borderRadius: AerosRadii.brMd,
-            border: Border.all(color: borderColor),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s3),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  enabled: widget.enabled,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                  ],
-                  onChanged: _emit,
-                  style: AerosTypography.bodyMd(color: a.fgPrimary),
-                  decoration: InputDecoration(
-                    hintText: widget.hint,
-                    hintStyle: AerosTypography.bodyMd(color: a.fgMuted),
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: AerosSpacing.s3,
-                    ),
-                  ),
-                ),
-              ),
-              if (widget.units.isNotEmpty) ...[
-                Container(
-                  width: 1,
-                  height: 24,
-                  color: a.borderDefault,
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: AerosSpacing.s2,
-                  ),
-                ),
-                DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: widget.unitCode,
-                    onChanged: widget.enabled
-                        ? (code) =>
-                            widget.onChanged(widget.numericValue, code)
-                        : null,
-                    icon: Icon(Icons.keyboard_arrow_down,
-                        size: 18, color: a.fgMuted),
-                    style: AerosTypography.bodyMd(color: a.fgPrimary),
-                    dropdownColor: a.bgSurface,
-                    borderRadius: AerosRadii.brMd,
-                    items: [
-                      for (final u in widget.units)
-                        DropdownMenuItem(
-                          value: u.code,
-                          child: Text(u.label),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-        if (hasError) ...[
-          const SizedBox(height: AerosSpacing.s1),
-          Text(
-            widget.errorText!,
-            style: AerosTypography.caption(color: AerosColors.dangerText),
-          ),
-        ] else if (widget.helperText != null) ...[
-          const SizedBox(height: AerosSpacing.s1),
-          Text(
-            widget.helperText!,
-            style: AerosTypography.caption(color: a.fgMuted),
-          ),
-        ] else if (widget.range != null) ...[
-          const SizedBox(height: AerosSpacing.s1),
-          Text(
-            'Allowed: ${widget.range!.min}–${widget.range!.max}'
-            '${widget.unitCode != null ? ' ${widget.unitCode}' : ''}',
-            style: AerosTypography.caption(color: a.fgMuted),
-          ),
-        ],
-      ],
+      ),
+    );
+
+    return AerosFormField(
+      label: widget.label,
+      required: widget.required,
+      errorText: widget.errorText,
+      helperText: helper,
+      labelGap: AerosSpacing.s1_5,
+      child: field,
     );
   }
 }

@@ -1,5 +1,413 @@
 # aeros_design_system
 
+## 3.0.0
+
+### The "Crisp precision" values
+
+Every colour, radius, duration and text size moves with the tokens — nothing in an app needs
+renaming, but every screen looks different. Review visually when upgrading.
+
+- **Colour:** cool neutral ink ramp (was warm stone), plus `AerosColors.ink850`. Dark mode is
+  near-black: canvas `ink950`, surface `ink900`, elevated `ink850`.
+- **Radius:** `AerosRadii` tightens — xs 2, sm 4, md 6, lg 8, xl 12 (were 4 / 6 / 8 / 12 / 16).
+- **Motion:** quick 80, fast 120, base 180, slow 260 ms.
+- **Type:** h1 24, h2 20, h3 16, h4 14, display 48 / 36 / 30 (all w600); labels w500; mono 20 /
+  13 / 12 / 11. `AerosDensity.touch` body line height is 1.4 (was 1.45).
+
+Typography now comes straight from the tokens, weights render, and the package has no runtime dependencies besides Flutter.
+
+### Controls rebuilt on a foundation layer ("Crisp precision", structure)
+
+Buttons, fields and the selection controls are now built on five shared primitives, so they agree on
+height, radius, state and focus. Resting controls are a fill and a 1px hairline with **no shadow**;
+hover and press change **colour only** (no ripple, no lift); there is **one focus ring**.
+
+**Added — foundation (`lib/src/foundation/`, all exported)**
+
+- `AerosPressable` — the one interaction primitive. Reports `AerosInteraction` (`hovered`, `pressed`,
+  `focused` = keyboard focus only, `enabled`) to a builder; hand cursor; Enter / Space activation;
+  semantics (`button`, `checked`, `mixed`, `toggled`, `selected`, `inMutuallyExclusiveGroup`,
+  `semanticLabel`). Its tappable box is at least `AerosSizeTokens.minTarget` for the density (24
+  pointer, 48 touch) without changing the visual's size; `expandHitTarget: false` opts out.
+- `AerosStateLayer.resolve(aliases, base, hovered:, pressed:, selected:, enabled:)` — composites the
+  `stateHover` / `statePressed` / `stateSelected` aliases over a base colour — and `AerosStateFill`,
+  a hairline box that animates between state colours in `AerosMotion.quick`.
+- `AerosFocusRing(focused:, radius:, tone:, placement:)` — a 2px ring painted outside the child by a
+  foreground painter, so focus never shifts layout. `placement`: `outside` (buttons, toggles),
+  `field` (straddles the border), `inset`. `tone: danger` uses the theme's danger colour.
+- `AerosSurface(level: flat | raised | overlay | modal)` — flat = fill + hairline, no shadow;
+  overlay / modal = `bgElevated` + the `AerosElevation` shadow and no border. The only place a
+  `BoxShadow` should be attached.
+- `AerosControlSize { xs, sm, md, lg, xl }` — one size ladder for buttons and fields:
+  `resolveHeight(context)` / `heightFor(density)` (24 / 28 / 32 / 36 / 40 pointer, 32 / 36 / 40 / 44 /
+  48 touch), `padH`, `gap`, `iconSize`, `labelStyle()`, `valueStyle()`, `radius`. `AerosControlSize.of(context)`
+  reads an `AerosControlSizeScope` (default `md`).
+- `AerosFieldFrame` — the shared field look, for composite inputs that should match the text field.
+- Theme access: `AerosThemeExtension.semantic` and `.elevation` (both lerped on a theme change),
+  `context.aerosElevation`; `AerosDensity.sizes` (the `AerosSizeTokens` for a density). The generated
+  `AerosElevation`, `AerosSizeTokens`, `AerosShapeTokens` and `AerosMetricTokens` are exported.
+- `AerosButtonVariant.dangerSubtle`, `AerosButton.icon(icon:, semanticLabel:, …)` (square, icon-only;
+  the label is required for screen readers).
+- A **disabled state** on `AerosCheckbox`, `AerosRadio` and `AerosSwitch`: pass `onChanged: null` or
+  `enabled: false`. Each also takes a `semanticLabel`.
+- `AerosSeverityPalette.of(context, …)`, `AerosSelectionPalette.of(context, …)`,
+  `AerosPricePalette.of(context, …)`.
+
+**Breaking — what an app has to change or re-check**
+
+- **Button heights follow the density tokens**: 24 / 28 / 32 / 36 / 40 inside an
+  `AerosDensityScope(density: pointer)`, 32 / 36 / 40 / 44 / 48 at touch or with no scope (were 28 /
+  32 / 40 / 46 / 52 everywhere). Labels are `labelSm` (xs, sm) / `labelMd`; every size has the 6px
+  control radius; horizontal padding is tighter (8 / 10 / 12 / 14 / 16). A long label now truncates
+  with an ellipsis instead of overflowing.
+- **A control's layout box is at least the density's minimum target** — at touch, a 40px `md` button
+  or a checkbox occupies 44px. The painted control is unchanged; tight rows may grow by a few px.
+- **`AerosButtonVariant.danger` is now solid red** with an inverse label (hover `dangerHover`). For the
+  old tinted look use `AerosButtonVariant.dangerSubtle`. `AerosConfirmDialog(destructive: true)` uses
+  the solid one.
+- **`secondary` has a `borderStrong` hairline; `ghost` has no border** (it had `borderDefault`).
+- **`AerosButtonSize` and `AerosFieldSize` are deprecated aliases of `AerosControlSize`** —
+  `AerosButtonSize.md` still compiles. `AerosFieldSize` therefore gains `xs` and `xl` (an exhaustive
+  `switch` over it needs two more cases), and `sm` / `md` / `lg` are 36 / 40 / 44 at touch (were 32 /
+  40 / 46). The `AerosFieldSizeMetrics` extension is gone (its members are on the enum); `padV` is
+  deprecated; `radius` is the control radius at every size.
+- `AerosButton.size` is nullable (null = `AerosControlSize.of(context)`); the named constructors take
+  `AerosControlSize? size`.
+- **Fields** (`AerosTextField`, `AerosSearchField`, `AerosTagField`): `bgSurface` fill, 1px
+  `borderStrong` that stays 1px when focused (focus is the ring), 6px radius at every size, error
+  colours from the theme (legible in dark mode now), disabled = the whole field at 40% opacity (was a
+  `bgSubtle` fill). `AerosSearchField` is no longer a borderless grey pill. `AerosTagField` fills the
+  width it is given (it used to shrink to its chips). Helper and error text are drawn by the field,
+  not by `InputDecoration`. `AerosTextField` is now a `StatefulWidget` (constructor unchanged).
+- **Selection controls are custom-drawn, not Material wrappers**: checkbox and radio are 16px (were
+  18), the switch is a 32×18 monochrome track on every platform (no Cupertino switch on iOS/macOS).
+  The default hit area is the density minimum target — **48px at touch**, as Material padded
+  before — and `compact` shrinks it to the glyph. `onChanged` is nullable on all three.
+- **Status palettes no longer default to light.** `AerosSeverityPalette.of(severity, {isDark})` →
+  `AerosSeverityPalette.of(context, severity)` or `.resolve(severity, context.aerosSemantic)`;
+  `AerosSelectionPalette.resolve(state, aliases, {isDark})` → `.of(context, state)` or
+  `.resolve(state, aliases, semantic)`; `AerosPricePalette.resolve(tone, aliases)` → `.of(context,
+  tone)` or `.resolve(tone, aliases, semantic)`.
+- **Every widget reads status colours from the theme** (`context.aerosSemantic`) — required markers,
+  error text and error borders in the configurable-MTO widgets were the light reds in dark mode.
+- **`AerosTheme` (ThemeData)**: `NoSplash` and transparent splash / highlight / hover colours — every
+  Material `InkWell` in your app stops rippling and loses the default hover tint; `surfaceTint`
+  transparent; `onError` / `onSecondary` / `onTertiary` are `fgInverse`; `secondary` / `tertiary`
+  come from the aliases; `scrim` is the alias. Input borders are 1px in every state and
+  `borderStrong` at rest; cards 8px, buttons / inputs 6px, dialogs 12px with **elevation 0** and a
+  hairline. New token-driven themes for divider, icon button, checkbox, radio, switch, popup menu,
+  bottom sheet, tooltip, scrollbar, list tile, progress indicator and text selection.
+- `AerosThemeExtension` has two new fields; a hand-built `AerosThemeExtension(aliases:, isDark:)`
+  still compiles and takes the status colours and elevation for its brightness.
+
+**Not in this release step** (later PRs): cards, badges, tabs, dialogs, data table, sidenav / scaffold
+and the configurable-MTO widgets keep their structure — they only picked up the status-colour fix and
+the theme changes above.
+
+### Cards, badges, feedback, navigation and the app shell restyled
+
+The rest of the everyday widgets move onto the foundation layer: flat hairline surfaces, semantic
+radii, token sizes per density, colour-only hover and press, the one focus ring, no ripple.
+
+**Changed — look**
+
+- **Cards** (`AerosCard`, `AerosStatCard`, `AerosIntentCard`, `AerosEmptyState`): `bgSurface` + 1px
+  hairline, 8px corners, **no shadow**. Card header and footer are divided by hairlines and the
+  footer has no fill. A tappable card / intent card tints and strengthens its hairline on hover and
+  draws the focus ring. The empty state is a 1px dashed outline; its title is a semantic heading.
+- **Badge family** (`AerosBadge`, `AerosTag`, `AerosCountBadge`, dense `AerosRoutingSignalBadge`):
+  one height — `AerosSizeTokens.badge`, 18 pointer / 20 touch — tinted fill, 1px border in the
+  tone's border colour, `labelXs`. A badge is a pill, a tag has 4px corners (`pill: true` still
+  rounds it). `info` tones use the neutral `info*` status colours.
+- **Chips**: `AerosFilterChip` gains a hairline and a focus ring; `AerosEnumChips` are control-sized
+  (`AerosControlSize.sm`) with 6px corners and a 1px selected border (was 2px).
+- **Feedback**: `AerosAlert` / `AerosConstraintErrorAlert` — tint + hairline, 8px corners, `labelSm`
+  title, `bodySm` body. `AerosProgress` / `AerosStepper` — a 4px pill track. `AerosSnackbar` — an
+  elevated surface (`bgElevated` + overlay shadow) like the web toast; the tone colours the icon
+  and the message only. `AerosTheme.snackBarTheme` is no longer an inverse slab either.
+  `AerosTooltip` sets its inverse / 4px / caption look itself.
+- **Tabs**: underline = 1px baseline + 2px indicator, one row high; pill = a compact segmented
+  track one control high whose active segment is lifted with `AerosElevation.raised`.
+- **Breadcrumb, pagination, avatar**: breadcrumb links are real buttons; pagination buttons are
+  control-sized squares with chevrons; avatars carry a 1px border.
+- **Shell**: `AerosTopnav` is `bgSurface` with an `h4` title. Nav rows have 4px corners, hover is
+  the shared `stateHover` overlay, selected stays `bgSubtle` + `fgPrimary` w600. The sidenav header
+  and footer sit on `borderDefault` hairlines; an inline sidenav has a hairline on its trailing
+  edge; the drawer is square and flat.
+
+**Added**
+
+- `AerosSidenav(collapsed: true)` — the 56px icon rail (`AerosMetricTokens.layoutSidebarRail`):
+  labels become tooltips, group labels become hairlines, the header / footer keep the mark / avatar.
+  `onExpandRequested` fires when a parent row is tapped in the rail. `AerosScaffold` sizes the rail
+  from the sidenav and always shows the full sidenav in its drawer (`AerosSidenavExpanded`).
+- `AerosSidenavDensity.sizes`, `.density`, `.labelStyle()`.
+- `AerosCard.semanticLabel`; `AerosStatCard.deltaSemanticLabel` and
+  `AerosStatCard.directionLabel()` — the delta is announced with its direction in words ("up
+  +12.4%"); pass a localised sentence to override.
+- `AerosTag.expandHitTarget`, `AerosTag.removeSemanticLabel`.
+- `AerosSnackbar.show(description:)`.
+- `AerosAvatar.semanticLabel`, `AerosAvatarSize.dimension`.
+- `AerosPagination.previousLabel` / `nextLabel`; `AerosConstraintErrorAlert.dismissLabel`.
+- `AerosProgress.trackHeight`.
+
+**Fixed**
+
+- `AerosProgress` with a value threw "Progress bar value, minValue, and maxValue must be valid
+  numbers" in debug builds with semantics on (it passed "35%" as the value). It now reports a bare
+  0–100 number, and out-of-range values are clamped.
+- `AerosCountBadge` stretched to the full width inside a `Wrap` or a stretching `Column`; it now
+  shrink-wraps everywhere.
+- `AerosTabs` arrow keys follow the reading direction; chevrons in breadcrumb, pagination and the
+  intent card mirror in right-to-left.
+
+**Breaking — what an app has to change or re-check**
+
+- **`AerosCardVariant.raised` is deprecated and renders flat.** Remove `variant:`; nothing in a
+  resting layout carries a shadow. `AerosStatCard` lost its shadow too.
+- **`AerosStatCard`**: the label is a sentence-case `caption` (no longer upper-cased); the mono
+  value is `monoLg` (20px, was 26px).
+- **Sizes changed** — re-check tight layouts: badges / tags are 18 / 20 high; avatars are
+  20 / 24 / 32 / 40 / 56 (were 24 / 30 / 38 / 48 / 60); `AerosTopnav` is 48 / 56 by density (was 60)
+  and `AerosTopnav.height` is now nullable (null = the density's header height); `AerosIntentCard`
+  uses `h4` / `bodySm` and a 40px icon tile; `AerosEmptyState` has less vertical padding.
+- **Touch targets grow at touch density** (and with no `AerosDensityScope`): a removable `AerosTag`,
+  a tappable `AerosRoutingSignalBadge`, an `AerosEnumChips` chip, a breadcrumb link, the pagination
+  arrows and the alert's resolve / dismiss buttons occupy at least 48px, with the visual centred in
+  that box. Inside an `AerosDensityScope(density: pointer)` the minimum is 24px.
+  `AerosFilterChip.touchTargetHeight` is now 48 (was 44) and is a getter, not a `const`.
+- **A removable `AerosTag` is one button** announced as "Remove <label>" (was an unlabelled
+  gesture). A tappable `AerosCard` announces its content as one button — do not nest buttons in it.
+- **`AerosPageHeader`**: the default padding is horizontal only and the title row is at least one
+  header high (48 / 56), so it lines up with the sidenav header. Pass `padding:` to restore the old
+  16px vertical padding. The subtitle is `bodySm`.
+- **`AerosScaffold.sidenavBreakpoint` defaults to the `md` breakpoint (768, was 720)** and is
+  compared with the real viewport width — an `AerosViewportScope` wins over `MediaQuery`.
+  `sidenavWidth` defaults to `AerosMetricTokens.layoutSidebar`; the drawer is 280 wide.
+- **Sidenav blocks follow the ambient density**: `AerosSidenavHeader` / `AerosSidenavFooter` are
+  `AerosDensity.of(context).sizes.header` high — 48 inside a pointer `AerosDensityScope`, 56
+  otherwise. `kAerosSidenavBlockHeight` is deprecated and no longer a `const`.
+- **`AerosSidenavDensity`'s `rowHeight` / `iconSize` / `labelSize` are getters** over the `navRow` /
+  `navIcon` / `navLabel` tokens (same values); the enum constructor arguments are gone.
+- **Sidenav hover** is the `stateHover` overlay (was a half-step between the rail and the selected
+  fill). The footer action is an icon button sized by density (32 / 44).
+- **`AerosSnackbar`**: the action is a small secondary button inside the surface, not a
+  `SnackBarAction`; the message colour follows the tone.
+- **Material ink is gone** from every widget above: anything that looked for an `InkWell` /
+  `Material` inside them (tests, custom themes' `splashColor`) no longer finds one.
+
+### Overlays, the data table and the configurable-MTO widgets restyled — the package is now all on the foundation
+
+Every floating layer is built on five new primitives, the data table no longer wraps Material's, and the
+last widgets leave `InkWell`. Nothing in `lib` uses `InkWell`, `showDialog`, `showModalBottomSheet`,
+`showMenu`, `PopupMenuItem`, `DropdownButton` or `DataTable` any more.
+
+**Added — overlay primitives (all exported)**
+
+- `AerosDialog({title, description, content, actions, size, maxWidth, showClose, scrollable, contentPadding,
+  semanticLabel})` and `AerosDialog.show<T>(context, builder:, barrierDismissible:, useRootNavigator:)`.
+  `bgElevated` + the modal elevation + `shape.modal` corners over the `scrim` alias; a header (title,
+  description, close button), a body that scrolls, a footer with a top hairline and no fill.
+  `AerosDialogSize { sm, md, lg, xl }` is `layout.dialog*` (400 / 520 / 720 / 960), default `md`. Fades in
+  with a slight scale (`AerosMotion.base`; instantly under reduced motion), keeps focus inside, closes on
+  Escape and a scrim tap (neither with `barrierDismissible: false`), and is announced by its title.
+- `AerosSheet({title, description, content, actions, …})` and `AerosSheet.show<T>(context, builder:,
+  side: bottom | right | left, size: sm | md | lg)`. The same header / body / footer. A bottom sheet is full
+  width with a drag handle (drag down to dismiss); a side sheet is full height and `layout.drawer*` wide
+  (360 / 480 / 640).
+- `AerosPopover(trigger:, content:, controller:, side:, align:, matchAnchorWidth:, padding:, constraints:)`
+  and `AerosPopover.show<T>(context, builder:, anchorRect:, …)` — an anchored surface (`bgElevated`, the
+  overlay elevation, `shape.surface`) with any content. Opens below its anchor, flips when there is no
+  room, is clamped to the screen; Escape and an outside tap close it and focus returns to the trigger.
+  `AerosPopoverController` has `open()`, `close()`, `toggle()` and `isOpen`.
+- `AerosMenu(items:, trigger:, …)` and `AerosMenu.show<T>(context, items:, …)` with `AerosMenuItem<T>`
+  (`label`, `onSelected`, `value`, `leading`, `shortcut`, `enabled`, `destructive`),
+  `AerosMenuCheckboxItem`, `AerosMenuRadioItem<T>`, `AerosMenuSeparator` and `AerosMenuLabel`. 4px padding,
+  rows `shape.item` at control-sm height, one highlight shared by mouse and keyboard (the hover state
+  layer; the danger tint for a destructive row). Arrow keys, Home and End move (skipping disabled rows),
+  Enter / Space choose. Callbacks run after the menu has closed. `AerosMenuRow` and `AerosMenuList` are the
+  row and the list on their own; `AerosWholeRows` cuts a scrolling list of equal rows at a whole row.
+- `AerosSelect<T>({items, value, onChanged, placeholder, label, helper, error, enabled, required, size})`
+  with `AerosSelectItem<T>(value:, label:, leading:, detail:, enabled:)` — a field-styled trigger (the
+  shared field frame, so it is the same height as `AerosTextField`) that opens the options with the chosen
+  one checked. `AerosSelect.showOptions<T>(context, …)` opens the same list from any trigger.
+- `AerosPressable.hover(builder:)` — hover tracking only: no taps, no focus, no semantics.
+- `AerosFormField.labelGap` (default unchanged, 8); the field-like widgets use 6, like `AerosTextField`.
+- `AerosDataTable.emptyText` (default `'No data'`) and `rowSemanticLabel`; `AerosMeasurementInput.size`.
+
+**Breaking — what an app has to change or re-check**
+
+- **`AerosConfirmDialog`** is an `AerosDialog` (`size: sm`, 400 wide — was 440): elevated surface, 12px
+  corners, `h3` title, `bodySm` body, buttons in a footer under a hairline. `show(...)` is unchanged and
+  still returns `false` when dismissed.
+- **`AerosDropdownSearch`**: the trigger is a field frame (control `md` high — 32 pointer / 40 touch; it
+  was taller, and the same at both densities) and announces itself as a button. `mode: dialog` opens an `AerosDialog` (`md`, or
+  `dialogMaxWidth`; as tall as its list, capped by `maxHeight` — it was 70% × 60% of the screen),
+  `mode: sheet` an `AerosSheet`, `mode: menu` an anchored surface exactly as wide as the field. **The menu
+  presentation now honours `showSearchBox` and `onFind`** (it ignored both): pass `showSearchBox: false` to
+  keep a plain list. Its viewport ends on a whole row — the last visible row is no longer cut through its
+  text. The chosen option is marked with a check (was bold on a tint). `itemBuilder` rows are wrapped in the
+  shared menu row, which adds 8px horizontal padding and the highlight.
+- **`AerosDataTable`** no longer wraps Material `DataTable` (it is a `StatefulWidget` now; the constructor
+  is unchanged apart from the two additions above).
+  - Header and rows are the `row` token: 40 pointer / 48 touch (header was 44, rows 48–56). A row grows
+    with a taller cell.
+  - The header is plain — no fill — with `labelXs` muted labels; cells default to `bodySm` in `fgPrimary`
+    (was `bodyMd`), and **`numeric` columns are right-aligned in mono**. Cell padding is 12px.
+  - Hover tints a row with the state layer; a selected row takes `stateSelected`. Selection uses
+    `AerosCheckbox`, and the header checkbox is mixed when some rows are selected.
+  - Sortable headers are buttons with a caret, a focus ring and an announced sort state
+    (`"Order, sorted ascending"`). `AerosDataSort.columnIndex` still counts your columns.
+  - **Inside a bounded height the rows now scroll under a header that stays in place** (it used to
+    overflow). In an unbounded height it is as tall as its rows, as before.
+  - The empty state is plain centred text under the header, inside the one frame. If you pass
+    `emptyState: AerosEmptyState(...)` you get its dashed outline inside the frame again — pass plain
+    content, or `emptyText`.
+  - The loading veil is `bgSurface` at `opacity.muted` and no longer covers the `footer`.
+  - Screen readers: header cells are headers, each row checkbox is named for its row
+    (`rowSemanticLabel`), a tappable row is a button that reports `selected`. Flutter's table roles are not
+    used — they need a row / cell tree this layout does not have.
+- **`AerosEnumDropdown`** is an `AerosSelect`: same constructor, the options open in the menu surface, and a
+  disabled option shows its `disabledReason` at the end of its row.
+- **`AerosMeasurementInput`** is one field frame (the inner second border is gone) at control `md` height.
+  The unit is a button at the end of the field that opens the list of units — plain text when there is only
+  one. Disabled dims the whole field. Without `helperText`, the "Allowed: …" line still shows.
+- **`AerosRangeSlider` / `AerosNumericRangeBand`** keep Material's `Slider` / `RangeSlider` under one
+  token-driven theme: 2px track, 14px thumb (`bgSurface` with a `brandPrimary` hairline), no tick marks, no
+  halo; the slider's height is the density's minimum target (24 pointer / 48 touch). Keyboard focus draws
+  the focus ring around the thumb of `AerosRangeSlider`; Material's `RangeSlider` takes no keyboard focus,
+  so the band has none. Disabled dims the whole control.
+- **Mono amounts are 400 / 500 only.** The slider and band values and every `AerosPriceBreakdown` amount
+  no longer ask for w600 / w700 (IBM Plex Mono ships Regular and Medium). The breakdown's header total is
+  `monoLg` (20px) medium; the total row is a hairline above, no fill.
+- **`AerosPriceBreakdown`**, **`AerosRepeatingRows`** rows and the attached-file row of
+  **`AerosFileUploadButton`** are flat surfaces with 8px corners. The upload drop zone is a button (hover
+  tint, focus ring, Enter / Space) with a 1px dashed outline; "Replace" and "Remove" are `AerosButton`s.
+  The repeater's remove button is a neutral ghost icon button (was a red `IconButton`).
+- **`AerosVariantPicker`** chips are the `AerosEnumChips` chip (control `sm`, a hairline that stays 1px, a
+  check on the selected one); stock badges are `AerosBadge`s. Swatch tiles are 56px with a 2px `fgPrimary`
+  border when selected. Both are keyboard-focusable and announce `selected`.
+- **`AerosAttributeSelector`**: a locked BOOLEAN attribute now shows a disabled switch (it looked enabled
+  and ignored taps).
+- **`AerosHoverable`** with `onTap` is now a real button — focusable, Enter / Space, announced, with the
+  focus ring around what the builder returns. Without `onTap` it only tracks the pointer, as before.
+- **`AerosSearchField`**: Escape with an empty query is no longer swallowed, so it closes the dialog or
+  menu the field sits in.
+- **`AerosShadows`** is **removed** (the class and its `card` / `menu` / `dialog` /
+  `popover(bool isDark)` functions): use `AerosSurface(level: …)`, or `context.aerosElevation` for
+  the raw shadow lists.
+
+### Breaking
+
+- **`google_fonts` is no longer a dependency.** IBM Plex Mono (Regular 400 + Medium 500, SIL OFL — `assets/fonts/OFL-IBMPlexMono.txt`) is bundled as the `IBM Plex Mono` family, like Inter, so mono text needs no network on first paint and renders in widget/golden tests. **If your app imports `package:google_fonts` itself and was getting it transitively through this package, add `google_fonts` to your own `pubspec.yaml`.** To use the bundled face outside `AerosTypography`, write `TextStyle(fontFamily: 'IBM Plex Mono', package: 'aeros_design_system')`.
+- **Body text is weight 450** (`bodyLg` / `bodyMd` / `bodySm`), the brand text weight — it rendered at 400. `fontWeight` still reports `w400` (Flutter has no 450); the `wght` axis carries the 450. Expect body copy a touch sturdier and a hair wider.
+- **Tracking follows the tokens.** `AerosTypography` is now a thin wrapper over the generated scale (`tokens.json`), so the hand-written values that had drifted are gone: `h4` −0.16 → −0.13, `bodySm` 0.01 → 0.04, `labelSm` 0.01 → 0.03, `caption` 0.02 → 0.05. Sizes, line heights and the other weights are unchanged.
+- **Weights inside the widgets now render.** 36 `copyWith(fontWeight:)` calls on Inter styles in the widget layer changed nothing on screen (Inter is a variable font and the glyphs follow the pinned `wght` axis — see 2.3.0); they now go through `withWeight`. Visibly heavier, and slightly wider, than before: the active tab (`AerosTabs`, w600 vs w500 inactive), the current breadcrumb, field labels (`AerosEnumChips`, `AerosEnumDropdown`, `AerosDropdownSearch`, `AerosMeasurementInput`, `AerosRangeSlider`, `AerosNumericRangeBand`, `AerosVariantPicker`, `AerosFileUploadButton`, `AerosAttributeSelector`), field values (w500), `AerosDataTable` headings, pagination numbers, chip and variant labels, the selected option in `AerosDropdownSearch` (w700), `AerosStepper` / `AerosProgress` labels, `AerosStatCard` deltas, `AerosIntentCard` badges, `AerosPriceBreakdown` titles, step names and total, `AerosConstraintErrorAlert` titles and `AerosRoutingSignalBadge`. Re-check tight layouts and re-record your goldens.
+- Mono amounts that ask for w600/w700 (`AerosPriceBreakdown`, `AerosRangeSlider`, `AerosNumericRangeBand`) resolve to the heaviest bundled face, Medium (the engine may embolden it synthetically); through `google_fonts` each weight was a separate download.
+
+### Added
+
+- **`weight:` on every `AerosTypography` role** — `AerosTypography.bodySm(color: c, weight: FontWeight.w600)`. It moves the `wght` axis with `fontWeight` and keeps the optical size, exactly like `style.withWeight(...)` (still public). Never `copyWith(fontWeight:)` an Aeros sans style: it renders at the style's original weight.
+
+### Migration
+
+1. Using `GoogleFonts.*` in your app? Add `google_fonts` to your own dependencies.
+2. Replace `AerosTypography.x().copyWith(fontWeight: w)` with `AerosTypography.x(weight: w)` (or `.withWeight(w)`); keep other `copyWith` arguments in a `copyWith` before it.
+3. Re-record golden images: body weight, tracking, widget weights and mono glyphs all change.
+
+### Review fixes — modal headers, menus, disabled states, table emphasis
+
+Six rough edges from the 3.0 review. Two of them change what an app sees.
+
+- **`AerosDataTable` body text is now `fgSecondary`** (it was `fgPrimary`), as in the React table.
+  Mark the column a row is known by — a name, an order number — with the new
+  `AerosDataColumn(emphasis: true)`: its cells are `fgPrimary` at w500. `numeric` columns stay mono in
+  `fgPrimary`. `fgSecondary` on a row is 7.7:1 in light and 12.2:1 in dark (5.6:1 and 6.4:1 at worst,
+  on a selected row being pressed), so cells stay above WCAG AA. A cell that sets its own text style
+  is untouched; to keep a column in `fgPrimary`, mark it `emphasis: true` or style the cell's text.
+  `AerosDataColumn.cellStyle(aliases)` returns the style a column's cells get.
+- **`AerosEnumChips` has a disabled state**: `enabled: false`, or a null `onChanged`, dims the group to
+  `AerosMetricTokens.opacityDisabled`; the chips take no hover, no keyboard focus, and are announced
+  as disabled. A group you passed a null `onChanged` to as "read only" is now dimmed.
+  `AerosAttributeSelector` uses it for an attribute that is `lockedByAdmin`.
+- `AerosDialog` / `AerosSheet`: at touch density the close button keeps its 48dp target but no longer
+  makes the header taller — a title-only header is 60 high (was 72), and a header with a description
+  is the same height as at pointer density.
+- `AerosMenu`, `AerosSelect`, `AerosDropdownSearch` (menu): a list too long for the screen keeps the
+  panel's 4px padding above the first row and below the last at every scroll offset; rows are clipped
+  at the padding, not at the edge of the surface.
+- `AerosRangeSlider` / `AerosNumericRangeBand`: a disabled slider dims its value readout with the
+  track and thumb.
+- `AerosVariantPicker` swatches, and the colour dot in a variant or enum chip, have a `borderStrong`
+  hairline (was `borderDefault`), so a dark sample keeps an edge in dark mode. A hovered swatch's
+  hairline is `fgMuted`.
+
+### Removals — the tokens the restyle replaced
+
+- **`AerosRadii.xl2` / `xl3` / `xl4`** and **`brXl2` / `brXl3` / `brXl4`** are removed (the token
+  scale now ends at `xl` = 12). Use `AerosShapeTokens` (`item`, `control`, `surface`, `modal`,
+  `pill`).
+- **`AerosMotion.emphasized` / `decelerate` / `entrance` / `spring`** are removed. Use
+  `AerosMotion.standard`, and the new `AerosMotion.enter` / `exit` for overlays (`enter` has the
+  value `entrance` had).
+- **`AerosAliasColors.focusRingOffset`** is removed — the focus ring has a transparent offset.
+- **`AerosShadows`** is removed (see above).
+
+### API gaps closed before release
+
+What building the example gallery showed was missing. All additive, except where "changes" is
+written.
+
+- **`AerosPageHeader` fits its width.** The actions sit beside the title while the title block
+  fits whole or keeps a readable measure (240), and move to a wrapping row under it when it cannot
+  — no page has to move them itself. Changes: the title is cut after two lines and the subtitle
+  after three (they wrapped without limit); a long breadcrumb trail scrolls sideways; the trail
+  has 6px more air above the title.
+- **`AerosPagination` numbered fits its width.** It shows up to `maxVisiblePages` numbers and
+  fewer when they do not fit — first, last, current and the "…" always stay — and the compact form
+  ("6 / 12") when even those do not. Give it a bounded width: in a `Row`, wrap it in `Flexible` /
+  `Expanded`. The numbered variant reads its constraints, so it cannot be measured by
+  `IntrinsicWidth` / `IntrinsicHeight`.
+- **`AerosTabs`.** Underline tabs scroll sideways when they do not fit, fade at a clipped edge and
+  bring the active tab into view (first build and on selection change). Pill segments that do not
+  fit share the width equally and truncate. Arrow keys now move the focus with the selection, and
+  Home / End select the first / last tab. Changes: an underline strip now fills the width it is
+  given even under loose constraints (the baseline runs edge to edge); in a `Row` give it an
+  `Expanded`.
+- **`AerosScaffold.of(context)` / `maybeOf`** return the new `AerosScaffoldState`: `hasSidenav`,
+  `isSidenavInline`, `isSidenavInDrawer`, `isDrawerOpen`, `openDrawer()`, `closeDrawer()`,
+  `toggleDrawer()`, `isRailCollapsed`, `canToggleRail`, `toggleRail()`. From above the scaffold use
+  a `GlobalKey<AerosScaffoldState>`. New `AerosScaffold.onDrawerChanged` and
+  `onRailCollapsedChanged`. **The app still owns the rail** (`AerosSidenav.collapsed`);
+  `toggleRail()` only asks for the change through `onRailCollapsedChanged`.
+- **`AerosTopnav` shows the sidenav's button itself.** Changes: inside an `AerosScaffold`, with no
+  `leading`, the bar now shows a menu button ("Open navigation") while the sidenav is in a drawer,
+  and a collapse / expand button when the scaffold has `onRailCollapsedChanged`. Remove your own
+  menu button, or pass `automaticallyImplyLeading: false`. Labels: `openNavigationLabel`,
+  `collapseSidebarLabel`, `expandSidebarLabel`.
+- **`AerosSidenavHeader.custom(child:, onTap:, semanticLabel:)`** — the header block around any
+  widget (a wordmark, a logo). **`AerosSidenavScope.of(context)`** (`collapsed`, `density`) tells a
+  custom header or footer whether the sidenav is the icon rail. `AerosSidenavHeader.title` is now
+  `String?` (null for `.custom`).
+- **`AerosButton`**: `.primary` / `.secondary` / `.ghost` / `.danger` take every option of the
+  default constructor (`leading`, `trailing`, `size`, `loading`, `fullWidth`, `semanticLabel`);
+  new `.dangerSubtle` and `.link`; new `semanticLabel` on the default constructor (announced in
+  place of the visible label).
+- **`AerosResponsiveGrid.auto`** — equal-width tiles that take the height of their content, each
+  row as tall as its tallest tile; `equalHeights: true` stretches a row's tiles. The default
+  constructor is unchanged.
+- **Field naming.** `AerosSelect` takes `helperText` / `errorText`; `helper` / `error` still work
+  and are deprecated. `AerosDropdownSearch` gains `helperText` / `errorText` (danger frame
+  included). `AerosFormField` gains `expand` (false hugs its content). `AerosEnumChips` and the
+  attribute switch row now draw their label / message through `AerosFormField` — no pixel changes.
+- **`AerosPriceBreakdown` groups its amounts** — changes: `₹6675.00` is now `₹6,675.00`, Indian
+  grouping for the rupee (`₹12,34,567.00`), thousands otherwise. `formatAmount:` replaces it. The
+  formatter is public: `AerosAmountFormat.group` / `.money`, `AerosDigitGrouping`.
+- **Small visual fixes** (re-record goldens): `AerosStatCard`'s value block is one `h1` line high
+  for `mono` too, so the delta lines of a row are level (a mono card is 4px taller);
+  `AerosVariantPicker` swatches and their names are start-aligned, flush with the label (were
+  inset 8px); `AerosRepeatingRows`' Add button has a plus and starts on the rows' leading edge.
+
 ## 2.5.0 — 2026-10-09 (wordmark + pulse orb)
 
 ### Changed

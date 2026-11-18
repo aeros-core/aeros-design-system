@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
+import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 
+/// A progress bar: a 4px pill track with a `brandPrimary` fill, and an
+/// optional label row above it.
+///
+/// With a [value] it is announced as a progress bar with a numeric value
+/// (0–100) and the [label]; without one it is an indeterminate, looping bar.
 class AerosProgress extends StatelessWidget {
   const AerosProgress({
     super.key,
@@ -17,35 +24,51 @@ class AerosProgress extends StatelessWidget {
   /// Fill colour. Defaults to the theme brand colour so it inverts in dark mode.
   final Color? color;
 
+  /// Track height: the 4px spacing step.
+  static const double trackHeight = AerosSpacing.s1;
+
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
     final fill = color ?? a.brandPrimary;
+    final clamped = value?.clamp(0.0, 1.0).toDouble();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
         if (label != null) ...[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(label!, style: AerosTypography.caption(color: a.fgSecondary).copyWith(fontWeight: FontWeight.w600)),
-              if (value != null)
-                Text('${(value! * 100).round()}%', style: AerosTypography.monoSm(color: a.fgMuted)),
-            ],
+          // The bar itself announces the label and the value.
+          ExcludeSemantics(
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    label!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AerosTypography.labelSm(color: a.fgSecondary),
+                  ),
+                ),
+                if (clamped != null) ...[
+                  const SizedBox(width: AerosSpacing.s2),
+                  Text('${(clamped * 100).round()}%', style: AerosTypography.monoSm(color: a.fgMuted)),
+                ],
+              ],
+            ),
           ),
-          const SizedBox(height: 7),
+          const SizedBox(height: AerosSpacing.s1_5),
         ],
-        ClipRRect(
-          borderRadius: BorderRadius.circular(999),
-          child: LinearProgressIndicator(
-            value: value?.clamp(0, 1),
-            minHeight: 6,
-            backgroundColor: a.borderDefault,
-            valueColor: AlwaysStoppedAnimation(fill),
-            semanticsLabel: label,
-            semanticsValue: value != null ? '${(value! * 100).round()}%' : null,
-          ),
+        // No `semanticsValue`: the indicator then reports the rounded
+        // percentage as a bare number between its min (0) and max (100),
+        // which is what a progress bar's semantics must be. A string like
+        // "35%" there fails Flutter's semantics check in debug builds.
+        LinearProgressIndicator(
+          value: clamped,
+          minHeight: trackHeight,
+          borderRadius: const BorderRadius.all(Radius.circular(AerosShapeTokens.pill)),
+          backgroundColor: a.borderDefault,
+          valueColor: AlwaysStoppedAnimation(fill),
+          semanticsLabel: label,
         ),
       ],
     );

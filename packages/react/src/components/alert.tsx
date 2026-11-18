@@ -6,7 +6,7 @@ import { cn } from "../lib/cn";
 // Body copy uses the `-text` shade (WCAG 4.5:1 on the tinted bg); only the
 // icon may use the brighter base color (3:1 non-text minimum).
 const alertVariants = cva(
-  "flex gap-3 rounded-lg border px-4 py-3.5",
+  "flex gap-2.5 rounded-surface border px-3 py-2.5",
   {
     variants: {
       variant: {
@@ -35,24 +35,24 @@ export interface AlertProps
 }
 
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
-  ({ className, variant = "info", title, icon, role, children, ...props }, ref) => {
+  ({ className, variant = "info", title, icon, children, ...props }, ref) => {
     const Icon = iconMap[variant!];
     return (
       <div
         ref={ref}
         // Only danger interrupts assistive tech; everything else is a polite
-        // status region. Pass role explicitly to override (e.g. role={undefined}
-        // for purely static content).
-        role={role !== undefined ? role : variant === "danger" ? "alert" : "status"}
+        // status region. A `role` prop overrides this — including
+        // role={undefined} for purely static content, because props spread last.
+        role={variant === "danger" ? "alert" : "status"}
         className={cn(alertVariants({ variant }), className)}
         {...props}
       >
-        <div className="aeros-alert-icon shrink-0 mt-0.5">
-          {icon ?? <Icon className="h-[18px] w-[18px]" />}
+        <div className="aeros-alert-icon mt-0.5 shrink-0">
+          {icon ?? <Icon className="size-icon-md" />}
         </div>
         <div className="flex-1 min-w-0">
-          {title && <div className="text-[13px] font-bold mb-0.5">{title}</div>}
-          <div className="text-xs leading-relaxed">{children}</div>
+          {title && <div className="text-label-sm">{title}</div>}
+          <div className="text-body-sm">{children}</div>
         </div>
       </div>
     );

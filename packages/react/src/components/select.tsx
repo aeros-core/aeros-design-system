@@ -3,25 +3,24 @@ import * as React from "react";
 import * as RS from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "../lib/cn";
+import {
+  fieldBase,
+  fieldSize,
+  fieldState,
+  menuItem,
+  menuItemState,
+  menuLabel,
+  menuPanel,
+  menuSeparator,
+  type FieldState
+} from "../internal/recipes";
 import { useFieldControl, type FieldControlSize } from "./input";
 
 export const Select: typeof RS.Root = RS.Root;
 export const SelectValue: typeof RS.Value = RS.Value;
 export const SelectGroup: typeof RS.Group = RS.Group;
 
-type TriggerState = "default" | "error" | "success";
-
-const triggerSizeClasses: Record<FieldControlSize, string> = {
-  sm: "h-8 px-3 text-[13px]",
-  md: "h-9 px-3.5 text-sm",
-  lg: "h-10 px-4 text-sm"
-};
-
-const triggerStateClasses: Record<TriggerState, string> = {
-  default: "border-border-default hover:border-border-strong focus:border-border-focus focus:shadow-focus",
-  error:   "border-danger focus:shadow-focus-danger",
-  success: "border-success focus:shadow-focus-success"
-};
+type TriggerState = FieldState;
 
 export const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof RS.Trigger>,
@@ -34,20 +33,13 @@ export const SelectTrigger = React.forwardRef<
   return (
     <RS.Trigger
       ref={ref}
-      className={cn(
-        "flex w-full items-center justify-between rounded-md border bg-bg-surface font-medium text-fg-primary",
-        triggerSizeClasses[size],
-        "transition-[border-color,box-shadow] duration-(--aeros-duration-fast)",
-        "focus:outline-none data-[placeholder]:text-fg-muted disabled:opacity-40 disabled:cursor-not-allowed",
-        triggerStateClasses[resolvedState],
-        className
-      )}
+      className={cn(fieldBase, "flex items-center justify-between gap-2 text-left", fieldSize[size], fieldState[resolvedState], className)}
       {...props}
       {...fieldProps}
     >
       {children}
       <RS.Icon asChild>
-        <ChevronDown className="h-4 w-4 text-fg-muted" />
+        <ChevronDown className="size-icon-md shrink-0 text-fg-muted" />
       </RS.Icon>
     </RS.Trigger>
   );
@@ -92,10 +84,10 @@ export const SelectContent = React.forwardRef<
       position={position}
       sideOffset={4}
       className={cn(
-        "z-(--aeros-z-popover) min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-lg border border-border-default bg-bg-elevated p-1.5 shadow-lg",
+        menuPanel,
+        "min-w-(--radix-select-trigger-width)",
         // Long lists must scroll inside the viewport instead of overflowing it.
         "max-h-[min(var(--radix-select-content-available-height),24rem)]",
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-1 data-[side=top]:slide-in-from-bottom-1 data-[state=open]:duration-(--aeros-duration-fast) data-[state=open]:ease-(--aeros-ease-entrance)",
         className
       )}
       {...props}
@@ -114,7 +106,7 @@ export const SelectLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <RS.Label
     ref={ref}
-    className={cn("px-2.5 pt-1.5 pb-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-fg-muted", className)}
+    className={cn(menuLabel, className)}
     {...props}
   />
 ));
@@ -126,20 +118,16 @@ export const SelectItem = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <RS.Item
     ref={ref}
-    className={cn(
-      "relative flex cursor-pointer select-none items-center rounded-md py-2 pl-8 pr-2.5 text-sm font-medium text-fg-secondary",
-      "focus:bg-bg-subtle focus:text-fg-primary focus:outline-none data-[state=checked]:text-fg-primary data-[state=checked]:font-semibold",
-      "data-[disabled]:pointer-events-none data-[disabled]:opacity-40",
-      className
-    )}
+    className={cn(menuItem, menuItemState.radix, "pr-8", className)}
     {...props}
   >
-    <span className="absolute left-2 flex h-4 w-4 items-center justify-center">
+    <RS.ItemText>{children}</RS.ItemText>
+    {/* The check trails the label, so labels line up with the trigger's text. */}
+    <span className="absolute right-2 flex size-icon-md items-center justify-center">
       <RS.ItemIndicator>
-        <Check className="h-3.5 w-3.5" />
+        <Check className="text-fg-primary" />
       </RS.ItemIndicator>
     </span>
-    <RS.ItemText>{children}</RS.ItemText>
   </RS.Item>
 ));
 SelectItem.displayName = "SelectItem";
@@ -148,6 +136,6 @@ export const SelectSeparator = React.forwardRef<
   React.ElementRef<typeof RS.Separator>,
   React.ComponentPropsWithoutRef<typeof RS.Separator>
 >(({ className, ...props }, ref) => (
-  <RS.Separator ref={ref} className={cn("my-1 h-px bg-border-default", className)} {...props} />
+  <RS.Separator ref={ref} className={cn(menuSeparator, className)} {...props} />
 ));
 SelectSeparator.displayName = "SelectSeparator";

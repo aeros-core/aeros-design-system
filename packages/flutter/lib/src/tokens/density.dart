@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import 'aeros_theme_tokens.g.dart';
 import 'typography.dart';
 
 /// How tightly a surface packs its content, by the pointer that will use it.
@@ -45,7 +46,7 @@ enum AerosDensity {
     badgeHeight: 20,
     titleSize: 16,
     titleHeight: 1.25,
-    bodyHeight: 1.45,
+    bodyHeight: 1.4,
     metaHeight: 1.3,
     labelSize: 13,
   );
@@ -106,6 +107,10 @@ enum AerosDensity {
   /// Whether a precise pointer is assumed (the mouse sizes).
   bool get isPointer => this == AerosDensity.pointer;
 
+  /// The generated size tokens for this density (`size` in tokens.json):
+  /// control heights, header, row, icon button and the minimum hit target.
+  AerosSizeTokens get sizes => isPointer ? AerosSizeTokens.pointer : AerosSizeTokens.touch;
+
   // ─── The density type ramp ───
   //
   // Weights go through `withWeight`: every Aeros style pins Inter's `wght` axis, so a plain
@@ -115,7 +120,7 @@ enum AerosDensity {
   TextStyle titleStyle({Color? color, FontWeight weight = FontWeight.w600}) =>
       AerosTypography.bodyLg(color: color).copyWith(fontSize: _titleSize, height: _titleHeight).withWeight(weight);
 
-  /// Reading text — a message, a description: 14px, line height 1.4 (pointer) or 1.45 (touch).
+  /// Reading text — a message, a description: 14px, line height 1.4.
   TextStyle bodyStyle({Color? color, FontWeight weight = FontWeight.w400}) =>
       AerosTypography.bodyMd(color: color).copyWith(height: _bodyHeight).withWeight(weight);
 

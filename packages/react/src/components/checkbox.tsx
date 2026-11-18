@@ -3,6 +3,7 @@ import * as React from "react";
 import * as RC from "@radix-ui/react-checkbox";
 import { Check, Minus } from "lucide-react";
 import { cn } from "../lib/cn";
+import { colorTransition } from "../internal/recipes";
 
 export const Checkbox = React.forwardRef<
   React.ElementRef<typeof RC.Root>,
@@ -11,21 +12,20 @@ export const Checkbox = React.forwardRef<
   <RC.Root
     ref={ref}
     className={cn(
-      "group peer h-[18px] w-[18px] shrink-0 rounded-[5px] border-[1.5px] border-border-strong bg-bg-surface",
-      "transition-colors duration-(--aeros-duration-fast)",
-      "hover:border-border-focus",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas",
-      "data-[state=checked]:bg-brand-primary data-[state=checked]:border-brand-primary data-[state=checked]:text-fg-inverse",
-      "data-[state=indeterminate]:bg-brand-primary data-[state=indeterminate]:border-brand-primary data-[state=indeterminate]:text-fg-inverse",
-      "disabled:opacity-40 disabled:cursor-not-allowed",
+      "group peer size-4 shrink-0 rounded-item border border-border-strong bg-bg-surface text-fg-inverse",
+      colorTransition,
+      "hover:border-fg-muted",
+      "data-[state=checked]:border-brand-primary data-[state=checked]:bg-brand-primary",
+      "data-[state=indeterminate]:border-brand-primary data-[state=indeterminate]:bg-brand-primary",
+      "disabled:cursor-not-allowed disabled:opacity-disabled",
       className
     )}
     {...props}
   >
     {/* Icon choice is driven by data-state so uncontrolled indeterminate works too. */}
     <RC.Indicator className="flex items-center justify-center text-current">
-      <Check className="h-3 w-3 group-data-[state=indeterminate]:hidden" strokeWidth={3} />
-      <Minus className="hidden h-3 w-3 group-data-[state=indeterminate]:block" />
+      <Check className="size-icon-xs group-data-[state=indeterminate]:hidden" strokeWidth={3} />
+      <Minus className="hidden size-icon-xs group-data-[state=indeterminate]:block" strokeWidth={3} />
     </RC.Indicator>
   </RC.Root>
 ));

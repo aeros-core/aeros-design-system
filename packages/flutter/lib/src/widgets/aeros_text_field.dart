@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../foundation/aeros_control_size.dart';
+import '../foundation/aeros_field_frame.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
+import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
-import 'aeros_field_size.dart';
 
-class AerosTextField extends StatelessWidget {
+/// A text input in the shared field frame ([AerosFieldFrame]): `bgSurface`
+/// fill, a 1px `borderStrong` hairline that stays 1px, the control radius and
+/// the focus ring. An error turns the border, the ring and the message to the
+/// theme's danger colours; a disabled field dims as a whole.
+class AerosTextField extends StatefulWidget {
   const AerosTextField({
     super.key,
     this.label,
@@ -24,7 +29,7 @@ class AerosTextField extends StatelessWidget {
     this.maxLines = 1,
     this.textInputAction,
     this.onSubmitted,
-    this.size = AerosFieldSize.md,
+    this.size = AerosControlSize.md,
     this.autocorrect = true,
     this.enableSuggestions = true,
     this.focusNode,
@@ -41,8 +46,7 @@ class AerosTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final bool obscureText;
 
-  /// Inline leading widget (usually an [Icon]). Rendered snug against the text —
-  /// NOT boxed to Material's 48px `prefixIcon` slot.
+  /// Inline leading widget (usually an [Icon]). Rendered snug against the text.
   final Widget? prefix;
 
   /// Inline trailing widget (usually an [Icon] or a small button).
@@ -55,8 +59,8 @@ class AerosTextField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final ValueChanged<String>? onSubmitted;
 
-  /// Control size — snaps the field onto the [AerosButton] height/radius ladder.
-  final AerosFieldSize size;
+  /// Control size — the same ladder, and so the same height, as [AerosButton].
+  final AerosControlSize size;
   final bool autocorrect;
   final bool enableSuggestions;
   final FocusNode? focusNode;
@@ -65,79 +69,129 @@ class AerosTextField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
 
   @override
+  State<AerosTextField> createState() => _AerosTextFieldState();
+}
+
+class _AerosTextFieldState extends State<AerosTextField> {
+  FocusNode? _internalFocus;
+  bool _focused = false;
+
+  FocusNode get _focus => widget.focusNode ?? (_internalFocus ??= FocusNode());
+
+  @override
+  void initState() {
+    super.initState();
+    _focus.addListener(_onFocus);
+  }
+
+  @override
+  void didUpdateWidget(covariant AerosTextField old) {
+    super.didUpdateWidget(old);
+    if (old.focusNode != widget.focusNode) {
+      (old.focusNode ?? _internalFocus)?.removeListener(_onFocus);
+      _focus.addListener(_onFocus);
+      _onFocus();
+    }
+  }
+
+  @override
+  void dispose() {
+    (widget.focusNode ?? _internalFocus)?.removeListener(_onFocus);
+    _internalFocus?.dispose();
+    super.dispose();
+  }
+
+  void _onFocus() {
+    if (_focus.hasFocus != _focused) setState(() => _focused = _focus.hasFocus);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
+    final semantic = context.aerosSemantic;
+    final size = widget.size;
+    final hasError = widget.errorText != null && widget.errorText!.isNotEmpty;
+    final hasHelper = !hasError && widget.helperText != null && widget.helperText!.isNotEmpty;
+    final multiline = !widget.obscureText && ((widget.maxLines ?? 2) > 1 || (widget.minLines ?? 1) > 1);
 
-    // A snug affix box: kill Material's 48px prefix/suffix slot so an icon sits
-    // tight against the text and no longer inflates the field height.
-    final affixConstraints = BoxConstraints(
-      minWidth: size.padH + size.iconSize + 8,
-      minHeight: 0,
-    );
-
-    OutlineInputBorder border(Color color, {double width = 1}) =>
-        OutlineInputBorder(
-          borderRadius: size.radius,
-          borderSide: BorderSide(color: color, width: width),
+    Widget affix(Widget child) => IconTheme.merge(
+          data: IconThemeData(color: a.fgMuted, size: size.iconSize),
+          child: child,
         );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        if (label != null) ...[
+        if (widget.label != null) ...[
           RichText(
             text: TextSpan(
-              text: label!,
+              text: widget.label!,
               style: AerosTypography.labelSm(color: a.fgSecondary),
               children: [
-                if (required)
-                  const TextSpan(
-                      text: ' *', style: TextStyle(color: AerosColors.danger)),
+                if (widget.required) TextSpan(text: ' *', style: TextStyle(color: semantic.danger)),
               ],
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AerosSpacing.s1_5),
         ],
-        TextField(
-          controller: controller,
-          focusNode: focusNode,
-          autofocus: autofocus,
-          onChanged: onChanged,
-          onSubmitted: onSubmitted,
-          obscureText: obscureText,
-          enabled: enabled,
-          keyboardType: keyboardType,
-          minLines: minLines,
-          maxLines: obscureText ? 1 : maxLines,
-          textInputAction: textInputAction,
-          autocorrect: autocorrect,
-          enableSuggestions: enableSuggestions,
-          textCapitalization: textCapitalization,
-          inputFormatters: inputFormatters,
-          style: size.valueStyle(color: a.fgPrimary),
-          decoration: InputDecoration(
-            isDense: true,
-            filled: true,
-            fillColor: enabled ? a.bgSurface : a.bgSubtle,
-            hintText: hint,
-            hintStyle: size.valueStyle(color: a.fgMuted),
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: size.padH, vertical: size.padV),
-            prefixIcon: prefix,
-            suffixIcon: suffix,
-            prefixIconConstraints: affixConstraints,
-            suffixIconConstraints: affixConstraints,
-            errorText: errorText,
-            helperText: helperText,
-            hintMaxLines: 1,
-            border: border(a.borderDefault),
-            enabledBorder: border(a.borderDefault),
-            focusedBorder: border(a.brandPrimary, width: 1.5),
-            disabledBorder: border(a.borderSubtle),
-            errorBorder: border(AerosColors.danger),
-            focusedErrorBorder: border(AerosColors.danger, width: 1.5),
+        AerosFieldFrame(
+          size: size,
+          focused: _focused,
+          hasError: hasError,
+          enabled: widget.enabled,
+          // A multi-line field needs its own breathing room; a single line is
+          // centred in the control height.
+          padding: EdgeInsets.symmetric(
+            horizontal: size.padH,
+            vertical: multiline ? AerosSpacing.s2 : AerosSpacing.s0,
+          ),
+          onTap: _focus.requestFocus,
+          child: Row(
+            children: [
+              if (widget.prefix != null) ...[
+                affix(widget.prefix!),
+                SizedBox(width: size.gap),
+              ],
+              Expanded(
+                child: TextField(
+                  controller: widget.controller,
+                  focusNode: _focus,
+                  autofocus: widget.autofocus,
+                  onChanged: widget.onChanged,
+                  onSubmitted: widget.onSubmitted,
+                  obscureText: widget.obscureText,
+                  enabled: widget.enabled,
+                  keyboardType: widget.keyboardType,
+                  minLines: widget.minLines,
+                  maxLines: widget.obscureText ? 1 : widget.maxLines,
+                  textInputAction: widget.textInputAction,
+                  autocorrect: widget.autocorrect,
+                  enableSuggestions: widget.enableSuggestions,
+                  textCapitalization: widget.textCapitalization,
+                  inputFormatters: widget.inputFormatters,
+                  style: size.valueStyle(color: a.fgPrimary),
+                  cursorColor: a.fgPrimary,
+                  decoration: AerosFieldFrame.bareDecoration(
+                    hintText: widget.hint,
+                    hintStyle: size.valueStyle(color: a.fgMuted),
+                  ),
+                ),
+              ),
+              if (widget.suffix != null) ...[
+                SizedBox(width: size.gap),
+                affix(widget.suffix!),
+              ],
+            ],
           ),
         ),
+        if (hasError) ...[
+          const SizedBox(height: AerosSpacing.s1),
+          Text(widget.errorText!, style: AerosTypography.caption(color: semantic.dangerText)),
+        ] else if (hasHelper) ...[
+          const SizedBox(height: AerosSpacing.s1),
+          Text(widget.helperText!, style: AerosTypography.caption(color: a.fgMuted)),
+        ],
       ],
     );
   }

@@ -12,18 +12,20 @@ void main() {
         home: Scaffold(body: Center(child: AerosDensityScope(density: density, child: chip))),
       ));
 
-  Finder pill() => find.descendant(of: find.byType(AerosFilterChip), matching: find.byType(Material)).first;
+  // The painted pill (the hit target around it may be larger).
+  Finder pill() => find.descendant(of: find.byType(AerosFilterChip), matching: find.byType(AerosStateFill)).first;
 
   testWidgets('the pill is 28px at pointer', (tester) async {
     await pump(tester, AerosFilterChip(label: 'All', onTap: () {}));
-    expect(tester.getSize(pill()).height, 28);
-    expect(tester.getSize(find.byType(AerosFilterChip)).height, 28);
+    expect(tester.getSize(pill()).height, AerosDensity.pointer.controlHeight);
+    expect(tester.getSize(find.byType(AerosFilterChip)).height, AerosDensity.pointer.controlHeight);
   });
 
-  testWidgets('at touch the pill is 32px but the tap target is 44px', (tester) async {
+  testWidgets('at touch the pill is 32px but the tap target is the touch minimum target', (tester) async {
     var taps = 0;
     await pump(tester, AerosFilterChip(label: 'All', onTap: () => taps++), density: AerosDensity.touch);
-    expect(tester.getSize(pill()).height, 32);
+    expect(tester.getSize(pill()).height, AerosDensity.touch.controlHeight);
+    expect(AerosFilterChip.touchTargetHeight, AerosSizeTokens.touch.minTarget);
     expect(tester.getSize(find.byType(AerosFilterChip)).height, AerosFilterChip.touchTargetHeight);
 
     // A tap in the transparent band above the pill still counts.
@@ -35,11 +37,11 @@ void main() {
   testWidgets('selected weight actually renders heavier (wght axis), and fills brandPrimary', (tester) async {
     await pump(tester, AerosFilterChip(label: 'Mine', onTap: () {}));
     expect(wght(tester, 'Mine'), 500);
-    expect(tester.widget<Material>(pill()).color, AerosAliasColors.light.bgSubtle);
+    expect(tester.widget<AerosStateFill>(pill()).color, AerosAliasColors.light.bgSubtle);
 
     await pump(tester, AerosFilterChip(label: 'Mine', selected: true, onTap: () {}));
     expect(wght(tester, 'Mine'), 600);
-    expect(tester.widget<Material>(pill()).color, AerosAliasColors.light.brandPrimary);
+    expect(tester.widget<AerosStateFill>(pill()).color, AerosAliasColors.light.brandPrimary);
   });
 
   testWidgets('counts: plain, floor and the 99+ cap', (tester) async {
@@ -64,7 +66,7 @@ void main() {
     );
     expect(find.byIcon(Icons.expand_more_rounded), findsOneWidget);
     expect(find.byIcon(Icons.flag_rounded), findsOneWidget);
-    expect(tester.widget<Material>(pill()).color, AerosSemanticColors.resolve(false).warningBg);
+    expect(tester.widget<AerosStateFill>(pill()).color, AerosSemanticColors.resolve(false).warningBg);
   });
 
   testWidgets('the clear ✕ shows only while selected, and clears without tapping the chip', (tester) async {
@@ -101,6 +103,9 @@ void main() {
         isSelected: true,
         hasSelectedState: true,
         isFocusable: true,
+        // AerosPressable always reports whether the control is enabled.
+        hasEnabledState: true,
+        isEnabled: true,
         hasTapAction: true,
         hasFocusAction: true,
       ),

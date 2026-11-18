@@ -7,15 +7,25 @@ export 'src/tokens/colors.dart';
 export 'src/tokens/typography.dart';
 export 'src/tokens/spacing.dart';
 export 'src/tokens/radii.dart';
-export 'src/tokens/shadows.dart';
 export 'src/tokens/motion.dart';
 export 'src/tokens/states.dart';
 export 'src/tokens/breakpoints.dart';
 export 'src/tokens/aeros_viewport_scope.dart';
 export 'src/tokens/density.dart';
+// Generated token classes the foundation layer is built on.
+export 'src/tokens/aeros_theme_tokens.g.dart'
+    show AerosElevation, AerosSizeTokens, AerosShapeTokens, AerosMetricTokens;
 
 export 'src/theme/aeros_theme.dart';
 export 'src/theme/aeros_theme_extension.dart';
+
+// Foundation — the primitives every control is built on.
+export 'src/foundation/aeros_control_size.dart';
+export 'src/foundation/aeros_pressable.dart';
+export 'src/foundation/aeros_state_layer.dart';
+export 'src/foundation/aeros_focus_ring.dart';
+export 'src/foundation/aeros_surface.dart';
+export 'src/foundation/aeros_field_frame.dart';
 
 export 'src/widgets/aeros_button.dart';
 export 'src/widgets/aeros_field_size.dart';
@@ -48,6 +58,12 @@ export 'src/widgets/aeros_dropdown_search.dart';
 export 'src/widgets/aeros_form_field.dart';
 export 'src/widgets/aeros_repeating_rows.dart';
 export 'src/widgets/aeros_page_header.dart';
+// Overlays — every floating layer is built on these.
+export 'src/widgets/aeros_popover.dart';
+export 'src/widgets/aeros_menu.dart';
+export 'src/widgets/aeros_select.dart';
+export 'src/widgets/aeros_dialog.dart';
+export 'src/widgets/aeros_sheet.dart';
 export 'src/widgets/aeros_confirm_dialog.dart';
 export 'src/widgets/aeros_data_table.dart';
 export 'src/widgets/aeros_wordmark.dart';
@@ -70,5 +86,6 @@ export 'src/widgets/aeros_measurement_input.dart';
 export 'src/widgets/aeros_file_upload_button.dart';
 export 'src/widgets/aeros_variant_picker.dart';
 export 'src/widgets/aeros_price_breakdown.dart';
+export 'src/widgets/aeros_amount_format.dart';
 export 'src/widgets/aeros_routing_signal_badge.dart';
 export 'src/widgets/aeros_constraint_error_alert.dart';

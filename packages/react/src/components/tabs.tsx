@@ -30,7 +30,7 @@ export const TabsList = React.forwardRef<
       className={cn(
         variant === "underline"
           ? "flex border-b border-border-default"
-          : "inline-flex gap-[3px] rounded-lg border border-border-default bg-bg-subtle p-1",
+          : "inline-flex gap-0.5 rounded-control bg-bg-inset p-0.5",
         className
       )}
       {...props}
@@ -48,11 +48,11 @@ export const TabsTrigger = React.forwardRef<
     <RT.Trigger
       ref={ref}
       className={cn(
-        "text-sm font-medium text-fg-muted transition-colors duration-(--aeros-duration-fast) whitespace-nowrap rounded-sm",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas",
+        "whitespace-nowrap text-label-sm text-fg-muted transition-colors duration-fast ease-standard",
+        "",
         variant === "underline"
-          ? "px-4 py-2.5 border-b-2 border-transparent -mb-px hover:text-fg-primary data-[state=active]:text-fg-primary data-[state=active]:border-fg-primary data-[state=active]:font-semibold"
-          : "rounded-md px-3.5 py-1.5 hover:text-fg-secondary data-[state=active]:bg-bg-surface data-[state=active]:text-fg-primary data-[state=active]:font-semibold data-[state=active]:shadow-sm",
+          ? "-mb-px h-control-lg border-b-2 border-transparent px-3 hover:text-fg-primary data-[state=active]:border-fg-primary data-[state=active]:text-fg-primary"
+          : "h-control-sm rounded-item px-2.5 hover:text-fg-primary data-[state=active]:bg-bg-elevated data-[state=active]:text-fg-primary data-[state=active]:shadow-raised",
         className
       )}
       {...props}
@@ -67,7 +67,7 @@ export const TabsContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <RT.Content
     ref={ref}
-    className={cn("mt-4 focus-visible:outline-none", className)}
+    className={cn("outline-none", className)}
     {...props}
   />
 ));
@@ -85,12 +85,12 @@ export const TabCount = React.forwardRef<HTMLSpanElement, TabCountProps>(
     <span
       ref={ref}
       className={cn(
-        "ml-1.5 inline-flex items-center rounded-full px-1.5 py-px text-[10px] font-bold",
+        "ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-pill px-1 text-label-xs",
         active === undefined
-          ? "bg-bg-subtle text-fg-secondary [[data-state=active]_&]:bg-brand-primary [[data-state=active]_&]:text-fg-inverse"
+          ? "bg-border-default text-fg-secondary [[data-state=active]_&]:bg-brand-primary [[data-state=active]_&]:text-fg-inverse"
           : active
             ? "bg-brand-primary text-fg-inverse"
-            : "bg-bg-subtle text-fg-secondary",
+            : "bg-border-default text-fg-secondary",
         className
       )}
       {...props}
