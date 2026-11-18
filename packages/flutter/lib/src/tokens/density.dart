@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import 'aeros_theme_tokens.g.dart';
 import 'typography.dart';
 
 /// How tightly a surface packs its content, by the pointer that will use it.
@@ -105,6 +106,10 @@ enum AerosDensity {
 
   /// Whether a precise pointer is assumed (the mouse sizes).
   bool get isPointer => this == AerosDensity.pointer;
+
+  /// The generated size tokens for this density (`size` in tokens.json):
+  /// control heights, header, row, icon button and the minimum hit target.
+  AerosSizeTokens get sizes => isPointer ? AerosSizeTokens.pointer : AerosSizeTokens.touch;
 
   // ─── The density type ramp ───
   //

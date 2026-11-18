@@ -405,7 +405,7 @@ void main() {
 
   goldenMatrix(
     'data_repeating_rows',
-    size: const Size(520, 920),
+    size: const Size(520, 960),
     (context) => GoldenColumn(
       width: 480,
       children: [

@@ -3,6 +3,7 @@ import * as React from "react";
 import { Command as CommandPrimitive } from "cmdk";
 import { Search } from "lucide-react";
 import { cn } from "../lib/cn";
+import { menuItem, menuItemState, menuSeparator } from "../internal/recipes";
 
 // cmdk-backed command menu / combobox surface. Compose inside a Popover for a
 // select-with-search (see docs), or inside a Dialog for a command palette.
@@ -15,7 +16,7 @@ export const Command = React.forwardRef<
   <CommandPrimitive
     ref={ref}
     className={cn(
-      "flex w-full flex-col overflow-hidden rounded-lg bg-bg-elevated text-fg-primary",
+      "flex w-full flex-col overflow-hidden rounded-surface bg-bg-elevated text-fg-primary",
       className
     )}
     {...props}
@@ -27,13 +28,17 @@ export const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
-  <div className="flex items-center gap-2 border-b border-border-default px-3" cmdk-input-wrapper="">
-    <Search aria-hidden className="h-4 w-4 shrink-0 text-fg-muted" />
+  // The wrapper shows focus for the borderless input inside it.
+  <div
+    className="flex items-center gap-2 border-b border-border-default px-3 focus-within:border-border-focus"
+    cmdk-input-wrapper=""
+  >
+    <Search aria-hidden className="size-icon-md shrink-0 text-fg-muted" />
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
-        "h-9 w-full bg-transparent text-sm font-medium text-fg-primary outline-none",
-        "placeholder:text-fg-muted placeholder:font-normal disabled:opacity-40",
+        "h-control-lg w-full bg-transparent text-body-sm text-fg-primary outline-none",
+        "placeholder:text-fg-muted disabled:opacity-disabled",
         className
       )}
       {...props}
@@ -48,7 +53,7 @@ export const CommandList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
-    className={cn("max-h-72 overflow-y-auto overflow-x-hidden p-1.5", className)}
+    className={cn("max-h-72 overflow-y-auto overflow-x-hidden p-1", className)}
     {...props}
   />
 ));
@@ -60,7 +65,7 @@ export const CommandEmpty = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Empty
     ref={ref}
-    className={cn("py-6 text-center text-[13px] text-fg-muted", className)}
+    className={cn("py-6 text-center text-body-sm text-fg-muted", className)}
     {...props}
   />
 ));
@@ -74,7 +79,7 @@ export const CommandGroup = React.forwardRef<
     ref={ref}
     className={cn(
       "overflow-hidden",
-      "[&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-1.5 [&_[cmdk-group-heading]]:pb-0.5 [&_[cmdk-group-heading]]:text-[10px] [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.06em] [&_[cmdk-group-heading]]:text-fg-muted",
+      "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-caption [&_[cmdk-group-heading]]:text-fg-muted",
       className
     )}
     {...props}
@@ -86,7 +91,7 @@ export const CommandSeparator = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>
 >(({ className, ...props }, ref) => (
-  <CommandPrimitive.Separator ref={ref} className={cn("my-1 h-px bg-border-default", className)} {...props} />
+  <CommandPrimitive.Separator ref={ref} className={cn(menuSeparator, className)} {...props} />
 ));
 CommandSeparator.displayName = "CommandSeparator";
 
@@ -96,12 +101,7 @@ export const CommandItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
-    className={cn(
-      "relative flex cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium text-fg-secondary",
-      "data-[selected=true]:bg-bg-subtle data-[selected=true]:text-fg-primary outline-none",
-      "data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-40",
-      className
-    )}
+    className={cn(menuItem, menuItemState.cmdk, className)}
     {...props}
   />
 ));

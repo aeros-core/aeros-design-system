@@ -2,6 +2,7 @@
 import * as React from "react";
 import * as RG from "@radix-ui/react-radio-group";
 import { cn } from "../lib/cn";
+import { colorTransition } from "../internal/recipes";
 
 export const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RG.Root>,
@@ -18,15 +19,15 @@ export const RadioGroupItem = React.forwardRef<
   <RG.Item
     ref={ref}
     className={cn(
-      "aspect-square h-[18px] w-[18px] rounded-full border-[1.5px] border-border-strong bg-bg-surface",
-      "transition-colors duration-(--aeros-duration-fast) hover:border-border-focus focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas",
-      "data-[state=checked]:border-brand-primary",
-      "disabled:opacity-40 disabled:cursor-not-allowed",
+      "size-4 shrink-0 rounded-full border border-border-strong bg-bg-surface",
+      colorTransition,
+      "hover:border-fg-muted data-[state=checked]:border-brand-primary",
+      "disabled:cursor-not-allowed disabled:opacity-disabled",
       className
     )}
     {...props}
   >
-    <RG.Indicator className="flex h-full w-full items-center justify-center after:h-2 after:w-2 after:rounded-full after:bg-brand-primary after:content-['']" />
+    <RG.Indicator className="flex h-full w-full items-center justify-center after:size-2 after:rounded-full after:bg-brand-primary after:content-['']" />
   </RG.Item>
 ));
 RadioGroupItem.displayName = "RadioGroupItem";

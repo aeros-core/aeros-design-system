@@ -93,7 +93,7 @@ export const SidebarItem = React.forwardRef<HTMLAnchorElement, SidebarItemProps>
         {...(Comp === "button" ? { type: "button" as const } : null)}
         aria-current={active ? "page" : undefined}
         className={cn(
-          "flex h-8 w-full items-center gap-2.5 rounded-md px-3 text-[13px] font-medium transition-colors duration-(--aeros-duration-quick) text-left [&>svg]:size-4 [&>svg]:shrink-0",
+          "flex h-8 w-full items-center gap-2.5 rounded-md px-3 text-[13px] font-medium transition-colors duration-quick text-left [&>svg]:size-4 [&>svg]:shrink-0",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80",
           active
             ? "bg-white/[0.08] text-white"

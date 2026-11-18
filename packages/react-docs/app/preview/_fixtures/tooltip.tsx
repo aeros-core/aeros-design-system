@@ -11,11 +11,11 @@ export default function TooltipFixture() {
         <Tooltip open>
           <TooltipTrigger asChild>
             <Button variant="secondary">
-              <Info className="h-4 w-4" />
+              <Info />
               Hover me
             </Button>
           </TooltipTrigger>
-          <TooltipContent>This is a tooltip.</TooltipContent>
+          <TooltipContent arrow>This is a tooltip.</TooltipContent>
         </Tooltip>
       </TooltipProvider>
     </Group>

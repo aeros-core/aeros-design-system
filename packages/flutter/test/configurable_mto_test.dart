@@ -255,7 +255,7 @@ void main() {
   group('Token helpers', () {
     test('AerosSelectionPalette resolves all states', () {
       for (final state in AerosSelectionState.values) {
-        final p = AerosSelectionPalette.resolve(state, AerosAliasColors.light);
+        final p = AerosSelectionPalette.resolve(state, AerosAliasColors.light, AerosSemanticColors.light);
         expect(p.background, isNotNull);
         expect(p.foreground, isNotNull);
         expect(p.border, isNotNull);
@@ -264,7 +264,7 @@ void main() {
 
     test('AerosSeverityPalette returns icon for each severity', () {
       for (final s in AerosSeverity.values) {
-        expect(AerosSeverityPalette.of(s).icon, isNotNull);
+        expect(AerosSeverityPalette.resolve(s, AerosSemanticColors.light).icon, isNotNull);
       }
     });
 
@@ -272,6 +272,7 @@ void main() {
       final p = AerosPricePalette.resolve(
         AerosPriceTone.nonDiscountable,
         AerosAliasColors.light,
+        AerosSemanticColors.light,
       );
       expect(p.label, 'fixed');
     });

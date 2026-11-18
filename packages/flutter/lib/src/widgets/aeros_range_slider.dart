@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 import 'aeros_attribute_models.dart';
@@ -71,9 +70,9 @@ class AerosRangeSlider extends StatelessWidget {
                         .withWeight(FontWeight.w600),
                     children: [
                       if (required)
-                        const TextSpan(
+                        TextSpan(
                           text: ' *',
-                          style: TextStyle(color: AerosColors.danger),
+                          style: TextStyle(color: context.aerosSemantic.danger),
                         ),
                     ],
                   ),
@@ -123,7 +122,7 @@ class AerosRangeSlider extends StatelessWidget {
           const SizedBox(height: AerosSpacing.s1),
           Text(
             errorText!,
-            style: AerosTypography.caption(color: AerosColors.dangerText),
+            style: AerosTypography.caption(color: context.aerosSemantic.dangerText),
           ),
         ],
       ],

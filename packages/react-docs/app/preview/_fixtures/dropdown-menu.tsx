@@ -3,22 +3,29 @@
 import {
   Button,
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@aeros-core/react";
-import { ChevronDown, Copy, LogOut, Plus, Settings } from "lucide-react";
+import { ChevronDown, Copy, LogOut, Plus, Settings, Share2 } from "lucide-react";
 import { Group } from "./kit";
 
 export default function DropdownMenuFixture() {
   return (
-    <Group label="Dropdown menu — open (label, items, disabled, destructive)">
+    <Group label="Dropdown menu — open (label, items, shortcut, disabled, checkbox, radio, submenu, destructive)">
       <DropdownMenu open>
         <DropdownMenuTrigger asChild>
-          <Button variant="secondary" trailingIcon={<ChevronDown className="h-4 w-4" />}>
+          <Button variant="secondary" trailingIcon={<ChevronDown />}>
             Actions
           </Button>
         </DropdownMenuTrigger>
@@ -26,18 +33,38 @@ export default function DropdownMenuFixture() {
           <DropdownMenuLabel>Workspace</DropdownMenuLabel>
           <DropdownMenuGroup>
             <DropdownMenuItem>
-              <Settings className="h-4 w-4" /> Settings
+              <Settings /> Settings
+              <DropdownMenuShortcut>⌘,</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Plus className="h-4 w-4" /> New RFQ
+              <Plus /> New RFQ
+              <DropdownMenuShortcut>⌘N</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem disabled>
-              <Copy className="h-4 w-4" /> Duplicate (disabled)
+              <Copy /> Duplicate (disabled)
             </DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <Share2 /> Share
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem>Copy link</DropdownMenuItem>
+                <DropdownMenuItem>Email</DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
+          <DropdownMenuLabel>View</DropdownMenuLabel>
+          <DropdownMenuCheckboxItem checked>Show archived</DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem>Show drafts</DropdownMenuCheckboxItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuRadioGroup value="comfortable">
+            <DropdownMenuRadioItem value="compact">Compact</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="comfortable">Comfortable</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+          <DropdownMenuSeparator />
           <DropdownMenuItem destructive>
-            <LogOut className="h-4 w-4" /> Sign out
+            <LogOut /> Sign out
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

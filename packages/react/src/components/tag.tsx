@@ -3,13 +3,13 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../lib/cn";
 
 const tagVariants = cva(
-  "inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap",
+  "inline-flex h-5 items-center whitespace-nowrap rounded-item border px-1.5 text-label-xs",
   {
     variants: {
       variant: {
-        info:    "bg-info-bg text-info-text",
-        neutral: "bg-bg-subtle text-fg-secondary border border-border-default",
-        inverse: "bg-bg-inverse text-fg-inverse"
+        info:    "border-info-border bg-info-bg text-info-text",
+        neutral: "border-border-default bg-bg-surface text-fg-secondary",
+        inverse: "border-transparent bg-bg-inverse text-fg-inverse"
       }
     },
     defaultVariants: { variant: "neutral" }

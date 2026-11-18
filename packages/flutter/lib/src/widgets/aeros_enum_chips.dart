@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/colors.dart';
 import '../tokens/radii.dart';
 import '../tokens/spacing.dart';
 import '../tokens/states.dart';
@@ -60,9 +59,9 @@ class AerosEnumChips extends StatelessWidget {
                   .withWeight(FontWeight.w600),
               children: [
                 if (required)
-                  const TextSpan(
+                  TextSpan(
                     text: ' *',
-                    style: TextStyle(color: AerosColors.danger),
+                    style: TextStyle(color: context.aerosSemantic.danger),
                   ),
               ],
             ),
@@ -89,7 +88,7 @@ class AerosEnumChips extends StatelessWidget {
           const SizedBox(height: AerosSpacing.s1),
           Text(
             errorText!,
-            style: AerosTypography.caption(color: AerosColors.dangerText),
+            style: AerosTypography.caption(color: context.aerosSemantic.dangerText),
           ),
         ],
       ],
@@ -122,7 +121,7 @@ class _Chip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final palette = AerosSelectionPalette.resolve(_state(), a, isDark: context.aeros.isDark);
+    final palette = AerosSelectionPalette.of(context, _state());
     final labelText =
         unitSuffix == null ? option.label : '${option.label} $unitSuffix';
 

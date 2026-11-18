@@ -28,6 +28,8 @@
   html, body {
     font-family: var(--aeros-font-sans);
     font-feature-settings: "cv11", "ss01";
+    /* Body weight is 450 (brand): a touch sturdier than regular on Inter. */
+    font-weight: 450;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background: var(--aeros-bg-canvas);
@@ -38,13 +40,18 @@
     box-sizing: border-box;
   }
 
-  /* Global focus-visible ring — two-tone: a surface-coloured gap (outline-offset)
-     between the element and a high-contrast ring. Outline follows the element's
-     own border-radius in modern browsers. Components may override with a
-     box-shadow ring (e.g. filled-dark buttons invert the colours). */
+  /* The one focus treatment: a token-driven outline on keyboard focus (text
+     fields show it on any focus — that is how :focus-visible behaves there).
+     The offset is transparent, so it reads correctly on any surface.
+     Components never draw their own ring; they may only move it with the
+     focus-ring-field / focus-ring-inset utilities below. */
   :focus-visible {
-    outline: 2px solid var(--aeros-focus-ring);
-    outline-offset: 2px;
+    outline: var(--aeros-focus-width) solid var(--aeros-focus-ring);
+    outline-offset: var(--aeros-focus-offset);
+  }
+  /* An invalid control's ring takes the danger colour. */
+  [aria-invalid="true"]:focus-visible {
+    outline-color: var(--aeros-color-semantic-danger);
   }
 
   /* Selection */
@@ -79,6 +86,19 @@
   @keyframes aeros-accordion-up {
     from { height: var(--radix-accordion-content-height); }
     to { height: 0; }
+  }
+}
+
+/* Focus ring placement — see the :focus-visible rule above. */
+@utility focus-ring-field {
+  /* On the field's own border, so the ring replaces the border visually. */
+  &:focus-visible {
+    outline-offset: var(--aeros-focus-offset-field);
+  }
+}
+@utility focus-ring-inset {
+  &:focus-visible {
+    outline-offset: var(--aeros-focus-offset-inset);
   }
 }
 

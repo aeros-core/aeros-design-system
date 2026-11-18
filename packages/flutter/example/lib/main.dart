@@ -166,7 +166,7 @@ class _GalleryState extends State<Gallery> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('8% above yesterday', style: AerosTypography.caption(color: a.fgMuted)),
-                  AerosButton(label: 'View', onPressed: () {}, size: AerosButtonSize.sm, variant: AerosButtonVariant.secondary),
+                  AerosButton(label: 'View', onPressed: () {}, size: AerosControlSize.sm, variant: AerosButtonVariant.secondary),
                 ],
               ),
               child: AerosProgress(label: 'Output', value: _progress),
@@ -230,25 +230,25 @@ class _GalleryState extends State<Gallery> {
                   Row(children: [
                     const Expanded(
                         child: AerosTextField(
-                            hint: 'md field (40)', size: AerosFieldSize.md)),
+                            hint: 'md field', size: AerosControlSize.md)),
                     const SizedBox(width: 8),
                     AerosButton(
-                        label: 'md', onPressed: () {}, size: AerosButtonSize.md),
+                        label: 'md', onPressed: () {}, size: AerosControlSize.md),
                   ]),
                   const SizedBox(height: 12),
                   Row(children: [
                     const Expanded(
                         child: AerosTextField(
-                            hint: 'sm field (32)', size: AerosFieldSize.sm)),
+                            hint: 'sm field', size: AerosControlSize.sm)),
                     const SizedBox(width: 8),
                     AerosButton(
-                        label: 'sm', onPressed: () {}, size: AerosButtonSize.sm),
+                        label: 'sm', onPressed: () {}, size: AerosControlSize.sm),
                   ]),
                   const SizedBox(height: 16),
                   const AerosSearchField(hint: 'Search notes'),
                   const SizedBox(height: 12),
                   const AerosSearchField(
-                      hint: 'Search the graph', size: AerosFieldSize.sm),
+                      hint: 'Search the graph', size: AerosControlSize.sm),
                   const SizedBox(height: 16),
                   AerosTagField(
                     label: 'Tags',

@@ -633,7 +633,7 @@ class AerosSizeTokens {
     navRow: 48.0,
     navIcon: 20.0,
     navLabel: 14.0,
-    minTarget: 44.0,
+    minTarget: 48.0,
   );
 
   // ─── Density-independent ───

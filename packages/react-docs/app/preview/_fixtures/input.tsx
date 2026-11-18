@@ -8,9 +8,9 @@ export default function InputFixture() {
   return (
     <>
       <Group label="Sizes" className="max-w-xl flex-col items-stretch">
-        <Input size="sm" aria-label="Small" placeholder="sm · 32" />
-        <Input size="md" aria-label="Medium" placeholder="md · 36" />
-        <Input size="lg" aria-label="Large" placeholder="lg · 40" />
+        <Input size="sm" aria-label="Small" placeholder="sm · 28" />
+        <Input size="md" aria-label="Medium" placeholder="md · 32" />
+        <Input size="lg" aria-label="Large" placeholder="lg · 36" />
       </Group>
       <Group label="States" className="max-w-xl flex-col items-stretch">
         <Input aria-label="Default empty" placeholder="Placeholder" />
@@ -35,7 +35,7 @@ export default function InputFixture() {
           defaultValue="double-wall cups"
         />
       </Group>
-      <Group label="Field wrapper" className="max-w-xl flex-col items-stretch gap-0">
+      <Group label="Field wrapper" className="max-w-xl flex-col items-stretch gap-4">
         <Field label="Email" hint="We'll never share your address.">
           <Input type="email" placeholder="priya@example.com" />
         </Field>

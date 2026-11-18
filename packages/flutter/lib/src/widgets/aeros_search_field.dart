@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../foundation/aeros_control_size.dart';
+import '../foundation/aeros_field_frame.dart';
+import '../foundation/aeros_pressable.dart';
 import '../theme/aeros_theme_extension.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
 import '../tokens/motion.dart';
-import '../tokens/radii.dart';
-import '../tokens/spacing.dart';
-import 'aeros_field_size.dart';
 
 /// A compact search input for lists and toolbars.
 ///
 /// A single control that retires the two hand-rolled search boxes (notes list,
-/// graph top bar). It reads as a calm, recessed pill — a leading search glyph,
-/// an animated clear affix that appears once there's a query, and, crucially,
+/// graph top bar). It sits in the same frame as every other field
+/// ([AerosFieldFrame]) — a leading search glyph, an animated clear affix that
+/// appears once there's a query, and, crucially,
 /// [autocorrect] / [enableSuggestions] **off by default** so a search box never
 /// "corrects" jargon (`pgvector` → `of vector`) and the iOS suggestion strip
 /// never swallows taps on the results beneath it.
@@ -24,7 +26,7 @@ class AerosSearchField extends StatefulWidget {
     this.onChanged,
     this.onSubmitted,
     this.onClear,
-    this.size = AerosFieldSize.md,
+    this.size = AerosControlSize.md,
     this.autocorrect = false,
     this.enableSuggestions = false,
     this.autofocus = false,
@@ -42,7 +44,7 @@ class AerosSearchField extends StatefulWidget {
   /// `onChanged('')`), so callers can also reset their query state.
   final VoidCallback? onClear;
 
-  final AerosFieldSize size;
+  final AerosControlSize size;
   final bool autocorrect;
   final bool enableSuggestions;
   final bool autofocus;
@@ -118,26 +120,21 @@ class _AerosSearchFieldState extends State<AerosSearchField> {
   Widget build(BuildContext context) {
     final a = context.aerosColors;
     final s = widget.size;
+    // The clear affix is as wide as the field is tall and fills its height
+    // inside the hairline, so it is a full-size target at the field's edge.
+    final height = s.resolveHeight(context);
+    final affixHeight = height - 2 * AerosMetricTokens.borderHairline;
 
-    return AnimatedContainer(
-      duration: AerosMotion.resolve(context, AerosMotion.fast),
-      curve: AerosMotion.standard,
-      height: s.height,
-      padding: EdgeInsets.symmetric(horizontal: s.padH),
-      decoration: BoxDecoration(
-        color: _focused ? a.bgSurface : a.bgSubtle,
-        borderRadius: AerosRadii.brLg,
-        border: Border.all(
-          color: _focused ? a.brandPrimary : Colors.transparent,
-        ),
-        boxShadow: _focused
-            ? [BoxShadow(color: a.focusRing.withValues(alpha: 0.14), spreadRadius: 3)]
-            : null,
-      ),
+    return AerosFieldFrame(
+      size: s,
+      focused: _focused,
+      enabled: widget.enabled,
+      padding: EdgeInsetsDirectional.only(start: s.padH),
+      onTap: _focus.requestFocus,
       child: Row(
         children: [
           Icon(Icons.search, size: s.iconSize, color: a.fgMuted),
-          const SizedBox(width: AerosSpacing.s2),
+          SizedBox(width: s.gap),
           Expanded(
             child: CallbackShortcuts(
               // Escape clears the query — expected desktop-search behavior.
@@ -157,12 +154,10 @@ class _AerosSearchFieldState extends State<AerosSearchField> {
                 onChanged: widget.onChanged,
                 onSubmitted: widget.onSubmitted,
                 style: s.valueStyle(color: a.fgPrimary),
-                decoration: InputDecoration(
-                  isCollapsed: true,
-                  border: InputBorder.none,
+                cursorColor: a.fgPrimary,
+                decoration: AerosFieldFrame.bareDecoration(
                   hintText: widget.hint,
                   hintStyle: s.valueStyle(color: a.fgMuted),
-                  hintMaxLines: 1,
                 ),
               ),
             ),
@@ -171,28 +166,27 @@ class _AerosSearchFieldState extends State<AerosSearchField> {
             duration: AerosMotion.resolve(context, AerosMotion.fast),
             transitionBuilder: (child, anim) =>
                 FadeTransition(opacity: anim, child: ScaleTransition(scale: anim, child: child)),
-            // Labeled button semantics + a full-height, ≥36dp-wide hit target
-            // (the bare 18dp glyph was unlabeled and sub-target before).
-            child: _hasText
-                ? Semantics(
+            child: _hasText && widget.enabled
+                ? AerosPressable(
                     key: const ValueKey('clear'),
-                    button: true,
-                    label: 'Clear search',
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: _clear,
-                      child: SizedBox(
-                        width: 36,
-                        height: double.infinity,
-                        child: Center(
-                          child: ExcludeSemantics(
-                            child: Icon(Icons.close, size: s.iconSize, color: a.fgMuted),
-                          ),
+                    onPressed: _clear,
+                    semanticLabel: 'Clear search',
+                    excludeSemantics: true,
+                    // Inside the field: the field's own height is the target.
+                    expandHitTarget: false,
+                    builder: (context, state) => SizedBox(
+                      width: height,
+                      height: affixHeight,
+                      child: Center(
+                        child: Icon(
+                          Icons.close,
+                          size: s.iconSize,
+                          color: state.hovered || state.pressed || state.focused ? a.fgPrimary : a.fgMuted,
                         ),
                       ),
                     ),
                   )
-                : const SizedBox.shrink(key: ValueKey('empty')),
+                : SizedBox(key: const ValueKey('empty'), width: s.padH, height: affixHeight),
           ),
         ],
       ),

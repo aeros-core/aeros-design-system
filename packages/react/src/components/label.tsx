@@ -11,8 +11,8 @@ export const Label = React.forwardRef<
   <RL.Root
     ref={ref}
     className={cn(
-      "text-[13px] font-medium text-fg-primary select-none",
-      "peer-disabled:cursor-not-allowed peer-disabled:opacity-40",
+      "text-label-sm text-fg-primary select-none",
+      "peer-disabled:cursor-not-allowed peer-disabled:opacity-disabled",
       className
     )}
     {...props}

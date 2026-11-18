@@ -13,9 +13,20 @@ export 'src/tokens/states.dart';
 export 'src/tokens/breakpoints.dart';
 export 'src/tokens/aeros_viewport_scope.dart';
 export 'src/tokens/density.dart';
+// Generated token classes the foundation layer is built on.
+export 'src/tokens/aeros_theme_tokens.g.dart'
+    show AerosElevation, AerosSizeTokens, AerosShapeTokens, AerosMetricTokens;
 
 export 'src/theme/aeros_theme.dart';
 export 'src/theme/aeros_theme_extension.dart';
+
+// Foundation — the primitives every control is built on.
+export 'src/foundation/aeros_control_size.dart';
+export 'src/foundation/aeros_pressable.dart';
+export 'src/foundation/aeros_state_layer.dart';
+export 'src/foundation/aeros_focus_ring.dart';
+export 'src/foundation/aeros_surface.dart';
+export 'src/foundation/aeros_field_frame.dart';
 
 export 'src/widgets/aeros_button.dart';
 export 'src/widgets/aeros_field_size.dart';
