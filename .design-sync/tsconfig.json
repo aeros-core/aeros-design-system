@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@aeros-core/react": ["../packages/react/dist/index.d.ts"],
+      "react": ["../packages/react/node_modules/@types/react"],
+      "react/*": ["../packages/react/node_modules/@types/react/*"],
+      "lucide-react": ["../packages/react/node_modules/lucide-react"]
+    }
+  },
+  "include": ["previews/**/*.tsx"]
+}

@@ -1,0 +1,30 @@
+{
+  "projectId": "197959a9-805d-4474-9c4d-dfd37d196817",
+  "shape": "package",
+  "pkg": "@aeros-core/react",
+  "globalName": "Aeros",
+  "buildCmd": "pnpm build:tokens && pnpm build:react && node .design-sync/compile-css.mjs",
+  "cssEntry": "dist/aeros.css",
+  "tokensPkg": "@aeros-core/tokens",
+  "readmeHeader": ".design-sync/conventions.md",
+  "guidelinesGlob": ["../../docs/principles.md", "../../docs/components.md", "../../docs/tokens.md"],
+  "overrides": {
+    "Dialog": { "cardMode": "single", "viewport": "640x460" },
+    "AlertDialog": { "cardMode": "single", "viewport": "520x360" },
+    "Drawer": { "cardMode": "single", "viewport": "760x520" },
+    "Popover": { "cardMode": "single", "viewport": "420x320" },
+    "DropdownMenu": { "cardMode": "single", "viewport": "360x380" },
+    "Tooltip": { "cardMode": "single", "viewport": "380x180" },
+    "Select": { "cardMode": "single", "viewport": "320x360" },
+    "Combobox": { "cardMode": "single", "viewport": "420x420" },
+    "DatePicker": { "cardMode": "single", "viewport": "420x520" },
+    "Toast": { "cardMode": "single", "viewport": "480x420" },
+    "Sidebar": { "cardMode": "single", "viewport": "300x500" },
+    "AppShell": { "cardMode": "single", "viewport": "1040x620" },
+    "AppHeader": { "cardMode": "column" },
+    "PageHeader": { "cardMode": "column" },
+    "DataTable": { "cardMode": "column" },
+    "Stepper": { "cardMode": "column" },
+    "Tabs": { "cardMode": "column" }
+  }
+}
