@@ -39,7 +39,9 @@ import TagFixture from "./tag";
 import TextareaFixture from "./textarea";
 import ToastFixture from "./toast";
 import TooltipFixture from "./tooltip";
-import TopNavFixture from "./topnav";
+import AppHeaderFixture from "./app-header";
+import AppShellFixture from "./app-shell";
+import SidebarRailFixture from "./sidebar-rail";
 
 /**
  * slug → fixture component. `Record<FixtureSlug, …>` makes this exhaustive in
@@ -77,8 +79,10 @@ export const FIXTURES: Record<FixtureSlug, ComponentType> = {
   tooltip: TooltipFixture,
   table: TableFixture,
   "empty-state": EmptyStateFixture,
-  topnav: TopNavFixture,
+  "app-header": AppHeaderFixture,
   sidebar: SidebarFixture,
+  "sidebar-rail": SidebarRailFixture,
+  "app-shell": AppShellFixture,
   "dot-matrix": DotMatrixFixture,
   label: LabelFixture,
   separator: SeparatorFixture,

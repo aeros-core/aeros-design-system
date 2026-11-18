@@ -58,11 +58,11 @@ import {
   TdMono,
   TdMuted,
   EmptyState,
-  TopNav,
-  TopNavBrand,
-  TopNavLinks,
-  TopNavLink,
-  TopNavRight,
+  AppHeader,
+  AppHeaderBrand,
+  AppHeaderNav,
+  AppHeaderLink,
+  AppHeaderActions,
   Sidebar,
   SidebarBrand,
   SidebarSection,
@@ -300,7 +300,7 @@ const NAV: Array<{ section: string; items: Array<{ href: string; label: React.Re
       { href: "#table", label: "Table" },
       { href: "#empty", label: "Empty state" },
       { href: "#dot-matrix", label: "Dot matrix" },
-      { href: "#nav", label: "TopNav" },
+      { href: "#nav", label: "AppHeader" },
       { href: "#overlays", label: "Overlays 2.1" },
       { href: "#feedback21", label: "Feedback 2.1" },
       { href: "#data21", label: "Data 2.1" },
@@ -961,19 +961,19 @@ export default function Playground() {
         </Section>
 
         {/* TOP NAV */}
-        <Section id="nav" eyebrow="20 — Components" title="TopNav">
-          <TopNav>
-            <TopNavBrand mark="A" name="Aeros" />
-            <TopNavLinks>
-              <TopNavLink active>Dashboard</TopNavLink>
-              <TopNavLink>Marketplace</TopNavLink>
-              <TopNavLink>Operations</TopNavLink>
-              <TopNavLink>AI</TopNavLink>
-            </TopNavLinks>
-            <TopNavRight>
+        <Section id="nav" eyebrow="20 — Components" title="AppHeader">
+          <AppHeader>
+            <AppHeaderBrand mark="A" name="Aeros" />
+            <AppHeaderNav>
+              <AppHeaderLink active>Dashboard</AppHeaderLink>
+              <AppHeaderLink>Marketplace</AppHeaderLink>
+              <AppHeaderLink>Operations</AppHeaderLink>
+              <AppHeaderLink>AI</AppHeaderLink>
+            </AppHeaderNav>
+            <AppHeaderActions>
               <Avatar size="sm" variant="inverse" fallback="PS" />
-            </TopNavRight>
-          </TopNav>
+            </AppHeaderActions>
+          </AppHeader>
         </Section>
 
         {/* OVERLAYS 2.1 */}
