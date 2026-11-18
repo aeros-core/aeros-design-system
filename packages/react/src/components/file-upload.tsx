@@ -13,6 +13,37 @@ export interface FileRejection {
   reason: FileRejectionReason;
 }
 
+/**
+ * Every string the FileUpload writes itself, for localisation. Pass a partial
+ * object as `labels`; anything left out keeps the English default.
+ */
+export interface FileUploadLabels {
+  /** Dropzone prompt. Default: "Drag a file here, or" / "Drag files here, or". */
+  dropPrompt: (multiple: boolean) => string;
+  /** Browse button text. Default: "Choose file" / "Choose files". */
+  browse: (multiple: boolean) => string;
+  /** Name of the list of chosen files. Default: "Selected files". */
+  selectedFiles: string;
+  /** Name of a file's remove button. Default: "Remove <name>". */
+  remove: (fileName: string) => string;
+  /** A file of a type `accept` does not allow. */
+  rejectedType: (fileName: string) => string;
+  /** A file over `maxSize`; `maxSize` is already formatted ("5 MB"), or undefined if no limit is set. */
+  rejectedSize: (fileName: string, maxSize: string | undefined) => string;
+  /** A file beyond the number the control keeps (`maxFiles`, or 1 without `multiple`). */
+  rejectedCount: (fileName: string, limit: number) => string;
+}
+
+export const defaultFileUploadLabels: FileUploadLabels = {
+  dropPrompt: (multiple) => (multiple ? "Drag files here, or" : "Drag a file here, or"),
+  browse: (multiple) => (multiple ? "Choose files" : "Choose file"),
+  selectedFiles: "Selected files",
+  remove: (fileName) => `Remove ${fileName}`,
+  rejectedType: (fileName) => `${fileName}: this file type is not accepted.`,
+  rejectedSize: (fileName, maxSize) => `${fileName}: larger than ${maxSize ?? "the size limit"}.`,
+  rejectedCount: (fileName, limit) => `${fileName}: not added — the limit is ${limit} ${limit === 1 ? "file" : "files"}.`
+};
+
 export interface FileUploadProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue" | "aria-invalid" | "aria-required">,
     FieldControlProps {
@@ -33,8 +64,10 @@ export interface FileUploadProps
   onReject?: (rejections: FileRejection[]) => void;
   /** Constraints in words, shown in the dropzone: "PDF or PNG, up to 5 MB". */
   hint?: React.ReactNode;
-  /** Text of the browse button. */
+  /** Text of the browse button. Wins over `labels.browse`. */
   browseLabel?: string;
+  /** Overrides for the strings the control writes itself (localisation). */
+  labels?: Partial<FileUploadLabels>;
 }
 
 /** 1536 → "1.5 KB". */
@@ -63,12 +96,15 @@ function matchesAccept(file: File, accept: string | undefined): boolean {
   );
 }
 
-function rejectionMessage({ file, reason }: FileRejection, maxSize?: number, limit?: number): string {
-  if (reason === "type") return `${file.name}: this file type is not accepted.`;
-  if (reason === "size") {
-    return `${file.name}: larger than ${maxSize != null ? formatFileSize(maxSize) : "the size limit"}.`;
-  }
-  return `${file.name}: not added — the limit is ${limit} ${limit === 1 ? "file" : "files"}.`;
+function rejectionMessage(
+  { file, reason }: FileRejection,
+  text: FileUploadLabels,
+  maxSize: number | undefined,
+  limit: number | undefined
+): string {
+  if (reason === "type") return text.rejectedType(file.name);
+  if (reason === "size") return text.rejectedSize(file.name, maxSize != null ? formatFileSize(maxSize) : undefined);
+  return text.rejectedCount(file.name, limit ?? 1);
 }
 
 /**
@@ -89,6 +125,7 @@ export const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       onReject,
       hint,
       browseLabel,
+      labels,
       className,
       id,
       "aria-describedby": ariaDescribedby,
@@ -106,6 +143,7 @@ export const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       "aria-invalid": ariaInvalid,
       "aria-required": ariaRequired
     });
+    const text = { ...defaultFileUploadLabels, ...labels };
     const hintId = React.useId();
     const inputRef = React.useRef<HTMLInputElement>(null);
     const [inner, setInner] = React.useState<File[]>([]);
@@ -188,7 +226,7 @@ export const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
         >
           <Upload aria-hidden className="size-icon-lg text-fg-muted" />
           <p className="text-body-sm text-fg-secondary">
-            {multiple ? "Drag files here, or" : "Drag a file here, or"}
+            {text.dropPrompt(multiple)}
           </p>
           <Button
             type="button"
@@ -201,7 +239,7 @@ export const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             aria-describedby={describedBy}
             onClick={() => inputRef.current?.click()}
           >
-            {browseLabel ?? (multiple ? "Choose files" : "Choose file")}
+            {browseLabel ?? text.browse(multiple)}
           </Button>
           {hint != null && (
             <p id={hintId} className="text-caption text-fg-muted">
@@ -227,7 +265,7 @@ export const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
         </div>
 
         {files.length > 0 && (
-          <ul aria-label="Selected files" className="grid gap-1.5">
+          <ul aria-label={text.selectedFiles} className="grid gap-1.5">
             {files.map((file, i) => (
               <li
                 key={`${file.name}-${file.size}-${file.lastModified}-${i}`}
@@ -242,7 +280,7 @@ export const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
                   size="xs"
                   iconOnly
                   disabled={disabled}
-                  aria-label={`Remove ${file.name}`}
+                  aria-label={text.remove(file.name)}
                   onClick={() => remove(i)}
                 >
                   <X aria-hidden />
@@ -257,7 +295,7 @@ export const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
         <div role="alert" className="grid gap-0.5 empty:-mt-2">
           {rejections.map((rejection, i) => (
             <p key={i} className="text-caption text-danger-text">
-              {rejectionMessage(rejection, maxSize, limit)}
+              {rejectionMessage(rejection, text, maxSize, limit)}
             </p>
           ))}
         </div>

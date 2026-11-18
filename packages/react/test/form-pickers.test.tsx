@@ -412,7 +412,8 @@ describe("MultiCombobox", () => {
 const AUGUST = new Date(2026, 7, 1);
 const TODAY = new Date(2026, 7, 14);
 const pinned = { defaultMonth: AUGUST, today: TODAY };
-const day = (n: number, month = "August") => screen.getByRole("button", { name: new RegExp(`${month} ${n}(st|nd|rd|th), 2026`) });
+// Day buttons are named "14, Friday, August 2026" (the visible number first).
+const day = (n: number, month = "August") => screen.getByRole("button", { name: new RegExp(`^${n}, \\w+, ${month} 2026`) });
 
 describe("date formatting", () => {
   it("formats for display as dd MMM yyyy and for forms as yyyy-MM-dd", () => {

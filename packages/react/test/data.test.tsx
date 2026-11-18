@@ -269,20 +269,90 @@ describe("Card", () => {
     expect(onKeyDown).toHaveBeenCalledTimes(1);
   });
 
-  // DEFECT (a11y, WCAG 2.1.1 Keyboard): `interactive` advertises the card as
-  // clickable (pointer cursor + hover lift, "use for clickable cards") but adds
-  // no tabIndex/role and no Enter/Space handling, so <Card interactive onClick>
-  // is mouse-only unless every caller wires keyboard access by hand.
-  // Cause: packages/react/src/components/card.tsx:10-20.
-  it.fails("an interactive card with onClick is reachable and operable from the keyboard", async () => {
+  // A clickable card is a button, so it holds no other control: the fixture
+  // here has only text. (`Full` nests a <Button>, which a button may not contain.)
+  function Clickable(props: React.ComponentProps<typeof Card>) {
+    return (
+      <Card data-testid="card" interactive {...props}>
+        <CardHeader>
+          <CardTitle>Order #1042</CardTitle>
+        </CardHeader>
+        <CardBody>24 cartons</CardBody>
+      </Card>
+    );
+  }
+
+  it("an interactive card with onClick is reachable and operable from the keyboard", async () => {
     const user = userEvent.setup();
     const onClick = vi.fn();
-    render(<Full interactive onClick={onClick} />);
-    const card = screen.getByTestId("card");
+    const { container } = render(<Clickable onClick={onClick} aria-label="Open order 1042" />);
+    const card = screen.getByRole("button", { name: "Open order 1042" });
+    expect(card).toBe(screen.getByTestId("card"));
     await user.tab();
     expect(card).toHaveFocus();
     await user.keyboard("{Enter}");
     expect(onClick).toHaveBeenCalledTimes(1);
+    await user.keyboard(" ");
+    expect(onClick).toHaveBeenCalledTimes(2);
+    await user.click(card);
+    expect(onClick).toHaveBeenCalledTimes(3);
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it("a clickable card still runs the caller's key handlers, and they can veto activation", async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+    const onKeyDown = vi.fn((event: React.KeyboardEvent) => event.preventDefault());
+    render(<Clickable onClick={onClick} onKeyDown={onKeyDown} />);
+    await user.tab();
+    await user.keyboard("{Enter}");
+    expect(onKeyDown).toHaveBeenCalledTimes(1);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("an interactive card without onClick stays a plain container around its own control", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<Full interactive />);
+    const card = screen.getByTestId("card");
+    expect(card).not.toHaveAttribute("role");
+    expect(card).not.toHaveAttribute("tabindex");
+    await user.tab();
+    expect(screen.getByRole("button", { name: "View" })).toHaveFocus();
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it("keys pressed on a control inside a clickable card do not activate the card twice", async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+    render(
+      <Card interactive onClick={onClick}>
+        <CardBody>
+          <input aria-label="Note" />
+        </CardBody>
+      </Card>
+    );
+    await user.click(screen.getByRole("textbox", { name: "Note" }));
+    onClick.mockClear();
+    await user.keyboard("a {Enter}");
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("asChild renders the caller's element as the card: a real link, with nothing added", async () => {
+    const ref = React.createRef<HTMLDivElement>();
+    const { container } = render(
+      <Card asChild interactive ref={ref} data-testid="card">
+        <a href="/orders/1042">
+          <CardBody>Order #1042</CardBody>
+        </a>
+      </Card>
+    );
+    const link = screen.getByRole("link", { name: "Order #1042" });
+    expect(link).toBe(screen.getByTestId("card"));
+    expect(link).toBe(ref.current);
+    expect(link).toHaveAttribute("href", "/orders/1042");
+    expect(link).not.toHaveAttribute("role");
+    expect(link).not.toHaveAttribute("tabindex");
+    expect(await axe(container)).toHaveNoViolations();
   });
 
   it("forwards refs on every part", () => {
@@ -540,11 +610,7 @@ describe("DotMatrix", () => {
     ).not.toThrow();
   });
 
-  // DEFECT: with rings=0 the radius is dotSize * (1 - (0 / 0) * falloff) = NaN,
-  // so the single centre dot renders with r="NaN" (invisible, plus a React
-  // "Received NaN for the `r` attribute" warning).
-  // Cause: packages/react/src/components/dot-matrix.tsx:93 (ring / rings).
-  it.fails("rings=0 renders a single dot with a finite radius", () => {
+  it("rings=0 renders a single dot with a finite radius", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
     try {
       render(<DotMatrix data-testid="dm" rings={0} />);

@@ -9,6 +9,13 @@
 - `SidebarGroup` opens when it comes to hold the current page, not only on mount; a `Sidebar` inside a `SidebarProvider` is hidden below `md` in CSS, so a phone never paints the desktop column first.
 - `Alert` accepts `role={undefined}` to opt out of the live region. `Field` no longer stretches a shorter control beside a taller field.
 - Fixed: a `DatePicker` inside a `Field` could keep a dangling `aria-labelledby` after hydration.
+- Fixed: `asChild` rendered nothing when the child came from a Server Component — `<Button asChild leadingIcon={…}><Link href="…">…</Link></Button>` in a server page produced no HTML. `Button`, `SidebarItem`, `SidebarSubItem`, `AppHeaderLink` and `FilterChip` now resolve the child (which React can hand over as a lazy reference) before composing it.
+- `SidebarItem asChild` behaves like the default row: the icon, the label and `count` render inside your element, the label truncates, and in the rail it is visually hidden, stays the accessible name and is the default tooltip. Pass only the label as the child's content — the `useSidebar()` label-hiding workaround is no longer needed.
+- `Card`: `interactive` with `onClick` is now a keyboard-operable button (focusable, Enter and Space, `role="button"`); give such a card no other control inside. `interactive` without `onClick` is unchanged (styling only). New `asChild` renders the card as your element, e.g. a link.
+- `Command`: `aria-activedescendant` now names the option that is actually active after filtering; the empty message renders beside the listbox in a polite live region (so it is announced) and the listbox is hidden while empty; `CommandSeparator` is decorative (`role="none"`) — a listbox may only own options and groups.
+- `Calendar` / date pickers: day buttons are named with the visible number first — "26, Sunday, July 2026" (plus ", today" / ", selected") instead of "Sunday, July 26th, 2026" — so the label is part of the name (WCAG 2.5.3). Tests that find days by name need updating; pass `labels={{ labelDayButton }}` to change it.
+- `DataTable` and `FileUpload` take a `labels` prop (a partial `DataTableLabels` / `FileUploadLabels`) to localise their built-in strings; the defaults (`defaultDataTableLabels`, `defaultFileUploadLabels`) keep the English text.
+- Fixed: `DotMatrix rings={0}` rendered its dot with `r="NaN"`.
 
 ### Major Changes
 

@@ -97,7 +97,7 @@ export const COMPONENTS = define({
 <Button variant="secondary" leadingIcon={<Download />}>Export</Button>
 <Button variant="ghost" size="sm" iconOnly aria-label="Search"><Search /></Button>
 <Button variant="danger" loading>Deleting…</Button>
-<Button asChild><Link href="/orders">All orders</Link></Button>`,
+<Button asChild trailingIcon={<ArrowRight />}><Link href="/orders">All orders</Link></Button>`,
     fixtures: ["button"],
   },
   toggle: {
@@ -301,6 +301,8 @@ export const COMPONENTS = define({
     value={files}
     onFilesChange={setFiles}
     onReject={(rejections) => console.warn(rejections)}
+    // Optional: localise the built-in strings (a partial object).
+    labels={{ browse: (multiple) => (multiple ? "Dateien wählen" : "Datei wählen") }}
   />
 </Field>`,
     fixtures: ["file-upload"],
@@ -356,7 +358,7 @@ export const COMPONENTS = define({
     title: "Card",
     family: "Data display",
     description:
-      "A resting surface: white on the canvas with a hairline and no shadow. Compose it from a header, body and footer. An interactive card changes border and fill on hover — it does not lift.",
+      "A resting surface: white on the canvas with a hairline and no shadow. Compose it from a header, body and footer. An interactive card changes border and fill on hover — it does not lift. On its own `interactive` is styling for a card that holds its own link or button; with `onClick` the card becomes a keyboard-operable button (give it no other control inside), and with `asChild` it renders as your element, such as a link.",
     imports: ["Card", "CardBody", "CardFooter", "CardHeader", "CardSubtitle", "CardTitle"],
     usage: `<Card>
   <CardHeader>
@@ -371,7 +373,11 @@ export const COMPONENTS = define({
     <span className="text-caption text-fg-muted">Updated automatically</span>
     <Button variant="secondary" size="sm">View</Button>
   </CardFooter>
-</Card>`,
+</Card>
+
+// The whole card as a link, or as a button
+<Card asChild interactive><Link href="/orders/1042">…</Link></Card>
+<Card interactive onClick={openOrder} aria-label="Open order 1042">…</Card>`,
     fixtures: ["card"],
   },
   "stat-card": {
@@ -428,6 +434,8 @@ export const COMPONENTS = define({
   selectable
   selectionActions={(rows) => <Button size="sm">Export {rows.length}</Button>}
   pageSize={20}
+  // Optional: localise the built-in strings (a partial object; keep it stable).
+  labels={{ selected: (n) => \`\${n} ausgewählt\`, clearSelection: "Auswahl aufheben" }}
 />`,
     fixtures: ["data-table"],
   },
@@ -846,6 +854,7 @@ toast({
     <SidebarSection label="Workspace">
       <SidebarItem href="/" active icon={<Home />}>Dashboard</SidebarItem>
       <SidebarItem href="/inbox" icon={<Inbox />} count={3}>Inbox</SidebarItem>
+      <SidebarItem asChild icon={<Box />} count={128}><Link href="/orders">Orders</Link></SidebarItem>
       <SidebarGroup label="Catalog" icon={<Tags />}>
         <SidebarSubItem href="/products">Products</SidebarSubItem>
         <SidebarSubItem href="/categories">Categories</SidebarSubItem>

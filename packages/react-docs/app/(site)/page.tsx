@@ -22,7 +22,6 @@ import { tokens } from "@aeros-core/tokens";
 import { ArrowRight } from "lucide-react";
 import { COMPONENT_SLUGS } from "../_registry";
 import { CodeBlock } from "../_site/code-block";
-import { LinkButton } from "../_site/link-button";
 import { Code, Section } from "../_site/prose";
 import { routesIn } from "../_site/routes";
 
@@ -125,12 +124,12 @@ export default function OverviewPage() {
             operator&apos;s data is the loudest thing on the screen.
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
-            <LinkButton href="/components" trailingIcon={<ArrowRight />}>
-              Browse components
-            </LinkButton>
-            <LinkButton href="/foundations/color" variant="secondary">
-              Foundations
-            </LinkButton>
+            <Button asChild trailingIcon={<ArrowRight />}>
+              <Link href="/components">Browse components</Link>
+            </Button>
+            <Button asChild variant="secondary">
+              <Link href="/foundations/color">Foundations</Link>
+            </Button>
           </div>
         </div>
 
@@ -180,9 +179,9 @@ export default function OverviewPage() {
               <Button variant="ghost" size="sm">
                 Export
               </Button>
-              <LinkButton href="/patterns/data-table" variant="secondary" size="sm">
-                View all
-              </LinkButton>
+              <Button asChild variant="secondary" size="sm">
+                <Link href="/patterns/data-table">View all</Link>
+              </Button>
             </div>
           </CardFooter>
         </Card>

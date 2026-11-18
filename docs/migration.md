@@ -172,6 +172,12 @@ New: the JS export is fully typed, and `rawTokens` gives tokens.json as authored
 | `Checkbox`, `RadioGroupItem` | 18px | 16px | Re-check alignment |
 | `Switch` | 42×24 | 36×20 | Re-check alignment |
 | `Tr selected` | Sets `aria-selected` | Sets `data-selected` | Change selectors and tests from `[aria-selected]` to `[data-selected]` |
+| `Calendar` / date pickers | Day buttons named "Sunday, July 26th, 2026" | Named "26, Sunday, July 2026" (plus ", today" / ", selected"), so the name starts with the visible number | Update tests that find days by name; override with `labels.labelDayButton` |
+| `Card interactive` with `onClick` | A `div` with hover styles; mouse only | `role="button"`, focusable, Enter and Space activate | Do not nest buttons or links inside such a card; use `Card asChild` with an `<a>` for a link card |
+| `SidebarItem asChild` | Threw | The icon, a truncating label and `count` render inside the child; the label is hidden in the rail | Remove any label / count markup you added inside the child |
+| `Button asChild`, `FilterChip asChild` | Rendered nothing when the child came from a Server Component | Works from Server Components | Remove client wrapper components added as a workaround |
+| `CommandSeparator` | `role="separator"` inside the listbox | Decorative (`role="none"`) | Update tests that query `role="separator"` in a command list |
+| `DataTable`, `FileUpload` | — | `labels` prop for every built-in string | Pass translations through `labels` |
 | `Th` | `text-left` | `text-start` | Nothing in LTR |
 | `TableLoadingRow` | Fixed status text | Takes `statusLabel` | Optional |
 | Focus rings | Each component drew a `ring` | The global `:focus-visible` outline is the only ring | Remove `ring-offset-*` and `focus-visible:ring-*` overrides |
@@ -345,7 +351,16 @@ An app on 1.x should apply the [1.x → 2.0 section](#1x--200) below first, then
 
 In short, from 1.x you also need to:
 
-- **Use the `@aeros-core` scope.** The packages are published to GitHub Packages as `@aeros-core/tokens` and `@aeros-core/react`. An app that imports `@aeros/tokens` or `@aeros/react` renames the dependency and every import, and adds the `.npmrc` from [consuming.md](./consuming.md#1-authenticate-to-github-packages).
+- **Rename the packages to the `@aeros-core` scope — required.** The packages were renamed from `@aeros/tokens` and `@aeros/react` to `@aeros-core/tokens` and `@aeros-core/react` at 1.1.0 (GitHub Packages scopes npm by the owning org). The old names do not exist at 3.0, so an app still on `@aeros/*` must:
+  1. Rename both dependencies in `package.json` (keep `workspace:*` if the app consumes the `vendor/aeros-design-system` submodule; otherwise use `^3.0.0`).
+  2. Rename every import and CSS `@import`: `@aeros/react` → `@aeros-core/react`, `@aeros/tokens` → `@aeros-core/tokens`.
+
+     ```bash
+     grep -rlE "@aeros/(react|tokens)" --include='*.ts' --include='*.tsx' --include='*.css' --include='*.json' --include='*.mjs' . \
+       | grep -v node_modules | xargs perl -pi -e 's#\@aeros/(react|tokens)#\@aeros-core/$1#g'
+     ```
+  3. If the app uses the submodule, point it at the `aeros-core` org URL and update it to the 3.0 tag.
+  4. If it installs from the registry, add the `.npmrc` from [consuming.md](./consuming.md#1-authenticate-to-github-packages).
 - **Rename colour-word variants to intent.** `blue` → `info`, `green` → `success`, `amber` → `warning`, `red` → `danger`, `grey` → `neutral`, `dark` → `inverse`. `royal` and `slate` are gone; the only ramp is `ink`. There is no blue in the system.
 - **Remove `Button variant="dark"`** (use `primary`) and the `accent` aliases.
 - **Use the unified breakpoints**: 640 / 768 / 1024 / 1280 / 1536 on both platforms.

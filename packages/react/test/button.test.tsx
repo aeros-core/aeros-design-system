@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { axe } from "jest-axe";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Button, Field, FieldGroup, Input } from "../src";
+import { lazyChild } from "./lazy-child";
 
 describe("Button", () => {
   it("asChild renders the child element as the button, with icons inside it", () => {
@@ -15,6 +16,45 @@ describe("Button", () => {
     expect(link).toContainElement(screen.getByTestId("lead"));
     expect(link).toContainElement(screen.getByTestId("trail"));
     expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  // From a Server Component the child arrives as a lazy reference, not an
+  // element. Regression: with an icon the button used to render nothing at all.
+  it("asChild renders a child that arrives as a lazy (server) reference, icons included", () => {
+    const ref = { current: null as HTMLButtonElement | null };
+    render(
+      <Button asChild ref={ref} className="extra" leadingIcon={<svg data-testid="lead" />} trailingIcon={<svg data-testid="trail" />}>
+        {lazyChild(
+          <a href="/orders/new" className="own">
+            New order
+          </a>
+        )}
+      </Button>
+    );
+    const link = screen.getByRole("link", { name: "New order" });
+    expect(link).toHaveAttribute("href", "/orders/new");
+    expect(link).toHaveClass("extra", "own");
+    expect(link).toContainElement(screen.getByTestId("lead"));
+    expect(link).toContainElement(screen.getByTestId("trail"));
+    expect(ref.current).toBe(link);
+  });
+
+  it("asChild merges the child's own handlers and keeps icon order around the label", async () => {
+    const onButton = vi.fn();
+    const onChild = vi.fn();
+    render(
+      <Button asChild onClick={onButton} leadingIcon={<svg data-testid="lead" />} trailingIcon={<svg data-testid="trail" />}>
+        <a href="#x" onClick={onChild}>
+          Go
+        </a>
+      </Button>
+    );
+    const link = screen.getByRole("link", { name: "Go" });
+    link.click();
+    expect(onButton).toHaveBeenCalledTimes(1);
+    expect(onChild).toHaveBeenCalledTimes(1);
+    expect(link.firstElementChild).toBe(screen.getByTestId("lead"));
+    expect(link.lastElementChild).toBe(screen.getByTestId("trail"));
   });
 
   it("iconOnly keeps the accessible name from aria-label", async () => {

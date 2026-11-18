@@ -88,6 +88,46 @@ export function createDataTableColumnHelper<T extends RowData>(): ColumnHelper<D
   return createColumnHelper<DataTableFeatures, T>();
 }
 
+/**
+ * Every string the DataTable writes itself, for localisation. Pass a partial
+ * object as `labels`; anything left out keeps the English default.
+ */
+export interface DataTableLabels {
+  /** Selection bar status. Default: "3 selected". */
+  selected: (count: number) => string;
+  /** Selection bar button. Default: "Clear selection". */
+  clearSelection: string;
+  /** Name of the header checkbox. Default: "Select all rows". */
+  selectAll: string;
+  /** Name of a row's checkbox, from `getRowLabel` (or `rowPosition`). Default: "Select <label>". */
+  selectRow: (label: string) => string;
+  /** How a row is named when `getRowLabel` is not set (1-based position). Default: "row 3". */
+  rowPosition: (position: number) => string;
+  /** Name of the focusable scroll area (with `maxHeight`). Default: "Scrollable table". */
+  scrollRegion: string;
+  /** Pagination summary. Default: "1–10 of 42". */
+  rangeOf: (from: number, to: number, total: number) => string;
+  /** Visible text while `loading`. Default: "Loading…". */
+  loading: string;
+  /** What assistive tech hears while `loading`. Default: "Loading table data". */
+  loadingStatus: string;
+  /** Shown when there is no data and no `emptyState`. Default: "No results.". */
+  empty: string;
+}
+
+export const defaultDataTableLabels: DataTableLabels = {
+  selected: (count) => `${count} selected`,
+  clearSelection: "Clear selection",
+  selectAll: "Select all rows",
+  selectRow: (label) => `Select ${label}`,
+  rowPosition: (position) => `row ${position}`,
+  scrollRegion: "Scrollable table",
+  rangeOf: (from, to, total) => `${from}–${to} of ${total}`,
+  loading: "Loading…",
+  loadingStatus: "Loading table data",
+  empty: "No results."
+};
+
 export interface DataTableProps<T extends RowData>
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "children" | "onChange"> {
   columns: ReadonlyArray<DataTableColumn<T>>;
@@ -143,6 +183,9 @@ export interface DataTableProps<T extends RowData>
 
   /** Accessible name of the table, rendered as a visually hidden `<caption>`. */
   caption?: React.ReactNode;
+
+  /** Overrides for the strings the table writes itself (localisation). Keep the object stable. */
+  labels?: Partial<DataTableLabels>;
 }
 
 // Same surface as Table's own shell, which cannot host a scroll area or a footer.
@@ -217,6 +260,7 @@ function DataTableInner<T extends RowData>(
     toolbar,
     selectionActions,
     caption,
+    labels,
     className,
     style,
     "aria-label": ariaLabel,
@@ -226,6 +270,7 @@ function DataTableInner<T extends RowData>(
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
   const paginated = pageSize !== undefined || paginationProp !== undefined;
+  const text = React.useMemo(() => ({ ...defaultDataTableLabels, ...labels }), [labels]);
 
   const [sorting, setSortingState] = useSlice(sortingProp, NO_SORTING, onSortingChange);
   const [rowSelection, setRowSelection] = useSlice(rowSelectionProp, NO_SELECTION, onRowSelectionChange);
@@ -312,13 +357,13 @@ function DataTableInner<T extends RowData>(
       {showSelectionBar ? (
         <div className="flex min-h-control-lg flex-wrap items-center gap-2 rounded-surface border border-border-default bg-bg-subtle px-3 py-1">
           <span className="text-label-sm text-fg-primary" role="status">
-            {selectedCount} selected
+            {text.selected(selectedCount)}
           </span>
           <div className="flex flex-1 flex-wrap items-center gap-2">
             {selectionActions(table.getSelectedRowModel().rows.map((row) => row.original))}
           </div>
           <Button variant="ghost" size="sm" leadingIcon={<X aria-hidden />} onClick={() => setRowSelection({})}>
-            Clear selection
+            {text.clearSelection}
           </Button>
         </div>
       ) : null}
@@ -331,7 +376,7 @@ function DataTableInner<T extends RowData>(
           // A scroll area has to be reachable without a pointer.
           tabIndex={scrolls ? 0 : undefined}
           role={scrolls ? "group" : undefined}
-          aria-label={scrolls ? "Scrollable table" : undefined}
+          aria-label={scrolls ? text.scrollRegion : undefined}
         >
           <Table
             shell={false}
@@ -349,7 +394,7 @@ function DataTableInner<T extends RowData>(
                     <Th rowSpan={headerGroups.length} className={cn("w-10 pe-0", stickyCell)}>
                       <span className="flex items-center">
                         <Checkbox
-                          aria-label="Select all rows"
+                          aria-label={text.selectAll}
                           checked={allSelected ? true : someSelected ? "indeterminate" : false}
                           disabled={!showRows}
                           onCheckedChange={(checked) => table.toggleAllPageRowsSelected(checked === true)}
@@ -381,13 +426,15 @@ function DataTableInner<T extends RowData>(
             </Thead>
             <Tbody>
               {loading ? (
-                <TableLoadingRow colSpan={colSpan} />
+                <TableLoadingRow colSpan={colSpan} statusLabel={text.loadingStatus}>
+                  {text.loading}
+                </TableLoadingRow>
               ) : rows.length === 0 ? (
-                <TableEmptyRow colSpan={colSpan}>{emptyState}</TableEmptyRow>
+                <TableEmptyRow colSpan={colSpan}>{emptyState ?? text.empty}</TableEmptyRow>
               ) : (
                 rows.map((row, rowIndex) => {
                   const selected = selectable && row.getIsSelected();
-                  const label = getRowLabel ? getRowLabel(row.original) : `row ${pageIndex * size + rowIndex + 1}`;
+                  const label = getRowLabel ? getRowLabel(row.original) : text.rowPosition(pageIndex * size + rowIndex + 1);
                   return (
                     <Tr
                       key={row.id}
@@ -416,7 +463,7 @@ function DataTableInner<T extends RowData>(
                         <Td className="w-10 pe-0">
                           <span className="flex items-center">
                             <Checkbox
-                              aria-label={`Select ${label}`}
+                              aria-label={text.selectRow(label)}
                               checked={selected}
                               disabled={!row.getCanSelect()}
                               onCheckedChange={(checked) => row.toggleSelected(checked === true)}
@@ -444,7 +491,7 @@ function DataTableInner<T extends RowData>(
         {paginated && total > 0 ? (
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border-default px-3 py-2">
             <span className="text-caption text-fg-muted tabular-nums">
-              {firstRow}–{lastRow} of {total}
+              {text.rangeOf(firstRow, lastRow, total)}
             </span>
             <Pagination
               page={pageIndex + 1}

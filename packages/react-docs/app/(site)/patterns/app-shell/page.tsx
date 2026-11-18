@@ -51,18 +51,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 const NAV_LINK = `"use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SidebarItem, useSidebar } from "@aeros-core/react";
+import { SidebarItem } from "@aeros-core/react";
 
 // A sidebar row that is a framework link, marked as the current page.
-export function NavLink({ href, icon, children }: { href: string; icon: React.ReactNode; children: string }) {
+// (A client component only because it reads the pathname.)
+export function NavLink({ href, icon, count, children }: { href: string; icon: React.ReactNode; count?: number; children: string }) {
   const pathname = usePathname();
-  const { collapsed, isMobile } = useSidebar();
-  const rail = collapsed && !isMobile;
   return (
-    <SidebarItem asChild active={pathname === href} icon={icon} tooltip={children}>
-      <Link href={href}>
-        <span className={rail ? "sr-only" : "min-w-0 flex-1 truncate"}>{children}</span>
-      </Link>
+    <SidebarItem asChild active={pathname === href} icon={icon} count={count}>
+      <Link href={href}>{children}</Link>
     </SidebarItem>
   );
 }`;
@@ -147,8 +144,9 @@ export default function AppShellPatternPage() {
         description={
           <>
             Pass a framework link through <Code>asChild</Code> and set <Code>active</Code> from the router; the row
-            then carries <Code>aria-current=&quot;page&quot;</Code>. With <Code>asChild</Code> the label is yours to
-            render, so hide it in the rail and give the row a <Code>tooltip</Code>.
+            then carries <Code>aria-current=&quot;page&quot;</Code>. An <Code>asChild</Code> row behaves like any
+            other: the icon, the label and <Code>count</Code> render inside your link, the label truncates, and in
+            the rail it is hidden visually, kept as the accessible name and shown as the tooltip.
           </>
         }
       >

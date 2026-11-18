@@ -2,10 +2,11 @@
 import * as React from "react";
 import * as RC from "@radix-ui/react-collapsible";
 import * as RD from "@radix-ui/react-dialog";
-import { Slot, Slottable } from "@radix-ui/react-slot";
+import { Slot } from "@radix-ui/react-slot";
 import { tokens } from "@aeros-core/tokens";
 import { ChevronRight, PanelLeft } from "lucide-react";
 import { cn } from "../lib/cn";
+import { resolveLazyNode, resolveSlotChild } from "../internal/as-child";
 import { colorTransition, modalPanel, scrim } from "../internal/recipes";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip";
 
@@ -319,13 +320,17 @@ export interface SidebarItemProps extends React.AnchorHTMLAttributes<HTMLAnchorE
   /** Shown as a count pill when above zero (unread, pending) and announced with the label. */
   count?: number;
   /**
-   * Render the child element (e.g. a framework `<Link>`) instead of a native anchor.
-   * The child owns its content, so `count` is not rendered and the label is not
-   * hidden in the rail for you: pass `tooltip`, and hide your own label with
-   * `useSidebar().collapsed`.
+   * Render the child element (e.g. a framework `<Link>`) as the row instead of a
+   * native anchor: `<SidebarItem asChild icon={…}><Link href="/orders">Orders</Link></SidebarItem>`.
+   * The row behaves exactly like the default one — the icon, the label and `count`
+   * render inside the child, the label truncates, and in the rail it is visually
+   * hidden but stays the accessible name. Pass only the label as the child's content.
    */
   asChild?: boolean;
-  /** Tooltip text in the rail. Defaults to the label when it is plain text. */
+  /**
+   * Tooltip text in the rail. Defaults to the label when it is plain text
+   * (with `asChild`, the child element's text content).
+   */
   tooltip?: string;
 }
 
@@ -337,6 +342,24 @@ export const SidebarItem = React.forwardRef<HTMLAnchorElement, SidebarItemProps>
     const Comp: React.ElementType = asChild ? Slot : href != null ? "a" : "button";
     const hasCount = count != null && count > 0;
     const { onClick, ...rest } = props;
+    // asChild: the caller's element becomes the row and its content is the label.
+    // (Resolved first — from a Server Component the child can be a lazy reference.)
+    const child = asChild ? resolveSlotChild(children) : null;
+    const label = child ? child.props.children : children;
+
+    const content = (
+      <>
+        {icon ?? (
+          // No icon: a small marker keeps labels aligned with rows that have one.
+          <span aria-hidden className="flex size-nav-icon shrink-0 items-center justify-center">
+            <span className={cn("size-1.5 rounded-full", active ? "bg-fg-primary" : "bg-border-strong")} />
+          </span>
+        )}
+        <span className={cn("min-w-0 flex-1 truncate", rail && "sr-only")}>{label}</span>
+        {hasCount && !rail && <CountPill count={count} />}
+        {hasCount && rail && <span className="sr-only">, {count}</span>}
+      </>
+    );
 
     const row = (
       <Comp
@@ -352,26 +375,11 @@ export const SidebarItem = React.forwardRef<HTMLAnchorElement, SidebarItemProps>
         }}
         {...rest}
       >
-        {icon ?? (
-          // No icon: a small marker keeps labels aligned with rows that have one.
-          <span aria-hidden className="flex size-nav-icon shrink-0 items-center justify-center">
-            <span className={cn("size-1.5 rounded-full", active ? "bg-fg-primary" : "bg-border-strong")} />
-          </span>
-        )}
-        {asChild ? (
-          // The caller's element becomes the row; the icon renders inside it.
-          <Slottable>{children}</Slottable>
-        ) : (
-          <>
-            <span className={cn("min-w-0 flex-1 truncate", rail && "sr-only")}>{children}</span>
-            {hasCount && !rail && <CountPill count={count} />}
-            {hasCount && rail && <span className="sr-only">, {count}</span>}
-          </>
-        )}
+        {asChild ? child && React.cloneElement(child, undefined, content) : content}
       </Comp>
     );
 
-    const tip = tooltip ?? (typeof children === "string" ? children : undefined);
+    const tip = tooltip ?? (typeof label === "string" ? label : undefined);
     if (!rail || !tip) return row;
     return (
       <Tooltip>
@@ -460,7 +468,7 @@ export interface SidebarSubItemProps extends React.AnchorHTMLAttributes<HTMLAnch
 
 /** A child of `SidebarGroup`. Its label lines up with the parent's label. */
 export const SidebarSubItem = React.forwardRef<HTMLAnchorElement, SidebarSubItemProps>(
-  ({ active, asChild, href, className, onClick, ...props }, ref) => {
+  ({ active, asChild, href, className, onClick, children, ...props }, ref) => {
     const { isMobile, setMobileOpen } = useSidebar();
     const Comp: React.ElementType = asChild ? Slot : href != null ? "a" : "button";
     return (
@@ -476,7 +484,10 @@ export const SidebarSubItem = React.forwardRef<HTMLAnchorElement, SidebarSubItem
           if (isMobile) setMobileOpen(false);
         }}
         {...props}
-      />
+      >
+        {/* From a Server Component the child can be a lazy reference; give Slot the element. */}
+        {asChild ? resolveLazyNode(children) : children}
+      </Comp>
     );
   }
 );

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "../lib/cn";
+import { resolveLazyNode } from "../internal/as-child";
 import { colorTransition } from "../internal/recipes";
 
 // The page frame: a sidebar beside a column of header, content and footer.
@@ -105,7 +106,7 @@ export interface AppHeaderLinkProps extends React.AnchorHTMLAttributes<HTMLAncho
 }
 
 export const AppHeaderLink = React.forwardRef<HTMLAnchorElement, AppHeaderLinkProps>(
-  ({ active, className, asChild, href, ...props }, ref) => {
+  ({ active, className, asChild, href, children, ...props }, ref) => {
     // Anchors without href are not keyboard-operable — fall back to a real button.
     const Comp: React.ElementType = asChild ? Slot : href != null ? "a" : "button";
     return (
@@ -120,7 +121,10 @@ export const AppHeaderLink = React.forwardRef<HTMLAnchorElement, AppHeaderLinkPr
           className
         )}
         {...props}
-      />
+      >
+        {/* From a Server Component the child can be a lazy reference; give Slot the element. */}
+        {asChild ? resolveLazyNode(children) : children}
+      </Comp>
     );
   }
 );

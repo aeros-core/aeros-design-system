@@ -1,7 +1,8 @@
 import * as React from "react";
-import { Slot, Slottable } from "@radix-ui/react-slot";
+import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../lib/cn";
+import { slotChildWith } from "../internal/as-child";
 import { colorTransition, controlSize, controlSquare, disabledControl } from "../internal/recipes";
 import { Spinner } from "./spinner";
 
@@ -52,21 +53,36 @@ export interface ButtonProps
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, iconOnly, asChild, loading, leadingIcon, trailingIcon, children, disabled, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
+    const leading = loading ? <Spinner size="sm" className="text-current" /> : leadingIcon;
+    const shared = {
+      ref,
+      className: cn(buttonVariants({ variant, size, iconOnly }), className),
+      disabled: disabled || loading,
+      "aria-busy": loading || undefined,
+      ...props
+    };
+    if (asChild) {
+      // The caller's element becomes the button and the icons render inside it.
+      // The child is resolved first: from a Server Component it can arrive as a
+      // lazy reference, which Slot only unwraps as its direct child.
+      return (
+        <Slot {...shared}>
+          {slotChildWith(children, (label) => (
+            <>
+              {leading}
+              {label}
+              {trailingIcon}
+            </>
+          ))}
+        </Slot>
+      );
+    }
     return (
-      <Comp
-        ref={ref}
-        className={cn(buttonVariants({ variant, size, iconOnly }), className)}
-        disabled={disabled || loading}
-        aria-busy={loading || undefined}
-        {...props}
-      >
-        {loading ? <Spinner size="sm" className="text-current" /> : leadingIcon}
-        {/* Slottable marks which child Slot should merge into when asChild is set;
-            the icons then render inside that child. */}
-        <Slottable>{children}</Slottable>
+      <button {...shared}>
+        {leading}
+        {children}
         {trailingIcon}
-      </Comp>
+      </button>
     );
   }
 );

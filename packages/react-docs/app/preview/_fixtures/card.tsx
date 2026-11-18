@@ -65,6 +65,24 @@ export default function CardFixture() {
           </CardBody>
         </Card>
       </Group>
+      <Group label="The whole card as the control" className="grid items-start gap-5 md:grid-cols-2">
+        {/* onClick: the card is a button — focusable, Enter and Space activate it. No other control inside. */}
+        <Card interactive onClick={() => {}}>
+          <CardBody>
+            <p className="text-body-md font-semibold text-fg-primary">Clickable card</p>
+            <p className="mt-1 text-caption text-fg-muted">interactive + onClick — a button.</p>
+          </CardBody>
+        </Card>
+        {/* asChild: the card is your element — here a real link. */}
+        <Card asChild interactive>
+          <a href="#order-1042">
+            <CardBody>
+              <p className="text-body-md font-semibold text-fg-primary">Order #1042</p>
+              <p className="mt-1 text-caption text-fg-muted">interactive + asChild — a link.</p>
+            </CardBody>
+          </a>
+        </Card>
+      </Group>
     </>
   );
 }
