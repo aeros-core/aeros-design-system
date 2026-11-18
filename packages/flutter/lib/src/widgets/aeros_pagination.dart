@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import '../foundation/aeros_control_size.dart';
+import '../foundation/aeros_focus_ring.dart';
+import '../foundation/aeros_pressable.dart';
+import '../foundation/aeros_state_layer.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/radii.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
+import 'aeros_button.dart';
 
 enum AerosPaginationVariant { compact, numbered }
 
+/// Page navigation.
+///
+/// Every button is one control ([AerosControlSize.sm]) high and square. The
+/// arrows are ghost icon buttons; page numbers are ghost until hovered, and
+/// the current page is solid `brandPrimary`. Keyboard focus draws the focus
+/// ring. [previousLabel] / [nextLabel] name the arrows for screen readers.
 class AerosPagination extends StatelessWidget {
   const AerosPagination({
     super.key,
@@ -14,6 +24,8 @@ class AerosPagination extends StatelessWidget {
     required this.onChanged,
     this.variant = AerosPaginationVariant.compact,
     this.maxVisiblePages = 5,
+    this.previousLabel = 'Previous page',
+    this.nextLabel = 'Next page',
   });
 
   final int page;
@@ -21,6 +33,10 @@ class AerosPagination extends StatelessWidget {
   final ValueChanged<int> onChanged;
   final AerosPaginationVariant variant;
   final int maxVisiblePages;
+  final String previousLabel;
+  final String nextLabel;
+
+  static const AerosControlSize _size = AerosControlSize.sm;
 
   bool get _hasPrev => page > 1;
   bool get _hasNext => page < totalPages;
@@ -30,77 +46,43 @@ class AerosPagination extends StatelessWidget {
     onChanged(target);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final a = context.aerosColors;
-    return switch (variant) {
-      AerosPaginationVariant.compact => _buildCompact(a),
-      AerosPaginationVariant.numbered => _buildNumbered(a),
-    };
-  }
-
-  Widget _buildCompact(a) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _ArrowButton(
-          icon: Icons.arrow_back_ios_new,
-          enabled: _hasPrev,
-          onTap: () => _go(page - 1),
-          fg: a.fgPrimary,
-          fgMuted: a.fgMuted,
-        ),
-        const SizedBox(width: AerosSpacing.s3),
-        Text(
-          '$page / $totalPages',
-          style: AerosTypography.bodyMd(color: a.fgPrimary),
-        ),
-        const SizedBox(width: AerosSpacing.s3),
-        _ArrowButton(
-          icon: Icons.arrow_forward_ios,
-          enabled: _hasNext,
-          onTap: () => _go(page + 1),
-          fg: a.fgPrimary,
-          fgMuted: a.fgMuted,
-        ),
-      ],
+  Widget _arrow(BuildContext context, {required bool forward}) {
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    final enabled = forward ? _hasNext : _hasPrev;
+    return AerosButton.icon(
+      // Points along the reading direction.
+      icon: Icon(forward != rtl ? Icons.chevron_right : Icons.chevron_left),
+      semanticLabel: forward ? nextLabel : previousLabel,
+      size: _size,
+      onPressed: enabled ? () => _go(forward ? page + 1 : page - 1) : null,
     );
   }
 
-  Widget _buildNumbered(a) {
-    final pages = _visiblePages();
+  @override
+  Widget build(BuildContext context) {
+    final a = context.aerosColors;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _ArrowButton(
-          icon: Icons.arrow_back_ios_new,
-          enabled: _hasPrev,
-          onTap: () => _go(page - 1),
-          fg: a.fgPrimary,
-          fgMuted: a.fgMuted,
-        ),
-        const SizedBox(width: AerosSpacing.s2),
-        for (final p in pages) ...[
-          _PageButton(
-            label: p == null ? '…' : '$p',
-            selected: p == page,
-            onTap: p == null ? null : () => _go(p),
-            fg: a.fgPrimary,
-            fgMuted: a.fgMuted,
-            selectedBg: a.brandPrimary,
-            selectedFg: a.fgInverse,
-            border: a.borderDefault,
-          ),
-          const SizedBox(width: AerosSpacing.s1),
-        ],
+        _arrow(context, forward: false),
         const SizedBox(width: AerosSpacing.s1),
-        _ArrowButton(
-          icon: Icons.arrow_forward_ios,
-          enabled: _hasNext,
-          onTap: () => _go(page + 1),
-          fg: a.fgPrimary,
-          fgMuted: a.fgMuted,
-        ),
+        if (variant == AerosPaginationVariant.compact)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s2),
+            child: Text('$page / $totalPages', style: AerosTypography.labelSm(color: a.fgPrimary)),
+          )
+        else
+          for (final p in _visiblePages()) ...[
+            _PageButton(
+              page: p,
+              selected: p == page,
+              size: _size,
+              onTap: p == null ? null : () => _go(p),
+            ),
+            const SizedBox(width: AerosSpacing.s1),
+          ],
+        if (variant == AerosPaginationVariant.compact) const SizedBox(width: AerosSpacing.s1),
+        _arrow(context, forward: true),
       ],
     );
   }
@@ -138,80 +120,71 @@ class AerosPagination extends StatelessWidget {
   }
 }
 
-class _ArrowButton extends StatelessWidget {
-  const _ArrowButton({
-    required this.icon,
-    required this.enabled,
-    required this.onTap,
-    required this.fg,
-    required this.fgMuted,
-  });
-
-  final IconData icon;
-  final bool enabled;
-  final VoidCallback onTap;
-  final Color fg;
-  final Color fgMuted;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: enabled ? onTap : null,
-      borderRadius: AerosRadii.brSm,
-      child: Padding(
-        padding: const EdgeInsets.all(AerosSpacing.s2),
-        child: Icon(icon, size: 14, color: enabled ? fg : fgMuted),
-      ),
-    );
-  }
-}
-
+/// One page number, or — with a null [page] — the "…" between two runs.
 class _PageButton extends StatelessWidget {
   const _PageButton({
-    required this.label,
+    required this.page,
     required this.selected,
+    required this.size,
     required this.onTap,
-    required this.fg,
-    required this.fgMuted,
-    required this.selectedBg,
-    required this.selectedFg,
-    required this.border,
   });
 
-  final String label;
+  final int? page;
   final bool selected;
+  final AerosControlSize size;
   final VoidCallback? onTap;
-  final Color fg;
-  final Color fgMuted;
-  final Color selectedBg;
-  final Color selectedFg;
-  final Color border;
 
   @override
   Widget build(BuildContext context) {
-    final disabled = onTap == null;
-    return Material(
-      color: selected ? selectedBg : Colors.transparent,
-      borderRadius: AerosRadii.brSm,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: AerosRadii.brSm,
-        child: Container(
-          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            borderRadius: AerosRadii.brSm,
-            border: selected ? null : Border.all(color: border),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            label,
-            style: AerosTypography.bodySm(
-              color: selected ? selectedFg : (disabled ? fgMuted : fg),
-            ).withWeight(FontWeight.w600),
-          ),
+    final a = context.aerosColors;
+    final side = size.resolveHeight(context);
+    final box = BoxConstraints(minWidth: side, minHeight: side, maxHeight: side);
+    final page = this.page;
+
+    if (page == null) {
+      return ConstrainedBox(
+        constraints: box,
+        child: Center(
+          widthFactor: 1,
+          child: ExcludeSemantics(child: Text('…', style: size.labelStyle(color: a.fgMuted))),
         ),
-      ),
+      );
+    }
+
+    return AerosPressable(
+      onPressed: onTap,
+      selected: selected,
+      // A run of numbers stays as tight as the controls themselves; the
+      // arrows on either side carry the full-size target.
+      expandHitTarget: false,
+      semanticLabel: 'Page $page',
+      excludeSemantics: true,
+      builder: (context, state) {
+        final active = state.hovered || state.pressed;
+        // The state overlays are ink and vanish on the solid brand fill.
+        final fill = selected
+            ? (active ? a.brandPrimaryHover : a.brandPrimary)
+            : AerosStateLayer.resolve(a, Colors.transparent, hovered: state.hovered, pressed: state.pressed);
+        return AerosFocusRing(
+          focused: state.focused,
+          radius: size.radius,
+          child: AerosStateFill(
+            color: fill,
+            radius: size.radius,
+            constraints: box,
+            padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s1_5),
+            child: Center(
+              widthFactor: 1,
+              child: Text(
+                '$page',
+                maxLines: 1,
+                softWrap: false,
+                style: size.labelStyle(color: selected ? a.fgInverse : a.fgPrimary),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

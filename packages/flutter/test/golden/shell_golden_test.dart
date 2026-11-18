@@ -24,8 +24,10 @@ List<AerosNavItem> _items() => [
       const AerosNavItem(label: 'No handler'),
     ];
 
-AerosSidenav _sidenav({AerosSidenavDensity density = AerosSidenavDensity.pointer}) => AerosSidenav(
+AerosSidenav _sidenav({AerosSidenavDensity density = AerosSidenavDensity.pointer, bool collapsed = false}) =>
+    AerosSidenav(
       density: density,
+      collapsed: collapsed,
       header: AerosSidenavHeader(title: 'Boson Machines', subtitle: 'Seller workspace', onTap: () {}),
       footer: AerosSidenavFooter(
         name: 'Parth Panchal',
@@ -37,7 +39,12 @@ AerosSidenav _sidenav({AerosSidenavDensity density = AerosSidenavDensity.pointer
       items: _items(),
     );
 
-Widget _shell(BuildContext context, {AerosSidenavDensity density = AerosSidenavDensity.pointer}) => AerosScaffold(
+Widget _shell(
+  BuildContext context, {
+  AerosSidenavDensity density = AerosSidenavDensity.pointer,
+  bool collapsed = false,
+}) =>
+    AerosScaffold(
       topnav: AerosTopnav(
         title: 'Orders',
         actions: [
@@ -49,7 +56,7 @@ Widget _shell(BuildContext context, {AerosSidenavDensity density = AerosSidenavD
           ),
         ],
       ),
-      sidenav: _sidenav(density: density),
+      sidenav: _sidenav(density: density, collapsed: collapsed),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -85,6 +92,29 @@ void main() {
   goldenMatrix(
     'shell_desktop_nav_item_focused',
     _shell,
+    size: desktop,
+    padded: false,
+    act: (t) => focus(t, find.byType(AerosSidenav)),
+  );
+
+  // Collapsed to the icon-only rail; a row hovered shows its label as a tooltip.
+  goldenMatrix(
+    'shell_desktop_rail',
+    (context) => _shell(context, collapsed: true),
+    size: desktop,
+    padded: false,
+  );
+  goldenMatrix(
+    'shell_desktop_rail_item_hovered',
+    (context) => _shell(context, collapsed: true),
+    size: desktop,
+    padded: false,
+    settle: GoldenSettle.bounded,
+    act: (t) => hover(t, find.byIcon(Icons.people_outline)),
+  );
+  goldenMatrix(
+    'shell_desktop_rail_item_focused',
+    (context) => _shell(context, collapsed: true),
     size: desktop,
     padded: false,
     act: (t) => focus(t, find.byType(AerosSidenav)),
@@ -192,6 +222,19 @@ void main() {
       ],
     ),
   );
+
+  // The rail on its own, at both row densities.
+  for (final density in AerosSidenavDensity.values) {
+    goldenMatrix(
+      'shell_sidenav_rail_${density.name}',
+      size: const Size(100, 520),
+      (context) => SizedBox(
+        width: AerosMetricTokens.layoutSidebarRail,
+        height: 480,
+        child: _sidenav(density: density, collapsed: true),
+      ),
+    );
+  }
 
   // A rail with no header or footer, and plain items.
   goldenMatrix(

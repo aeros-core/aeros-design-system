@@ -14,11 +14,11 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-  TopNav,
-  TopNavBrand,
-  TopNavLink,
-  TopNavLinks,
-  TopNavRight
+  AppHeader,
+  AppHeaderBrand,
+  AppHeaderLink,
+  AppHeaderNav,
+  AppHeaderActions
 } from "../src";
 
 // Behaviour + semantics only. No class-name or pixel assertions.
@@ -354,13 +354,8 @@ describe("Sidebar", () => {
     expect(within(link).getByTestId("icon")).toBeInTheDocument();
   });
 
-  // DEFECT: <SidebarItem asChild> always throws "React.Children.only expected
-  // to receive a single React element child". The component hands Radix Slot
-  // two children (the icon/default marker plus the caller's element), and Slot
-  // accepts exactly one, so the documented framework-<Link> usage cannot render.
-  // Cause: packages/react/src/components/sidebar.tsx:88 (Comp = Slot) with
-  // :105-106 (icon rendered as a sibling of `children` inside the Slot).
-  it.fails("asChild renders the caller's link element with aria-current", () => {
+  // The caller's element becomes the row; the icon renders inside it.
+  it("asChild renders the caller's link element with aria-current", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
     onTestFinished(() => error.mockRestore());
     render(
@@ -398,22 +393,22 @@ describe("Sidebar", () => {
   });
 });
 
-describe("TopNav", () => {
+describe("AppHeader", () => {
   function Nav({ onSignOut = () => {} }: { onSignOut?: () => void }) {
     return (
-      <TopNav>
-        <TopNavBrand mark="A" name="Aeros" />
-        <TopNavLinks>
-          <TopNavLink href="/home">Home</TopNavLink>
-          <TopNavLink href="/orders" active>
+      <AppHeader>
+        <AppHeaderBrand mark="A" name="Aeros" />
+        <AppHeaderNav>
+          <AppHeaderLink href="/home">Home</AppHeaderLink>
+          <AppHeaderLink href="/orders" active>
             Orders
-          </TopNavLink>
-          <TopNavLink onClick={onSignOut}>Sign out</TopNavLink>
-        </TopNavLinks>
-        <TopNavRight>
+          </AppHeaderLink>
+          <AppHeaderLink onClick={onSignOut}>Sign out</AppHeaderLink>
+        </AppHeaderNav>
+        <AppHeaderActions>
           <span>parth@aeros.dev</span>
-        </TopNavRight>
-      </TopNav>
+        </AppHeaderActions>
+      </AppHeader>
     );
   }
 
@@ -452,17 +447,17 @@ describe("TopNav", () => {
   });
 
   it("an active button fallback also carries aria-current", () => {
-    render(<TopNavLink active>Dashboard</TopNavLink>);
+    render(<AppHeaderLink active>Dashboard</AppHeaderLink>);
     expect(screen.getByRole("button", { name: "Dashboard" })).toHaveAttribute("aria-current", "page");
   });
 
   it("asChild renders the caller's link element with aria-current", () => {
     render(
-      <TopNavLink asChild active>
+      <AppHeaderLink asChild active>
         <a href="/orders" data-router-link="">
           Orders
         </a>
-      </TopNavLink>
+      </AppHeaderLink>
     );
     const link = screen.getByRole("link", { name: "Orders" });
     expect(link).toHaveAttribute("href", "/orders");
@@ -471,7 +466,7 @@ describe("TopNav", () => {
   });
 
   it("lets the caller rename the links landmark", () => {
-    render(<TopNavLinks aria-label="Sections">x</TopNavLinks>);
+    render(<AppHeaderNav aria-label="Sections">x</AppHeaderNav>);
     expect(screen.getByRole("navigation", { name: "Sections" })).toBeInTheDocument();
   });
 

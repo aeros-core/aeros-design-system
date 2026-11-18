@@ -293,12 +293,18 @@ class AerosTheme {
         titleTextStyle: AerosTypography.titleLg(color: aliases.fgPrimary),
         contentTextStyle: AerosTypography.bodyMd(color: aliases.fgSecondary),
       ),
+      // A plain SnackBar is the same elevated surface as `AerosSnackbar`
+      // (which adds the overlay shadow): never an inverse slab.
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: aliases.bgInverse,
-        contentTextStyle: AerosTypography.bodySm(color: aliases.fgInverse),
+        backgroundColor: aliases.bgElevated,
+        contentTextStyle: AerosTypography.labelSm(color: aliases.fgPrimary),
+        actionTextColor: aliases.fgPrimary,
         behavior: SnackBarBehavior.floating,
         elevation: 0,
-        shape: const RoundedRectangleBorder(borderRadius: _controlRadius),
+        shape: RoundedRectangleBorder(
+          borderRadius: _surfaceRadius,
+          side: BorderSide(color: aliases.borderDefault, width: AerosMetricTokens.borderHairline),
+        ),
       ),
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(

@@ -60,28 +60,37 @@ void main() {
       .firstWhere((v) => v.axis == 'wght')
       .value;
 
+  // The row's painted fill: the nearest AerosStateFill around its label.
   Color? fillOf(WidgetTester tester, Finder f) => tester
-      .widgetList<Material>(find.ancestor(of: f, matching: find.byType(Material)))
+      .widgetList<AerosStateFill>(find.ancestor(of: f, matching: find.byType(AerosStateFill)))
       .first
       .color;
 
   group('AerosSidenav density', () {
     testWidgets('pointer rows are 32px with 16px icons and 13px labels', (tester) async {
+      const sizes = AerosSizeTokens.pointer;
+      expect((sizes.navRow, sizes.navIcon, sizes.navLabel), (32, 16, 13));
       await pumpSidenav(tester);
 
       final label = tester.widget<Text>(find.text('Orders'));
-      expect(label.style!.fontSize, 13);
+      expect(label.style!.fontSize, sizes.navLabel);
       expect(label.maxLines, 1);
       expect(label.overflow, TextOverflow.ellipsis);
-      expect(tester.widget<Icon>(find.byIcon(Icons.receipt_long_outlined)).size, 16);
-      // 32px row + the 2px gap that keeps a hovered pill from fusing with the selected one.
-      expect(tester.getSize(find.byKey(const ValueKey('nav:orders'))).height, 34);
+      expect(tester.widget<Icon>(find.byIcon(Icons.receipt_long_outlined)).size, sizes.navIcon);
+      // The row + the 2px gap that keeps a hovered row from fusing with the selected one.
+      expect(tester.getSize(find.byKey(const ValueKey('nav:orders'))).height, sizes.navRow + AerosSpacing.s0_5);
+      // AerosSidenavDensity is a view onto the same tokens.
+      expect(AerosSidenavDensity.pointer.rowHeight, sizes.navRow);
+      expect(AerosSidenavDensity.pointer.iconSize, sizes.navIcon);
+      expect(AerosSidenavDensity.pointer.labelSize, sizes.navLabel);
     });
 
     testWidgets('touch rows are 48px with 20px icons', (tester) async {
+      const sizes = AerosSizeTokens.touch;
+      expect((sizes.navRow, sizes.navIcon), (48, 20));
       await pumpSidenav(tester, density: AerosSidenavDensity.touch);
-      expect(tester.getSize(find.byKey(const ValueKey('nav:orders'))).height, 50);
-      expect(tester.widget<Icon>(find.byIcon(Icons.receipt_long_outlined)).size, 20);
+      expect(tester.getSize(find.byKey(const ValueKey('nav:orders'))).height, sizes.navRow + AerosSpacing.s0_5);
+      expect(tester.widget<Icon>(find.byIcon(Icons.receipt_long_outlined)).size, sizes.navIcon);
     });
   });
 
@@ -127,30 +136,32 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('selected fills bgSubtle; hover is a step lighter, in both themes', (tester) async {
+    testWidgets('selected fills bgSubtle; hover is the state overlay on the rail, in both themes', (tester) async {
       for (final theme in [AerosTheme.light(), AerosTheme.dark()]) {
         await pumpSidenav(tester, theme: theme);
         final a = tester.element(find.text('Orders')).aerosColors;
         expect(fillOf(tester, find.text('Industry Master')), a.bgSubtle);
+        // At rest a row is the rail itself.
+        expect(fillOf(tester, find.text('Orders')), a.bgSurface);
 
         final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
         await mouse.addPointer(location: Offset.zero);
         await mouse.moveTo(tester.getCenter(find.text('Orders')));
         await tester.pump();
         final hover = fillOf(tester, find.text('Orders'))!;
-        // Strictly between the rail and the selected fill.
-        final l = hover.computeLuminance();
-        final s = a.bgSurface.computeLuminance(), sel = a.bgSubtle.computeLuminance();
-        expect(l, isNot(s));
-        expect(l, isNot(sel));
-        expect(l, inInclusiveRange(s < sel ? s : sel, s < sel ? sel : s));
+        // 3.0: hover is the shared `stateHover` overlay over the rail (it was a
+        // bespoke half-step between the rail and the selected fill). It is
+        // opaque, and distinct from the rail it rests on.
+        expect(hover, Color.alphaBlend(a.stateHover, a.bgSurface));
+        expect(hover.a, 1.0);
+        expect(hover.computeLuminance(), isNot(a.bgSurface.computeLuminance()));
         await mouse.removePointer();
       }
     });
   });
 
   group('AerosSidenav blocks', () {
-    testWidgets('header and footer are 56px; mark and avatar sit on the 20px line', (tester) async {
+    testWidgets('header and footer are one app header high; mark and avatar sit on the 20px line', (tester) async {
       var switched = 0, signedOut = 0;
       await pumpSidenav(
         tester,
@@ -169,8 +180,11 @@ void main() {
         ),
       );
 
-      expect(tester.getSize(find.byType(AerosSidenavHeader)).height, kAerosSidenavBlockHeight);
-      expect(tester.getSize(find.byType(AerosSidenavFooter)).height, kAerosSidenavBlockHeight);
+      // No AerosDensityScope here, so the ambient density is touch: 56.
+      final header = AerosDensity.touch.sizes.header;
+      expect(header, 56);
+      expect(tester.getSize(find.byType(AerosSidenavHeader)).height, header);
+      expect(tester.getSize(find.byType(AerosSidenavFooter)).height, header);
       // Default mark = the title's first letter.
       expect(tester.getTopLeft(find.byType(AerosSidenavMark)).dx, 20);
       expect(find.descendant(of: find.byType(AerosSidenavMark), matching: find.text('A')), findsOneWidget);

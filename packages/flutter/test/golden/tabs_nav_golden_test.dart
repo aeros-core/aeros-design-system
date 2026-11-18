@@ -9,7 +9,7 @@ const _tabs = ['Overview', 'Orders', 'Invoices', 'Settings'];
 void main() {
   goldenMatrix(
     'tabs_nav',
-    size: const Size(760, 880),
+    size: const Size(760, 960),
     (context) => GoldenColumn(
       width: 720,
       children: [
@@ -163,7 +163,7 @@ void main() {
         AerosPagination(page: 6, totalPages: 12, onChanged: (_) {}, variant: AerosPaginationVariant.numbered),
       ],
     ),
-    size: const Size(460, 90),
+    size: const Size(520, 90),
     act: (t) => hover(t, find.text('7')),
   );
 }

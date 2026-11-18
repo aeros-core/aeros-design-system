@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
+import '../tokens/density.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 import 'aeros_breadcrumb.dart';
@@ -7,6 +8,12 @@ import 'aeros_breadcrumb.dart';
 /// Compound page header used at the top of every admin screen.
 /// Composes: optional breadcrumbs row, then a title row (leading +
 /// title + subtitle + action buttons).
+///
+/// The title row is at least one app header high ([AerosSizeTokens.header]
+/// for the density — the height of `AerosTopnav` and of the sidenav's header
+/// block), with the title centred in it. With the default padding (horizontal
+/// only) a page header at the top of the content therefore sits level with
+/// the rail's header beside it.
 ///
 /// ```dart
 /// AerosPageHeader(
@@ -33,12 +40,8 @@ class AerosPageHeader extends StatelessWidget {
     this.breadcrumbs,
     this.leading,
     this.actions,
-    this.padding = const EdgeInsets.symmetric(
-      horizontal: AerosSpacing.s4,
-      vertical: AerosSpacing.s4,
-    ),
-  }) : assert(title != null || titleWidget != null,
-            'Provide either title or titleWidget');
+    this.padding = const EdgeInsets.symmetric(horizontal: AerosSpacing.s4),
+  }) : assert(title != null || titleWidget != null, 'Provide either title or titleWidget');
 
   /// Title string. If you need richer content, use [titleWidget] instead.
   final String? title;
@@ -61,6 +64,8 @@ class AerosPageHeader extends StatelessWidget {
   /// Right-aligned action buttons.
   final List<Widget>? actions;
 
+  /// Around the header. Horizontal only by default: the title row brings its
+  /// own height.
   final EdgeInsetsGeometry padding;
 
   @override
@@ -68,16 +73,16 @@ class AerosPageHeader extends StatelessWidget {
     final a = context.aerosColors;
 
     final titleNode = titleWidget ??
-        Text(
-          title!,
-          style: AerosTypography.h2(color: a.fgPrimary),
+        Semantics(
+          header: true,
+          child: Text(title!, style: AerosTypography.h2(color: a.fgPrimary)),
         );
 
     final subtitleNode = subtitleWidget ??
         (subtitle != null
             ? Text(
                 subtitle!,
-                style: AerosTypography.bodyMd(color: a.fgSecondary),
+                style: AerosTypography.bodySm(color: a.fgSecondary),
               )
             : null);
 
@@ -88,39 +93,41 @@ class AerosPageHeader extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (breadcrumbs != null && breadcrumbs!.isNotEmpty) ...[
-            AerosBreadcrumb(items: breadcrumbs!),
-            const SizedBox(height: AerosSpacing.s2),
+            Padding(
+              padding: const EdgeInsets.only(top: AerosSpacing.s2),
+              child: AerosBreadcrumb(items: breadcrumbs!),
+            ),
           ],
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (leading != null) ...[
-                leading!,
-                const SizedBox(width: AerosSpacing.s3),
-              ],
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    titleNode,
-                    if (subtitleNode != null) ...[
-                      const SizedBox(height: AerosSpacing.s1),
-                      subtitleNode,
+          ConstrainedBox(
+            constraints: BoxConstraints(minHeight: AerosDensity.of(context).sizes.header),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (leading != null) ...[
+                  leading!,
+                  const SizedBox(width: AerosSpacing.s3),
+                ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      titleNode,
+                      if (subtitleNode != null) subtitleNode,
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              if (actions != null && actions!.isNotEmpty) ...[
-                const SizedBox(width: AerosSpacing.s4),
-                Wrap(
-                  spacing: AerosSpacing.s2,
-                  runSpacing: AerosSpacing.s2,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: actions!,
-                ),
+                if (actions != null && actions!.isNotEmpty) ...[
+                  const SizedBox(width: AerosSpacing.s4),
+                  Wrap(
+                    spacing: AerosSpacing.s2,
+                    runSpacing: AerosSpacing.s2,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: actions!,
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ],
       ),

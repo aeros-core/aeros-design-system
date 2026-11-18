@@ -19,7 +19,7 @@ export * from "./components/dialog";
 export * from "./components/tooltip";
 export * from "./components/table";
 export * from "./components/empty-state";
-export * from "./components/topnav";
+export * from "./components/app-shell";
 export * from "./components/sidebar";
 export * from "./components/dot-matrix";
 export * from "./components/label";

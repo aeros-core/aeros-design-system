@@ -104,6 +104,99 @@ hover and press change **colour only** (no ripple, no lift); there is **one focu
 and the configurable-MTO widgets keep their structure — they only picked up the status-colour fix and
 the theme changes above.
 
+### Cards, badges, feedback, navigation and the app shell restyled
+
+The rest of the everyday widgets move onto the foundation layer: flat hairline surfaces, semantic
+radii, token sizes per density, colour-only hover and press, the one focus ring, no ripple.
+
+**Changed — look**
+
+- **Cards** (`AerosCard`, `AerosStatCard`, `AerosIntentCard`, `AerosEmptyState`): `bgSurface` + 1px
+  hairline, 8px corners, **no shadow**. Card header and footer are divided by hairlines and the
+  footer has no fill. A tappable card / intent card tints and strengthens its hairline on hover and
+  draws the focus ring. The empty state is a 1px dashed outline; its title is a semantic heading.
+- **Badge family** (`AerosBadge`, `AerosTag`, `AerosCountBadge`, dense `AerosRoutingSignalBadge`):
+  one height — `AerosSizeTokens.badge`, 18 pointer / 20 touch — tinted fill, 1px border in the
+  tone's border colour, `labelXs`. A badge is a pill, a tag has 4px corners (`pill: true` still
+  rounds it). `info` tones use the neutral `info*` status colours.
+- **Chips**: `AerosFilterChip` gains a hairline and a focus ring; `AerosEnumChips` are control-sized
+  (`AerosControlSize.sm`) with 6px corners and a 1px selected border (was 2px).
+- **Feedback**: `AerosAlert` / `AerosConstraintErrorAlert` — tint + hairline, 8px corners, `labelSm`
+  title, `bodySm` body. `AerosProgress` / `AerosStepper` — a 4px pill track. `AerosSnackbar` — an
+  elevated surface (`bgElevated` + overlay shadow) like the web toast; the tone colours the icon
+  and the message only. `AerosTheme.snackBarTheme` is no longer an inverse slab either.
+  `AerosTooltip` sets its inverse / 4px / caption look itself.
+- **Tabs**: underline = 1px baseline + 2px indicator, one row high; pill = a compact segmented
+  track one control high whose active segment is lifted with `AerosElevation.raised`.
+- **Breadcrumb, pagination, avatar**: breadcrumb links are real buttons; pagination buttons are
+  control-sized squares with chevrons; avatars carry a 1px border.
+- **Shell**: `AerosTopnav` is `bgSurface` with an `h4` title. Nav rows have 4px corners, hover is
+  the shared `stateHover` overlay, selected stays `bgSubtle` + `fgPrimary` w600. The sidenav header
+  and footer sit on `borderDefault` hairlines; an inline sidenav has a hairline on its trailing
+  edge; the drawer is square and flat.
+
+**Added**
+
+- `AerosSidenav(collapsed: true)` — the 56px icon rail (`AerosMetricTokens.layoutSidebarRail`):
+  labels become tooltips, group labels become hairlines, the header / footer keep the mark / avatar.
+  `onExpandRequested` fires when a parent row is tapped in the rail. `AerosScaffold` sizes the rail
+  from the sidenav and always shows the full sidenav in its drawer (`AerosSidenavExpanded`).
+- `AerosSidenavDensity.sizes`, `.density`, `.labelStyle()`.
+- `AerosCard.semanticLabel`; `AerosStatCard.deltaSemanticLabel` and
+  `AerosStatCard.directionLabel()` — the delta is announced with its direction in words ("up
+  +12.4%"); pass a localised sentence to override.
+- `AerosTag.expandHitTarget`, `AerosTag.removeSemanticLabel`.
+- `AerosSnackbar.show(description:)`.
+- `AerosAvatar.semanticLabel`, `AerosAvatarSize.dimension`.
+- `AerosPagination.previousLabel` / `nextLabel`; `AerosConstraintErrorAlert.dismissLabel`.
+- `AerosProgress.trackHeight`.
+
+**Fixed**
+
+- `AerosProgress` with a value threw "Progress bar value, minValue, and maxValue must be valid
+  numbers" in debug builds with semantics on (it passed "35%" as the value). It now reports a bare
+  0–100 number, and out-of-range values are clamped.
+- `AerosCountBadge` stretched to the full width inside a `Wrap` or a stretching `Column`; it now
+  shrink-wraps everywhere.
+- `AerosTabs` arrow keys follow the reading direction; chevrons in breadcrumb, pagination and the
+  intent card mirror in right-to-left.
+
+**Breaking — what an app has to change or re-check**
+
+- **`AerosCardVariant.raised` is deprecated and renders flat.** Remove `variant:`; nothing in a
+  resting layout carries a shadow. `AerosStatCard` lost its shadow too.
+- **`AerosStatCard`**: the label is a sentence-case `caption` (no longer upper-cased); the mono
+  value is `monoLg` (20px, was 26px).
+- **Sizes changed** — re-check tight layouts: badges / tags are 18 / 20 high; avatars are
+  20 / 24 / 32 / 40 / 56 (were 24 / 30 / 38 / 48 / 60); `AerosTopnav` is 48 / 56 by density (was 60)
+  and `AerosTopnav.height` is now nullable (null = the density's header height); `AerosIntentCard`
+  uses `h4` / `bodySm` and a 40px icon tile; `AerosEmptyState` has less vertical padding.
+- **Touch targets grow at touch density** (and with no `AerosDensityScope`): a removable `AerosTag`,
+  a tappable `AerosRoutingSignalBadge`, an `AerosEnumChips` chip, a breadcrumb link, the pagination
+  arrows and the alert's resolve / dismiss buttons occupy at least 48px, with the visual centred in
+  that box. Inside an `AerosDensityScope(density: pointer)` the minimum is 24px.
+  `AerosFilterChip.touchTargetHeight` is now 48 (was 44) and is a getter, not a `const`.
+- **A removable `AerosTag` is one button** announced as "Remove <label>" (was an unlabelled
+  gesture). A tappable `AerosCard` announces its content as one button — do not nest buttons in it.
+- **`AerosPageHeader`**: the default padding is horizontal only and the title row is at least one
+  header high (48 / 56), so it lines up with the sidenav header. Pass `padding:` to restore the old
+  16px vertical padding. The subtitle is `bodySm`.
+- **`AerosScaffold.sidenavBreakpoint` defaults to the `md` breakpoint (768, was 720)** and is
+  compared with the real viewport width — an `AerosViewportScope` wins over `MediaQuery`.
+  `sidenavWidth` defaults to `AerosMetricTokens.layoutSidebar`; the drawer is 280 wide.
+- **Sidenav blocks follow the ambient density**: `AerosSidenavHeader` / `AerosSidenavFooter` are
+  `AerosDensity.of(context).sizes.header` high — 48 inside a pointer `AerosDensityScope`, 56
+  otherwise. `kAerosSidenavBlockHeight` is deprecated and no longer a `const`.
+- **`AerosSidenavDensity`'s `rowHeight` / `iconSize` / `labelSize` are getters** over the `navRow` /
+  `navIcon` / `navLabel` tokens (same values); the enum constructor arguments are gone.
+- **Sidenav hover** is the `stateHover` overlay (was a half-step between the rail and the selected
+  fill). The footer action is an icon button sized by density (32 / 44).
+- **`AerosSnackbar`**: the action is a small secondary button inside the surface, not a
+  `SnackBarAction`; the message colour follows the tone.
+- **Material ink is gone** from every widget above: anything that looked for an `InkWell` /
+  `Material` inside them (tests, custom themes' `splashColor`) no longer finds one.
+
+
 ### Breaking
 
 - **`google_fonts` is no longer a dependency.** IBM Plex Mono (Regular 400 + Medium 500, SIL OFL — `assets/fonts/OFL-IBMPlexMono.txt`) is bundled as the `IBM Plex Mono` family, like Inter, so mono text needs no network on first paint and renders in widget/golden tests. **If your app imports `package:google_fonts` itself and was getting it transitively through this package, add `google_fonts` to your own `pubspec.yaml`.** To use the bundled face outside `AerosTypography`, write `TextStyle(fontFamily: 'IBM Plex Mono', package: 'aeros_design_system')`.

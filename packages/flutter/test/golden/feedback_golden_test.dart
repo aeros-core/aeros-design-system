@@ -74,12 +74,8 @@ void main() {
     ),
   );
 
-  // semantics off: a determinate AerosProgress passes "35%" as the bar's
-  // semantics value, and Flutter 3.41 asserts that a progress bar's value is a
-  // number, so the widget throws in any debug build with semantics on.
   goldenMatrix(
     'feedback_progress',
-    semantics: false,
     size: const Size(420, 380),
     (context) => const GoldenColumn(
       width: 380,
@@ -132,6 +128,21 @@ void main() {
       },
     );
   }
+  goldenMatrix(
+    'feedback_snackbar_description',
+    size: const Size(480, 160),
+    (context) => const SizedBox(key: Key('anchor'), width: 10, height: 10),
+    act: (t) async {
+      AerosSnackbar.show(
+        t.element(find.byKey(const Key('anchor'))),
+        'Payment failed',
+        description: 'The card was declined. Try another one.',
+        tone: AerosSnackbarTone.danger,
+        actionLabel: 'Retry',
+        onAction: () {},
+      );
+    },
+  );
   goldenMatrix(
     'feedback_snackbar_action',
     size: const Size(480, 140),

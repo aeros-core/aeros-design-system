@@ -141,6 +141,8 @@ class _AerosTagFieldState extends State<AerosTagField> {
                     tone: AerosTagTone.neutral,
                     pill: true,
                     onRemove: widget.enabled ? () => _remove(t) : null,
+                    // Inside the field's own target; Backspace removes too.
+                    expandHitTarget: false,
                   ),
                 ConstrainedBox(
                   constraints: const BoxConstraints(minWidth: 88),

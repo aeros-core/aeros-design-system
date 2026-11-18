@@ -1,15 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../foundation/aeros_control_size.dart';
+import '../foundation/aeros_focus_ring.dart';
+import '../foundation/aeros_pressable.dart';
+import '../foundation/aeros_state_layer.dart';
+import '../foundation/aeros_surface.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/motion.dart';
-import '../tokens/radii.dart';
-import '../tokens/shadows.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
+import '../tokens/density.dart';
+import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 
 enum AerosTabVariant { underline, pill }
 
-/// Tab strip. Keyboard-operable: Tab reaches the strip, Enter/Space activates
-/// a tab (InkWell), and ←/→ move the selection while any tab has focus.
+/// Tab strip.
+///
+/// - [AerosTabVariant.underline]: a 1px baseline hairline under the strip and
+///   a 2px `fgPrimary` indicator under the active tab. Tabs are one list row
+///   high ([AerosSizeTokens.row]).
+/// - [AerosTabVariant.pill]: a compact segmented track, one control high
+///   ([AerosControlSize.md]); the active segment is a `bgElevated` chip with the
+///   faintest lift ([AerosElevation.raised]).
+///
+/// The active label is `fgPrimary` at w600, the others `fgSecondary` at w500;
+/// hover changes colour only. Keyboard-operable: Tab reaches the strip, Enter /
+/// Space activates the focused tab (which draws the focus ring), and ← / →
+/// move the selection while any tab has focus (mirrored in right-to-left).
 class AerosTabs extends StatelessWidget {
   const AerosTabs({
     super.key,
@@ -24,123 +40,174 @@ class AerosTabs extends StatelessWidget {
   final ValueChanged<int> onChanged;
   final AerosTabVariant variant;
 
+  static const BorderRadius _item = BorderRadius.all(Radius.circular(AerosShapeTokens.item));
+  static const BorderRadius _control = BorderRadius.all(Radius.circular(AerosShapeTokens.control));
+
   void _step(int delta) {
     final next = (selectedIndex + delta).clamp(0, tabs.length - 1);
     if (next != selectedIndex) onChanged(next);
   }
 
-  @override
-  Widget build(BuildContext context) {
+  TextStyle _label(AerosAliasColors a, {required bool active, required AerosInteraction state}) =>
+      AerosTypography.labelSm(
+        color: active || state.hovered || state.pressed ? a.fgPrimary : a.fgSecondary,
+        weight: active ? FontWeight.w600 : FontWeight.w500,
+      );
+
+  Widget _pressable({
+    required int index,
+    required AerosPressableBuilder builder,
+  }) =>
+      AerosPressable(
+        onPressed: () => onChanged(index),
+        selected: index == selectedIndex,
+        inMutuallyExclusiveGroup: true,
+        // The tab is already a full row (or the full track) high.
+        expandHitTarget: false,
+        builder: builder,
+      );
+
+  Widget _underline(BuildContext context) {
     final a = context.aerosColors;
-    final strip = variant == AerosTabVariant.underline
-        ? Container(
-            decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: a.borderDefault)),
-            ),
-            child: Row(
-              children: List.generate(tabs.length, (i) {
-                final active = i == selectedIndex;
-                return _tab(
-                  context,
-                  index: i,
-                  active: active,
-                  child: Transform.translate(
-                    offset: const Offset(0, 1),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: active ? a.fgPrimary : Colors.transparent,
-                            width: 2,
+    final height = AerosDensity.of(context).sizes.row;
+    return Stack(
+      children: [
+        // The baseline: the active indicator is drawn over it.
+        PositionedDirectional(
+          start: 0,
+          end: 0,
+          bottom: 0,
+          height: AerosMetricTokens.borderHairline,
+          child: ColoredBox(color: a.borderDefault),
+        ),
+        Row(
+          children: [
+            for (var i = 0; i < tabs.length; i++)
+              _pressable(
+                index: i,
+                builder: (context, state) {
+                  final active = i == selectedIndex;
+                  return AerosFocusRing(
+                    focused: state.focused,
+                    radius: _item,
+                    placement: AerosFocusRingPlacement.inset,
+                    child: SizedBox(
+                      height: height,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s3),
+                            child: Text(
+                              tabs[i],
+                              maxLines: 1,
+                              softWrap: false,
+                              style: _label(a, active: active, state: state),
+                            ),
                           ),
+                          if (active)
+                            PositionedDirectional(
+                              start: 0,
+                              end: 0,
+                              bottom: 0,
+                              height: AerosMetricTokens.borderThick,
+                              child: ColoredBox(color: a.fgPrimary),
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _segmented(BuildContext context) {
+    final a = context.aerosColors;
+    const gap = AerosSpacing.s0_5;
+    // The track's hairline and inset, and the segment's own hairline, come
+    // off the control height.
+    final segment =
+        AerosControlSize.md.resolveHeight(context) - (AerosMetricTokens.borderHairline * 2 + gap) * 2;
+    return Container(
+      padding: const EdgeInsets.all(gap),
+      decoration: BoxDecoration(
+        // A recessed track: darker than the page in dark mode, so the active
+        // segment (bgElevated) reads as lifted in both themes.
+        color: a.bgInset,
+        border: Border.all(color: a.borderDefault, width: AerosMetricTokens.borderHairline),
+        borderRadius: _control,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var i = 0; i < tabs.length; i++)
+            Padding(
+              padding: EdgeInsetsDirectional.only(start: i == 0 ? 0 : gap),
+              child: _pressable(
+                index: i,
+                builder: (context, state) {
+                  final active = i == selectedIndex;
+                  final label = SizedBox(
+                    height: segment,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s3),
+                      child: Center(
+                        widthFactor: 1,
+                        child: Text(
+                          tabs[i],
+                          maxLines: 1,
+                          softWrap: false,
+                          style: _label(a, active: active, state: state),
                         ),
                       ),
-                      child: Text(
-                        tabs[i],
-                        style: AerosTypography.bodySm(
-                          color: active ? a.fgPrimary : a.fgMuted,
-                        ).withWeight(active ? FontWeight.w600 : FontWeight.w500),
-                      ),
                     ),
-                  ),
-                );
-              }),
+                  );
+                  return AerosFocusRing(
+                    focused: state.focused,
+                    radius: _item,
+                    placement: AerosFocusRingPlacement.inset,
+                    child: active
+                        ? AerosSurface(
+                            level: AerosSurfaceLevel.raised,
+                            radius: _item,
+                            color: a.bgElevated,
+                            borderColor: a.borderDefault,
+                            child: label,
+                          )
+                        : AerosStateFill(
+                            color: AerosStateLayer.resolve(
+                              a,
+                              a.bgInset,
+                              hovered: state.hovered,
+                              pressed: state.pressed,
+                            ),
+                            radius: _item,
+                            child: label,
+                          ),
+                  );
+                },
+              ),
             ),
-          )
-        : Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: a.bgSubtle,
-              border: Border.all(color: a.borderDefault),
-              borderRadius: AerosRadii.brLg,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(tabs.length, (i) {
-                final active = i == selectedIndex;
-                return Padding(
-                  padding: EdgeInsets.only(left: i == 0 ? 0 : 3),
-                  child: _tab(
-                    context,
-                    index: i,
-                    active: active,
-                    borderRadius: AerosRadii.brMd,
-                    child: AnimatedContainer(
-                      duration: AerosMotion.resolve(context, AerosMotion.fast),
-                      curve: AerosMotion.standard,
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: active ? a.bgSurface : Colors.transparent,
-                        borderRadius: AerosRadii.brMd,
-                        boxShadow: active ? AerosShadows.card(context.aeros.isDark) : null,
-                      ),
-                      child: Text(
-                        tabs[i],
-                        style: AerosTypography.bodySm(color: active ? a.fgPrimary : a.fgMuted)
-                            .withWeight(active ? FontWeight.w600 : FontWeight.w500),
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            ),
-          );
-
-    // Arrow keys move the selection while focus is anywhere inside the strip.
-    return FocusTraversalGroup(
-      child: CallbackShortcuts(
-        bindings: {
-          const SingleActivator(LogicalKeyboardKey.arrowLeft): () => _step(-1),
-          const SingleActivator(LogicalKeyboardKey.arrowRight): () => _step(1),
-        },
-        child: strip,
+        ],
       ),
     );
   }
 
-  Widget _tab(
-    BuildContext context, {
-    required int index,
-    required bool active,
-    required Widget child,
-    BorderRadius borderRadius = BorderRadius.zero,
-  }) {
-    final a = context.aerosColors;
-    return Semantics(
-      button: true,
-      selected: active,
-      inMutuallyExclusiveGroup: true,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => onChanged(index),
-          borderRadius: borderRadius,
-          hoverColor: Colors.transparent,
-          splashColor: a.fgPrimary.withValues(alpha: 0.06),
-          focusColor: a.brandPrimaryMuted,
-          child: child,
-        ),
+  @override
+  Widget build(BuildContext context) {
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    // Arrow keys move the selection while focus is anywhere inside the strip.
+    return FocusTraversalGroup(
+      child: CallbackShortcuts(
+        bindings: {
+          const SingleActivator(LogicalKeyboardKey.arrowLeft): () => _step(rtl ? 1 : -1),
+          const SingleActivator(LogicalKeyboardKey.arrowRight): () => _step(rtl ? -1 : 1),
+        },
+        child: variant == AerosTabVariant.underline ? _underline(context) : _segmented(context),
       ),
     );
   }

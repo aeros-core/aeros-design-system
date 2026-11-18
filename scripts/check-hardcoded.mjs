@@ -37,9 +37,8 @@ const RULES = [
   { name: "backdrop blur", re: /\bbackdrop-blur/g }
 ];
 
-// Files not yet restyled. Their violations are reported but do not fail the
-// gate; the list shrinks to nothing as the remaining PRs land.
-const PENDING = new Set(["components/sidebar.tsx", "components/topnav.tsx"]);
+// Files not yet restyled would be listed here: reported, not failing. None remain.
+const PENDING = new Set([]);
 
 // Deliberate literals, by file → rule name.
 const ALLOW = {
