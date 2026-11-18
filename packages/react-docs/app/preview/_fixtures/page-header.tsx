@@ -56,7 +56,7 @@ export default function PageHeaderFixture() {
         />
       </Group>
       <Group label="Narrow (390px) — actions wrap under the title" className="flex-col items-start">
-        <div className="w-[358px] max-w-full rounded-lg border border-border-default bg-bg-surface p-4">
+        <div className="w-[358px] max-w-full rounded-surface border border-border-default bg-bg-surface p-4">
           <PageHeader
             as="h2"
             title="Quarterly packaging procurement review"

@@ -34,7 +34,7 @@ export default function ToastFixture() {
   return (
     <>
       <Group label="Toast — neutral, success + action, warning, danger (open, bottom-right)">
-        <p className="text-sm text-fg-secondary">Toasts render in the fixed viewport.</p>
+        <p className="text-body-md text-fg-secondary">Toasts render in the fixed viewport.</p>
       </Group>
       <Toaster />
     </>

@@ -70,10 +70,6 @@ class AerosTokens {
   static const Duration durationBase = Duration(milliseconds: 180);
   static const Duration durationSlow = Duration(milliseconds: 260);
   static const Cubic easeStandard = Cubic(0.2, 0, 0, 1);
-  static const Cubic easeEmphasized = Cubic(0.3, 0, 0, 1);
-  static const Cubic easeDecelerate = Cubic(0, 0, 0, 1);
-  static const Cubic easeEntrance = Cubic(0.16, 1, 0.3, 1);
-  static const Cubic easeSpring = Cubic(0.34, 1.4, 0.64, 1);
   static const Cubic easeEnter = Cubic(0.16, 1, 0.3, 1);
   static const Cubic easeExit = Cubic(0.4, 0, 1, 1);
 
@@ -98,7 +94,6 @@ class AerosTokens {
   static const Color aliasLightBrandPrimaryHover = Color(0xFF3B3B42);
   static const Color aliasLightBrandPrimaryMuted = Color(0xFFF4F4F5);
   static const Color aliasLightFocusRing = Color(0xFF141417);
-  static const Color aliasLightFocusRingOffset = Color(0xFFFFFFFF);
   static const Color aliasLightStateHover = Color(0x0D141417);
   static const Color aliasLightStatePressed = Color(0x17141417);
   static const Color aliasLightStateSelected = Color(0x12141417);
@@ -123,7 +118,6 @@ class AerosTokens {
   static const Color aliasDarkBrandPrimaryHover = Color(0xFFD2D2D7);
   static const Color aliasDarkBrandPrimaryMuted = Color(0xFF1C1C20);
   static const Color aliasDarkFocusRing = Color(0xFFFAFAFA);
-  static const Color aliasDarkFocusRingOffset = Color(0xFF141417);
   static const Color aliasDarkStateHover = Color(0x12FAFAFA);
   static const Color aliasDarkStatePressed = Color(0x1FFAFAFA);
   static const Color aliasDarkStateSelected = Color(0x1AFAFAFA);
@@ -159,9 +153,6 @@ class AerosTokens {
   static const double radiusMd = 6.0;
   static const double radiusLg = 8.0;
   static const double radiusXl = 12.0;
-  static const double radius2xl = 16.0;
-  static const double radius3xl = 20.0;
-  static const double radius4xl = 24.0;
   static const double radiusFull = 9999.0;
 
   // ─── Font families ───

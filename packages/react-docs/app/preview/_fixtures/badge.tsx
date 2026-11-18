@@ -28,7 +28,7 @@ export default function BadgeFixture() {
         <Badge variant="danger">99+</Badge>
       </Group>
       <Group label="On bg-surface">
-        <div className="flex flex-wrap gap-3 rounded-lg border border-border-default bg-bg-surface p-4">
+        <div className="flex flex-wrap gap-3 rounded-surface border border-border-default bg-bg-surface p-4">
           {VARIANTS.map((v) => (
             <Badge key={v} variant={v} dot>
               {v}

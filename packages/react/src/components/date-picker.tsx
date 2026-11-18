@@ -160,7 +160,10 @@ function DateFieldFrame({
       if (!label.id) label.id = `${valueId}-label-${index}`;
       return label.id;
     });
-    trigger.setAttribute("aria-labelledby", [...ids, valueId].join(" "));
+    // Read the value element's id from the DOM: after hydration it can differ
+    // from this render's useId(), and a stale id would dangle.
+    const valueEl = trigger.querySelector<HTMLElement>("[data-date-value]");
+    trigger.setAttribute("aria-labelledby", [...ids, valueEl?.id ?? valueId].join(" "));
   });
 
   return (
@@ -189,7 +192,7 @@ function DateFieldFrame({
             data-invalid={resolvedState === "error" || undefined}
           >
             <CalendarIcon aria-hidden className="size-icon-md shrink-0 text-fg-muted" />
-            <span id={valueId} className="min-w-0 flex-1 truncate">
+            <span id={valueId} data-date-value="" className="min-w-0 flex-1 truncate">
               {text ?? placeholder}
             </span>
             {showClear && <span aria-hidden className="size-5 shrink-0" />}

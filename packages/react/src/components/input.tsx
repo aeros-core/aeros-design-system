@@ -121,7 +121,7 @@ export const Field = React.forwardRef<HTMLDivElement, FieldProps>(
     };
     return (
       <FieldContext.Provider value={ctx}>
-        <div ref={ref} className={cn("grid gap-1.5", className)} {...props}>
+        <div ref={ref} className={cn("grid content-start gap-1.5", className)} {...props}>
           {label && (
             <label htmlFor={ctx.inputId} className="text-label-sm text-fg-primary">
               {label}

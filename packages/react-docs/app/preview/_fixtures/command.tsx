@@ -12,7 +12,7 @@ import {
 import { Box, Settings, Truck } from "lucide-react";
 import { Group } from "./kit";
 
-const shell = "w-full max-w-xs overflow-hidden rounded-lg border border-border-default shadow-lg";
+const shell = "w-full max-w-xs overflow-hidden rounded-surface border border-border-default shadow-overlay";
 
 // Rendered inline (not inside a Popover) so the list is always visible.
 export default function CommandFixture() {

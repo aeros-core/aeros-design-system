@@ -126,7 +126,7 @@ class AerosSheet extends StatefulWidget {
         },
         transitionBuilder: (context, animation, _, child) => SlideTransition(
           position: Tween<Offset>(begin: begin, end: Offset.zero).animate(
-            CurvedAnimation(parent: animation, curve: AerosMotion.decelerate, reverseCurve: AerosMotion.standard),
+            CurvedAnimation(parent: animation, curve: AerosMotion.enter, reverseCurve: AerosMotion.standard),
           ),
           child: child,
         ),

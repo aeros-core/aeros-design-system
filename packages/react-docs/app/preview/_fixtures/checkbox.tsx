@@ -3,7 +3,7 @@
 import { Checkbox } from "@aeros-core/react";
 import { Group } from "./kit";
 
-const row = "inline-flex items-center gap-2 text-sm text-fg-secondary";
+const row = "inline-flex items-center gap-2 text-body-md text-fg-secondary";
 
 export default function CheckboxFixture() {
   return (

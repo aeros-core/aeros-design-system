@@ -19,16 +19,16 @@ export default function TabsFixture() {
             <TabsTrigger value="archived" disabled>Archived</TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="pt-3">
-            <p className="text-sm text-fg-secondary">Overview panel.</p>
+            <p className="text-body-md text-fg-secondary">Overview panel.</p>
           </TabsContent>
           <TabsContent value="orders" className="pt-3">
-            <p className="text-sm text-fg-secondary">Orders panel.</p>
+            <p className="text-body-md text-fg-secondary">Orders panel.</p>
           </TabsContent>
           <TabsContent value="team" className="pt-3">
-            <p className="text-sm text-fg-secondary">Team panel.</p>
+            <p className="text-body-md text-fg-secondary">Team panel.</p>
           </TabsContent>
           <TabsContent value="archived" className="pt-3">
-            <p className="text-sm text-fg-secondary">Archived panel.</p>
+            <p className="text-body-md text-fg-secondary">Archived panel.</p>
           </TabsContent>
         </Tabs>
       </Group>
@@ -43,24 +43,24 @@ export default function TabsFixture() {
             <TabsTrigger value="year" disabled>Year</TabsTrigger>
           </TabsList>
           <TabsContent value="day" className="pt-3">
-            <p className="text-sm text-fg-secondary">Day range selected.</p>
+            <p className="text-body-md text-fg-secondary">Day range selected.</p>
           </TabsContent>
           <TabsContent value="week" className="pt-3">
-            <p className="text-sm text-fg-secondary">Week range selected.</p>
+            <p className="text-body-md text-fg-secondary">Week range selected.</p>
           </TabsContent>
           <TabsContent value="month" className="pt-3">
-            <p className="text-sm text-fg-secondary">Month range selected.</p>
+            <p className="text-body-md text-fg-secondary">Month range selected.</p>
           </TabsContent>
           <TabsContent value="year" className="pt-3">
-            <p className="text-sm text-fg-secondary">Year range selected.</p>
+            <p className="text-body-md text-fg-secondary">Year range selected.</p>
           </TabsContent>
         </Tabs>
       </Group>
       <Group label="TabCount standalone (active override)">
-        <span className="text-sm text-fg-secondary">
+        <span className="text-body-md text-fg-secondary">
           Inactive <TabCount active={false}>3</TabCount>
         </span>
-        <span className="text-sm text-fg-secondary">
+        <span className="text-body-md text-fg-secondary">
           Active <TabCount active>3</TabCount>
         </span>
       </Group>

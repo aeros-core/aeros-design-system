@@ -136,7 +136,6 @@ class AerosAliasColors {
     required this.brandPrimaryHover,
     required this.brandPrimaryMuted,
     required this.focusRing,
-    required this.focusRingOffset,
     required this.stateHover,
     required this.statePressed,
     required this.stateSelected,
@@ -163,7 +162,6 @@ class AerosAliasColors {
   final Color brandPrimaryHover;
   final Color brandPrimaryMuted;
   final Color focusRing;
-  final Color focusRingOffset;
   final Color stateHover;
   final Color statePressed;
   final Color stateSelected;
@@ -190,7 +188,6 @@ class AerosAliasColors {
     brandPrimaryHover: AerosTokens.aliasLightBrandPrimaryHover,
     brandPrimaryMuted: AerosTokens.aliasLightBrandPrimaryMuted,
     focusRing: AerosTokens.aliasLightFocusRing,
-    focusRingOffset: AerosTokens.aliasLightFocusRingOffset,
     stateHover: AerosTokens.aliasLightStateHover,
     statePressed: AerosTokens.aliasLightStatePressed,
     stateSelected: AerosTokens.aliasLightStateSelected,
@@ -218,7 +215,6 @@ class AerosAliasColors {
     brandPrimaryHover: AerosTokens.aliasDarkBrandPrimaryHover,
     brandPrimaryMuted: AerosTokens.aliasDarkBrandPrimaryMuted,
     focusRing: AerosTokens.aliasDarkFocusRing,
-    focusRingOffset: AerosTokens.aliasDarkFocusRingOffset,
     stateHover: AerosTokens.aliasDarkStateHover,
     statePressed: AerosTokens.aliasDarkStatePressed,
     stateSelected: AerosTokens.aliasDarkStateSelected,
@@ -249,7 +245,6 @@ class AerosAliasColors {
         brandPrimaryHover: Color.lerp(a.brandPrimaryHover, b.brandPrimaryHover, t)!,
         brandPrimaryMuted: Color.lerp(a.brandPrimaryMuted, b.brandPrimaryMuted, t)!,
         focusRing: Color.lerp(a.focusRing, b.focusRing, t)!,
-        focusRingOffset: Color.lerp(a.focusRingOffset, b.focusRingOffset, t)!,
         stateHover: Color.lerp(a.stateHover, b.stateHover, t)!,
         statePressed: Color.lerp(a.statePressed, b.statePressed, t)!,
         stateSelected: Color.lerp(a.stateSelected, b.stateSelected, t)!,
@@ -441,80 +436,6 @@ class AerosTypeScale {
     height: 1.4545,
     letterSpacing: 0.0,
   );
-}
-
-/// Shadows (`shadow` / `shadowDark` in tokens.json), parsed from the CSS values.
-class AerosShadowTokens {
-  AerosShadowTokens._();
-
-  static const List<BoxShadow> xs = <BoxShadow>[
-    BoxShadow(color: Color(0x0A0A0A0A), blurRadius: 2.0, offset: Offset(0.0, 1.0)),
-  ];
-  static const List<BoxShadow> sm = <BoxShadow>[
-    BoxShadow(color: Color(0x0D0A0A0A), blurRadius: 2.0, offset: Offset(0.0, 1.0)),
-    BoxShadow(color: Color(0x0F0A0A0A), blurRadius: 3.0, offset: Offset(0.0, 1.0)),
-  ];
-  static const List<BoxShadow> md = <BoxShadow>[
-    BoxShadow(color: Color(0x0D0A0A0A), blurRadius: 4.0, offset: Offset(0.0, 2.0)),
-    BoxShadow(color: Color(0x120A0A0A), blurRadius: 12.0, offset: Offset(0.0, 4.0)),
-  ];
-  static const List<BoxShadow> lg = <BoxShadow>[
-    BoxShadow(color: Color(0x0F0A0A0A), blurRadius: 8.0, offset: Offset(0.0, 4.0)),
-    BoxShadow(color: Color(0x170A0A0A), blurRadius: 24.0, offset: Offset(0.0, 12.0)),
-  ];
-  static const List<BoxShadow> xl = <BoxShadow>[
-    BoxShadow(color: Color(0x120A0A0A), blurRadius: 16.0, offset: Offset(0.0, 8.0)),
-    BoxShadow(color: Color(0x1F0A0A0A), blurRadius: 48.0, offset: Offset(0.0, 24.0)),
-  ];
-  static const List<BoxShadow> focus = <BoxShadow>[
-    BoxShadow(color: Color(0x290A0A0A), blurRadius: 0.0, spreadRadius: 3.0),
-  ];
-  static const List<BoxShadow> focusDanger = <BoxShadow>[
-    BoxShadow(color: Color(0x2EDC2626), blurRadius: 0.0, spreadRadius: 3.0),
-  ];
-  static const List<BoxShadow> hairline = <BoxShadow>[
-    BoxShadow(color: Color(0x0F0A0A0A), blurRadius: 0.0, spreadRadius: 1.0),
-  ];
-  static const List<BoxShadow> focusSuccess = <BoxShadow>[
-    BoxShadow(color: Color(0x2E16A34A), blurRadius: 0.0, spreadRadius: 3.0),
-  ];
-
-  static const List<BoxShadow> xsDark = <BoxShadow>[
-    BoxShadow(color: Color(0x66000000), blurRadius: 2.0, offset: Offset(0.0, 1.0)),
-    BoxShadow(color: Color(0x0DFFFFFF), blurRadius: 0.0, spreadRadius: 1.0),
-  ];
-  static const List<BoxShadow> smDark = <BoxShadow>[
-    BoxShadow(color: Color(0x73000000), blurRadius: 2.0, offset: Offset(0.0, 1.0)),
-    BoxShadow(color: Color(0x59000000), blurRadius: 4.0, offset: Offset(0.0, 2.0)),
-    BoxShadow(color: Color(0x0FFFFFFF), blurRadius: 0.0, spreadRadius: 1.0),
-  ];
-  static const List<BoxShadow> mdDark = <BoxShadow>[
-    BoxShadow(color: Color(0x73000000), blurRadius: 6.0, offset: Offset(0.0, 2.0)),
-    BoxShadow(color: Color(0x66000000), blurRadius: 14.0, offset: Offset(0.0, 6.0)),
-    BoxShadow(color: Color(0x0FFFFFFF), blurRadius: 0.0, spreadRadius: 1.0),
-  ];
-  static const List<BoxShadow> lgDark = <BoxShadow>[
-    BoxShadow(color: Color(0x80000000), blurRadius: 12.0, offset: Offset(0.0, 4.0)),
-    BoxShadow(color: Color(0x73000000), blurRadius: 28.0, offset: Offset(0.0, 12.0)),
-    BoxShadow(color: Color(0x12FFFFFF), blurRadius: 0.0, spreadRadius: 1.0),
-  ];
-  static const List<BoxShadow> xlDark = <BoxShadow>[
-    BoxShadow(color: Color(0x8C000000), blurRadius: 20.0, offset: Offset(0.0, 8.0)),
-    BoxShadow(color: Color(0x80000000), blurRadius: 48.0, offset: Offset(0.0, 20.0)),
-    BoxShadow(color: Color(0x14FFFFFF), blurRadius: 0.0, spreadRadius: 1.0),
-  ];
-  static const List<BoxShadow> focusDark = <BoxShadow>[
-    BoxShadow(color: Color(0x38F5F3EF), blurRadius: 0.0, spreadRadius: 3.0),
-  ];
-  static const List<BoxShadow> focusDangerDark = <BoxShadow>[
-    BoxShadow(color: Color(0x47F87171), blurRadius: 0.0, spreadRadius: 3.0),
-  ];
-  static const List<BoxShadow> focusSuccessDark = <BoxShadow>[
-    BoxShadow(color: Color(0x404ADE80), blurRadius: 0.0, spreadRadius: 3.0),
-  ];
-  static const List<BoxShadow> hairlineDark = <BoxShadow>[
-    BoxShadow(color: Color(0x14FFFFFF), blurRadius: 0.0, spreadRadius: 1.0),
-  ];
 }
 
 /// Elevation intents (`elevation` in tokens.json). Resting surfaces carry a

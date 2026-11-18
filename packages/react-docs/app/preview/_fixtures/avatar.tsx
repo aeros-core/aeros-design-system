@@ -50,7 +50,7 @@ export default function AvatarFixture() {
         </AvatarStack>
       </Group>
       <Group label="Stack on bg-surface (ring colour)">
-        <div className="rounded-lg border border-border-default bg-bg-surface p-4">
+        <div className="rounded-surface border border-border-default bg-bg-surface p-4">
           <AvatarStack>
             <Avatar size="sm" fallback="PS" />
             <Avatar size="sm" variant="inverse" fallback="RK" />

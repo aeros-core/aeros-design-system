@@ -20,6 +20,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tool
 // SidebarProvider owns the state; without one the sidebar is simply expanded.
 
 interface SidebarContextValue {
+  /** True inside a SidebarProvider (the sidebar can become a mobile sheet). */
+  managed: boolean;
   /** Desktop rail mode. */
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
@@ -32,6 +34,7 @@ interface SidebarContextValue {
 }
 
 const SidebarContext = React.createContext<SidebarContextValue>({
+  managed: false,
   collapsed: false,
   setCollapsed: () => {},
   isMobile: false,
@@ -134,7 +137,7 @@ export function SidebarProvider({
   }, [keyboardShortcut, toggle]);
 
   const value = React.useMemo(
-    () => ({ collapsed, setCollapsed, isMobile, mobileOpen, setMobileOpen, toggle }),
+    () => ({ managed: true, collapsed, setCollapsed, isMobile, mobileOpen, setMobileOpen, toggle }),
     [collapsed, setCollapsed, isMobile, mobileOpen, toggle]
   );
   return <SidebarContext.Provider value={value}>{children}</SidebarContext.Provider>;
@@ -149,7 +152,7 @@ export interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
 
 export const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
   ({ className, children, label = "Sidebar", ...props }, ref) => {
-    const { collapsed, isMobile, mobileOpen, setMobileOpen } = useSidebar();
+    const { managed, collapsed, isMobile, mobileOpen, setMobileOpen } = useSidebar();
 
     if (isMobile) {
       return (
@@ -188,6 +191,10 @@ export const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
             "sticky top-0 flex h-dvh w-sidebar shrink-0 flex-col border-r border-border-default bg-bg-surface text-fg-primary",
             "transition-[width] duration-base ease-standard motion-reduce:transition-none",
             "data-[collapsed]:w-sidebar-rail",
+            // With a provider the sidebar is a sheet below md. Hide the desktop
+            // column there in CSS too, so a phone never paints it before the
+            // media query is read on the client.
+            managed && "max-md:hidden",
             className
           )}
           {...props}
@@ -311,7 +318,12 @@ export interface SidebarItemProps extends React.AnchorHTMLAttributes<HTMLAnchorE
   icon?: React.ReactNode;
   /** Shown as a count pill when above zero (unread, pending) and announced with the label. */
   count?: number;
-  /** Render the child element (e.g. a framework `<Link>`) instead of a native anchor. */
+  /**
+   * Render the child element (e.g. a framework `<Link>`) instead of a native anchor.
+   * The child owns its content, so `count` is not rendered and the label is not
+   * hidden in the rail for you: pass `tooltip`, and hide your own label with
+   * `useSidebar().collapsed`.
+   */
   asChild?: boolean;
   /** Tooltip text in the rail. Defaults to the label when it is plain text. */
   tooltip?: string;
@@ -387,6 +399,12 @@ export const SidebarGroup = React.forwardRef<HTMLDivElement, SidebarGroupProps>(
   ({ label, icon, active, defaultOpen, className, children, ...props }, ref) => {
     const rail = useRail();
     const { setCollapsed } = useSidebar();
+    // Opens when it comes to hold the current page (client-side navigation),
+    // not only on mount; the user can still close it.
+    const [open, setOpen] = React.useState(defaultOpen ?? active ?? false);
+    React.useEffect(() => {
+      if (active) setOpen(true);
+    }, [active]);
 
     // In the rail there is nowhere to show children, so the parent is a plain
     // button whose useful action is to expand the sidebar. (Not a collapsible
@@ -417,7 +435,7 @@ export const SidebarGroup = React.forwardRef<HTMLDivElement, SidebarGroupProps>(
     }
 
     return (
-      <RC.Root ref={ref} defaultOpen={defaultOpen ?? active} className={cn("grid gap-0.5", className)} {...props}>
+      <RC.Root ref={ref} open={open} onOpenChange={setOpen} className={cn("grid gap-0.5", className)} {...props}>
         <RC.Trigger className={cn(rowBase, rowIdle, active && "text-fg-primary")}>
           {icon}
           <span className="min-w-0 flex-1 truncate">{label}</span>

@@ -19,6 +19,7 @@
     "test:visual": "pnpm --filter @aeros-core/react-docs test:visual",
     "test:visual:update": "pnpm --filter @aeros-core/react-docs test:visual:update",
     "test:a11y": "pnpm --filter @aeros-core/react-docs test:a11y",
+    "test:site": "pnpm --filter @aeros-core/react-docs test:site",
     "clean": "pnpm -r exec rm -rf dist",
     "changeset": "changeset",
     "version-packages": "changeset version",

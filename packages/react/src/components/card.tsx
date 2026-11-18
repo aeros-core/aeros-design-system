@@ -2,7 +2,10 @@ import * as React from "react";
 import { cn } from "../lib/cn";
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** Adds a hover elevation lift — use for clickable cards (links, selectable items). */
+  /**
+   * Styles the card as clickable: pointer cursor, stronger border and a fill on hover.
+   * Styling only — give the card a real link or button for keyboard access.
+   */
   interactive?: boolean;
 }
 

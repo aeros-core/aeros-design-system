@@ -58,6 +58,12 @@ export default defineConfig({
       testMatch: /a11y\.spec\.ts$/,
       use: { viewport: { width: 1280, height: 800 } },
     },
+    {
+      // The documentation site itself: every route, smoke + axe (e2e/site.spec.ts).
+      name: "site",
+      testMatch: /site\.spec\.ts$/,
+      use: { viewport: { width: 1280, height: 800 } },
+    },
   ],
 
   webServer: {

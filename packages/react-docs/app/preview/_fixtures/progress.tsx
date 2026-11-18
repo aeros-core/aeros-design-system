@@ -17,7 +17,7 @@ export default function ProgressFixture() {
         <Progress value={100} aria-label="Full" />
       </Group>
       <Group label="On bg-surface" className="max-w-md flex-col items-stretch">
-        <div className="rounded-lg border border-border-default bg-bg-surface p-4">
+        <div className="rounded-surface border border-border-default bg-bg-surface p-4">
           <div className="mb-1.5 flex justify-between text-xs">
             <span className="font-medium text-fg-secondary">Line 1</span>
             <span className="font-mono text-fg-muted">64%</span>

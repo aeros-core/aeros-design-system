@@ -20,6 +20,9 @@ import 'aeros_form_field.dart';
 /// focus draws the focus ring. Tap selects; tapping the
 /// selected variant again is a no-op.
 ///
+/// Every colour sample — the swatch tile and the dot inside a chip — has a
+/// `borderStrong` hairline, so it keeps an edge on any surface in both themes.
+///
 /// Deep-linking is supported by the parent: pass the desired
 /// [selectedVariantId] in via state and the picker reflects it.
 class AerosVariantPicker extends StatelessWidget {
@@ -136,7 +139,8 @@ class _VariantTile extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Color(variant.swatchColor!),
                 shape: BoxShape.circle,
-                border: Border.all(color: a.borderDefault, width: AerosMetricTokens.borderHairline),
+                // borderStrong, so a dark sample still has an edge in dark mode.
+                border: Border.all(color: a.borderStrong, width: AerosMetricTokens.borderHairline),
               ),
             ),
             SizedBox(width: _size.gap),
@@ -174,13 +178,15 @@ class _VariantTile extends StatelessWidget {
                   : AerosStateLayer.resolve(a, palette.background, hovered: state.hovered, pressed: state.pressed),
               borderRadius: _size.radius,
               // A swatch is a sample, not a control: the chosen one is marked
-              // with the thick border so it reads over any colour.
+              // with the thick border so it reads over any colour. At rest the
+              // hairline is borderStrong — borderDefault lets a dark sample
+              // sink into a dark surface (and a white one into a light one).
               border: Border.all(
                 color: selected
                     ? a.fgPrimary
                     : state.hovered || state.pressed
-                        ? a.borderStrong
-                        : a.borderDefault,
+                        ? a.fgMuted
+                        : a.borderStrong,
                 width: selected ? AerosMetricTokens.borderThick : AerosMetricTokens.borderHairline,
               ),
             ),

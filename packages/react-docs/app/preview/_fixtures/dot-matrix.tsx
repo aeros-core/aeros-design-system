@@ -10,15 +10,15 @@ export default function DotMatrixFixture() {
   return (
     <>
       <Group label="Ripple (defaults) / pulse" className="items-start gap-6">
-        <div className="overflow-hidden rounded-3xl shadow-lg">
+        <div className="overflow-hidden rounded-modal shadow-overlay">
           <DotMatrix variant="ripple" />
         </div>
-        <div className="overflow-hidden rounded-3xl shadow-lg">
+        <div className="overflow-hidden rounded-modal shadow-overlay">
           <DotMatrix size={200} rings={4} variant="pulse" speed={1600} />
         </div>
       </Group>
       <Group label="Custom colours, tight grid" className="items-start gap-6">
-        <div className="overflow-hidden rounded-3xl border border-border-default">
+        <div className="overflow-hidden rounded-modal border border-border-default">
           <DotMatrix
             size={200}
             rings={3}

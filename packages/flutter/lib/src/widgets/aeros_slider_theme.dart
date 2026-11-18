@@ -52,6 +52,20 @@ class AerosSliderTheme extends StatelessWidget {
   }
 }
 
+/// The value readout in a slider's label row. It dims with the slider — to
+/// [AerosMetricTokens.opacityDisabled] — when the slider is disabled. Not
+/// exported.
+class AerosSliderValue extends StatelessWidget {
+  const AerosSliderValue({super.key, required this.enabled, required this.child});
+
+  final bool enabled;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) =>
+      enabled ? child : Opacity(opacity: AerosMetricTokens.opacityDisabled, child: child);
+}
+
 class _ThumbPainter {
   const _ThumbPainter({required this.fill, required this.border});
 

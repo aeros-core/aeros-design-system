@@ -448,7 +448,7 @@ class _PopupBodyState<T> extends State<_PopupBody<T>> {
     } else {
       final builder = widget.itemBuilder;
       list = SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(side, AerosMenu.panelPadding, side, bottom),
+        padding: EdgeInsets.symmetric(horizontal: side),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -471,12 +471,14 @@ class _PopupBodyState<T> extends State<_PopupBody<T>> {
       );
       if (builder == null) {
         // Rows are all one height: cut the viewport at a whole row.
-        list = AerosWholeRows(
-          rowHeight: AerosMenuRow.heightOf(context),
-          leadingPadding: AerosMenu.panelPadding,
-          child: list,
-        );
+        list = AerosWholeRows(rowHeight: AerosMenuRow.heightOf(context), child: list);
       }
+      // Outside the scroll view, so the padding stays at both ends of a
+      // scrolled list (as in AerosMenu).
+      list = Padding(
+        padding: EdgeInsets.only(top: AerosMenu.panelPadding, bottom: bottom),
+        child: list,
+      );
     }
 
     return Focus(

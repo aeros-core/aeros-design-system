@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { composite, isRef, parseHex, resolveTokens, toHex, withAlpha } from "../src/resolve.mjs";
 import { buildCss } from "../src/emit/css";
 import { buildDartTheme, buildDartTokens, dartColor } from "../src/emit/dart";
+import { buildTokenDocs } from "../src/emit/docs";
 import { buildDts, buildJs } from "../src/emit/js";
 import { parseShadow, splitTopLevel } from "../src/emit/shared";
 import { buildTheme } from "../src/emit/theme";
@@ -113,7 +114,6 @@ describe("emitters (real tokens.json)", () => {
       expect(css.split(`--aeros-${k}: `).length - 1, k).toBe(3);
     }
     expect(Object.keys(tokens.alias.dark).sort()).toEqual(Object.keys(tokens.alias.light).sort());
-    expect(Object.keys(tokens.shadowDark).sort()).toEqual(Object.keys(tokens.shadow).sort());
   });
 
   it("Tailwind theme resets the default palette and maps every alias inline", () => {
@@ -123,7 +123,6 @@ describe("emitters (real tokens.json)", () => {
     expect(theme).toContain("@custom-variant dark {");
     for (const k of Object.keys(tokens.alias.light)) expect(theme).toContain(`--color-${k}: var(--aeros-${k});`);
     for (const k of Object.keys(tokens.color.semantic)) expect(theme).toContain(`--color-${k}: var(--aeros-color-semantic-${k});`);
-    for (const k of Object.keys(tokens.shadow)) expect(theme).toContain(`--shadow-${k}: var(--aeros-shadow-${k});`);
     // no hue other than the neutral ramp and black/white is defined statically
     const staticColours = [...theme.matchAll(/--color-([a-z]+)[-:]/g)].map((m) => m[1]);
     expect(new Set(staticColours)).toEqual(
@@ -178,7 +177,7 @@ describe("emitters (real tokens.json)", () => {
     expect(dts).not.toContain(": any");
   });
 
-  it("Dart output covers every alias, status colour, text role and shadow", () => {
+  it("Dart output covers every alias, status colour and text role", () => {
     const base = buildDartTokens(tokens);
     const theme = buildDartTheme(tokens);
     for (const k of Object.keys(tokens.alias.light)) {
@@ -190,13 +189,90 @@ describe("emitters (real tokens.json)", () => {
       const name = role.replace(/-([a-z0-9])/g, (_m: string, c: string) => c.toUpperCase());
       expect(theme).toContain(`static const TextStyle ${name} = TextStyle(`);
     }
-    for (const k of Object.keys(tokens.shadow)) {
-      const name = k.replace(/-([a-z0-9])/g, (_m: string, c: string) => c.toUpperCase());
-      expect(theme).toContain(`static const List<BoxShadow> ${name} =`);
-      expect(theme).toContain(`static const List<BoxShadow> ${name}Dark =`);
-    }
     // sans styles pin the variable-font axes and resolve the bundled family
     expect(theme).toMatch(/package: 'aeros_design_system',\n\s+fontSize: 14\.0,/);
     expect(theme).toContain("FontVariation('wght', 450.0)");
+  });
+});
+
+describe("token docs (docs/tokens.md)", () => {
+  const docs = buildTokenDocs(tokens, raw);
+  const row = (first: string) => docs.split("\n").find((l) => l.startsWith(`| \`${first}\` |`));
+
+  it("is marked as generated and is deterministic", () => {
+    expect(docs.split("\n")[0]).toMatch(/^<!-- Generated from .*tokens\.json.* Do not edit\. -->$/);
+    expect(buildTokenDocs(tokens, raw)).toBe(docs);
+    expect(docs.endsWith("\n")).toBe(true);
+    expect(docs).not.toMatch(/\n\n\n/);
+    // no date or other run-dependent text
+    expect(docs).not.toMatch(/\b20\d\d-\d\d-\d\d\b/);
+  });
+
+  it("is the committed file (run `pnpm build:tokens` after changing tokens.json)", () => {
+    const committed = readFileSync(new URL("../../../docs/tokens.md", import.meta.url), "utf8");
+    expect(committed).toBe(docs);
+  });
+
+  it("has a section for every token group", () => {
+    for (const heading of [
+      "## Colour", "### Ink ramp", "### Aliases", "### Status colours", "## Type", "### Type scale", "## Spacing",
+      "## Radius", "### Semantic radii", "## Elevation", "## Sizes", "## Motion", "## Focus ring", "## Opacity",
+      "## Border width", "## Layout", "## Z-index", "## Breakpoints"
+    ]) {
+      expect(docs, heading).toContain(`\n${heading}\n`);
+    }
+  });
+
+  it("lists every ramp stop, alias and status colour with its resolved value", () => {
+    for (const [stop, v] of Object.entries(tokens.color.ink as Record<string, { $value: string }>)) {
+      expect(docs).toContain(`| \`${stop}\` | \`${v.$value}\` | \`--aeros-color-ink-${stop}\` |`);
+    }
+    for (const k of Object.keys(tokens.alias.light)) {
+      const line = row(k);
+      expect(line, k).toBeDefined();
+      // reference as authored + resolved value, for both themes
+      expect(line).toContain(`\`${raw.alias.light[k]}\` | \`${tokens.alias.light[k]}\``);
+      expect(line).toContain(`\`${raw.alias.dark[k]}\` | \`${tokens.alias.dark[k]}\``);
+    }
+    for (const k of Object.keys(tokens.color.semantic)) {
+      const line = row(k);
+      expect(line, k).toContain(`\`${tokens.color.semantic[k].$value}\``);
+      expect(line, k).toContain(`\`${tokens.color.semanticDark[k].$value}\``);
+    }
+    // a status colour that is a reference shows the reference; a literal shows a dash
+    expect(row("info")).toContain(`\`${raw.color.semantic.info.$value}\``);
+    expect(row("success")).toContain("| — |");
+  });
+
+  it("lists every type role, size, radius, elevation, duration, layer and breakpoint", () => {
+    for (const [role, s] of Object.entries(tokens.text as Record<string, { size: number; weight: number }>)) {
+      expect(docs).toContain(`| \`${role}\` | ${s.size} | ${s.weight} |`);
+      expect(docs).toContain(`\`text-${role}\``);
+    }
+    for (const [k, v] of Object.entries(tokens.size.control as Record<string, { pointer: number; touch: number }>)) {
+      expect(docs).toContain(`| \`control-${k}\` | ${v.pointer}px | ${v.touch}px |`);
+    }
+    for (const [k, v] of Object.entries(tokens.shape)) expect(docs).toContain(`| \`${k}\` | \`${raw.shape[k]}\` | ${v}px | \`rounded-${k}\` |`);
+    for (const k of Object.keys(tokens.radius)) expect(docs).toContain(`\`AerosRadii.${k}\``);
+    for (const k of Object.keys(tokens.elevation.light)) {
+      expect(docs).toContain(`| \`${k}\` | \`${tokens.elevation.light[k]}\` | \`${tokens.elevation.dark[k]}\` |`);
+    }
+    for (const [k, v] of Object.entries(tokens.motion.duration)) expect(docs).toContain(`| \`${k}\` | ${v}ms | \`duration-${k}\` |`);
+    for (const k of Object.keys(tokens.motion.ease)) expect(docs).toContain(`\`ease-${k}\``);
+    for (const [k, v] of Object.entries(tokens.z)) expect(docs).toContain(`| \`${k}\` | ${v} | \`z-${k}\` |`);
+    for (const [k, v] of Object.entries(tokens.breakpoint)) expect(docs).toContain(`| \`${k}\` | ${v}px | \`${k}:\` |`);
+    for (const k of Object.keys(tokens.space)) expect(docs).toContain(`\`--aeros-space-${k.replace(".", "_")}\``);
+    for (const k of Object.keys(tokens.focus)) expect(docs).toContain(`\`--aeros-focus-${k}\``);
+    for (const k of Object.keys(tokens.opacity)) expect(docs).toContain(`\`opacity-${k}\``);
+    for (const k of Object.keys(tokens.borderWidth)) expect(docs).toContain(`\`border-${k}\``);
+    expect(docs).toContain("| `dialog-md` | 520px | `max-w-dialog-md` | `AerosMetricTokens.layoutDialogMd` |");
+    expect(docs).toContain("| `sidebar` | 240px | `w-sidebar` | `AerosMetricTokens.layoutSidebar` |");
+  });
+
+  it("names only CSS variables that tokens.css defines", () => {
+    const css = buildCss(tokens);
+    const named = [...docs.matchAll(/`(--aeros-[a-z0-9_-]+)`/g)].map((m) => m[1]).filter((n) => !n.endsWith("-"));
+    expect(named.length).toBeGreaterThan(50);
+    for (const name of new Set(named)) expect(css, name).toContain(`${name}:`);
   });
 });

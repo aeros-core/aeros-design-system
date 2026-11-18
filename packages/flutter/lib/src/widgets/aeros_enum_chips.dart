@@ -18,6 +18,12 @@ import 'aeros_attribute_models.dart';
 /// check. Hover and press change the fill only; keyboard focus draws the
 /// focus ring.
 ///
+/// Disabled ([enabled] false or a null [onChanged]) the whole group is dimmed
+/// to [AerosMetricTokens.opacityDisabled]; its chips do not answer the
+/// pointer, take no keyboard focus and are announced as disabled. The chosen
+/// chip keeps its check, so a locked value still reads. One option can be
+/// disabled on its own with [AerosAttributeOption.disabled].
+///
 /// Use this for short option lists (2–6 items) and where labels are short
 /// enough to fit a chip. Picks up [AerosAttributeOption.swatchColor] to render
 /// a colour swatch in front of each chip — used for colour pickers.
@@ -32,6 +38,7 @@ class AerosEnumChips extends StatelessWidget {
     this.requiredButMissing = false,
     this.unitSuffix,
     this.errorText,
+    this.enabled = true,
   });
 
   final List<AerosAttributeOption> options;
@@ -52,10 +59,30 @@ class AerosEnumChips extends StatelessWidget {
 
   final String? errorText;
 
+  /// False disables every chip, like a null [onChanged].
+  final bool enabled;
+
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
     final hasError = errorText != null && errorText!.isNotEmpty;
+    final active = enabled && onChanged != null;
+
+    Widget chips = Wrap(
+      spacing: AerosSpacing.s2,
+      runSpacing: AerosSpacing.s2,
+      children: [
+        for (final o in options)
+          _Chip(
+            option: o,
+            selected: o.id == selectedId,
+            requiredButMissing: requiredButMissing && selectedId == null,
+            unitSuffix: unitSuffix,
+            onTap: o.disabled || !active ? null : () => onChanged!(o.id == selectedId ? null : o.id),
+          ),
+      ],
+    );
+    if (!active) chips = Opacity(opacity: AerosMetricTokens.opacityDisabled, child: chips);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,22 +104,7 @@ class AerosEnumChips extends StatelessWidget {
           ),
           const SizedBox(height: AerosSpacing.s2),
         ],
-        Wrap(
-          spacing: AerosSpacing.s2,
-          runSpacing: AerosSpacing.s2,
-          children: [
-            for (final o in options)
-              _Chip(
-                option: o,
-                selected: o.id == selectedId,
-                requiredButMissing: requiredButMissing && selectedId == null,
-                unitSuffix: unitSuffix,
-                onTap: o.disabled || onChanged == null
-                    ? null
-                    : () => onChanged!(o.id == selectedId ? null : o.id),
-              ),
-          ],
-        ),
+        chips,
         if (hasError) ...[
           const SizedBox(height: AerosSpacing.s1),
           Text(
@@ -164,7 +176,8 @@ class _Chip extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Color(option.swatchColor!),
                     shape: BoxShape.circle,
-                    border: Border.all(color: a.borderDefault, width: AerosMetricTokens.borderHairline),
+                    // borderStrong, so a dark sample still has an edge in dark mode.
+                    border: Border.all(color: a.borderStrong, width: AerosMetricTokens.borderHairline),
                   ),
                 ),
                 SizedBox(width: _size.gap),

@@ -321,6 +321,35 @@ void main() {
     },
   );
 
+  // A menu too long for the screen keeps the panel's padding above the first
+  // row and below the last: at the top, and scrolled to the end.
+  Widget longMenu(BuildContext context) => AerosMenu(
+        items: [for (var i = 1; i <= 40; i++) AerosMenuItem<void>(label: 'Warehouse $i', onSelected: () {})],
+        trigger: (context, menu) => AerosButton(
+          key: const Key('target'),
+          variant: AerosButtonVariant.secondary,
+          label: 'Move to',
+          trailing: const Icon(Icons.keyboard_arrow_down),
+          onPressed: menu.toggle,
+        ),
+      );
+  goldenMatrix(
+    'overlays_menu_long',
+    size: const Size(360, 420),
+    longMenu,
+    act: (t) => t.tap(find.byKey(const Key('target'))),
+  );
+  goldenMatrix(
+    'overlays_menu_long_scrolled',
+    size: const Size(360, 420),
+    longMenu,
+    act: (t) async {
+      await t.tap(find.byKey(const Key('target')));
+      await t.pumpAndSettle();
+      await t.drag(find.text('Warehouse 4'), const Offset(0, -2000));
+    },
+  );
+
   // At the bottom-right corner the menu flips above and is pulled inside.
   goldenMatrix(
     'overlays_menu_at_edge',
