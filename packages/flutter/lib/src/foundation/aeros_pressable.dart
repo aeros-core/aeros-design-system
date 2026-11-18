@@ -53,7 +53,7 @@ typedef AerosPressableBuilder = Widget Function(BuildContext context, AerosInter
 /// `AerosFocusRing`).
 ///
 /// The tappable box is at least `AerosSizeTokens.minTarget` on each side for
-/// the nearest [AerosDensityScope] (24 for a mouse, 44 for fingers). A smaller
+/// the nearest [AerosDensityScope] (24 for a mouse, 48 for fingers). A smaller
 /// visual is centred in that box at its own size; turn [expandHitTarget] off
 /// for a control that sits inside another target (a clear button in a field).
 class AerosPressable extends StatefulWidget {

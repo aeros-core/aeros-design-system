@@ -1,30 +1,13 @@
 import 'package:aeros_design_system/aeros_design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 import 'harness.dart';
-
-/// A shrink-wrapped row with 12px gaps.
-class _Inline extends StatelessWidget {
-  const _Inline({required this.children});
-
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) => Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (final (index, child) in children.indexed) ...[
-            if (index > 0) const SizedBox(width: 12),
-            child,
-          ],
-        ],
-      );
-}
 
 void main() {
   goldenMatrix(
     'badges',
-    size: const Size(720, 900),
+    size: const Size(720, 1180),
     (context) => GoldenColumn(
       width: 680,
       children: [
@@ -61,6 +44,49 @@ void main() {
           ),
         ),
         GoldenSection(
+          'AerosFilterChip (rest, count, selected, selected + clear, dropdown, warning)',
+          child: GoldenRow(
+            children: [
+              AerosFilterChip(label: 'All', onTap: () {}),
+              AerosFilterChip(label: 'Mine', count: 6, countIsFloor: true, onTap: () {}),
+              AerosFilterChip(label: 'Unread', selected: true, count: 12, onTap: () {}),
+              AerosFilterChip(label: 'Stage: Won', selected: true, dropdown: true, onTap: () {}, onClear: () {}),
+              AerosFilterChip(label: 'Stage', dropdown: true, leadingIcon: Icons.flag_outlined, onTap: () {}),
+              AerosFilterChip(label: 'Needs attention', tone: AerosFilterChipTone.warning, count: 3, onTap: () {}),
+            ],
+          ),
+        ),
+        GoldenSection(
+          'AerosEnumChips (selected, swatch, disabled) and required but missing',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AerosEnumChips(
+                selectedId: 'm',
+                onChanged: (_) {},
+                options: const [
+                  AerosAttributeOption(id: 's', label: '250', swatchColor: 0xFFB45309),
+                  AerosAttributeOption(id: 'm', label: '350'),
+                  AerosAttributeOption(id: 'l', label: '450', disabled: true),
+                ],
+                unitSuffix: 'ml',
+              ),
+              const SizedBox(height: 8),
+              AerosEnumChips(
+                selectedId: null,
+                requiredButMissing: true,
+                onChanged: (_) {},
+                options: const [
+                  AerosAttributeOption(id: 'a', label: 'Single wall'),
+                  AerosAttributeOption(id: 'b', label: 'Double wall'),
+                ],
+                errorText: 'Pick a wall type',
+              ),
+            ],
+          ),
+        ),
+        GoldenSection(
           'AerosTag pill',
           child: GoldenRow(
             children: [
@@ -71,9 +97,7 @@ void main() {
         ),
         const GoldenSection(
           'AerosCountBadge (1, 9, 42, 99, 120, floor, muted, zero)',
-          // In a Row, not a Wrap: the badge fills whatever width it is
-          // offered, and only shrinks to a pill where width is unbounded.
-          child: _Inline(
+          child: GoldenRow(
             children: [
               AerosCountBadge(count: 1),
               AerosCountBadge(count: 9),
@@ -88,7 +112,7 @@ void main() {
         ),
         const GoldenSection(
           'AerosCountBadge with its own density (pointer, then touch)',
-          child: _Inline(
+          child: GoldenRow(
             children: [
               AerosCountBadge(count: 12, density: AerosDensity.pointer),
               AerosCountBadge(count: 12, density: AerosDensity.touch),
@@ -174,4 +198,31 @@ void main() {
       ],
     ),
   );
+
+  // Hover and keyboard focus on the interactive members of the family.
+  Widget chips(BuildContext context) => GoldenRow(
+        children: [
+          AerosFilterChip(key: const Key('chip'), label: 'Mine', count: 6, onTap: () {}),
+          AerosTag(key: const Key('tag'), label: 'launch', onRemove: () {}),
+          AerosRoutingSignalBadge(
+            key: const Key('signal'),
+            signal: const AerosRoutingSignal(kind: 'RFQ', label: 'Quote required'),
+            onTap: () {},
+          ),
+        ],
+      );
+  for (final target in ['chip', 'tag', 'signal']) {
+    goldenMatrix(
+      'badges_${target}_hovered',
+      chips,
+      size: const Size(420, 90),
+      act: (t) => hover(t, find.byKey(Key(target))),
+    );
+    goldenMatrix(
+      'badges_${target}_focused',
+      chips,
+      size: const Size(420, 90),
+      act: (t) => focus(t, find.byKey(Key(target))),
+    );
+  }
 }

@@ -30,7 +30,7 @@ export const TabsList = React.forwardRef<
       className={cn(
         variant === "underline"
           ? "flex border-b border-border-default"
-          : "inline-flex gap-0.5 rounded-control bg-bg-subtle p-0.5",
+          : "inline-flex gap-0.5 rounded-control bg-bg-inset p-0.5",
         className
       )}
       {...props}
@@ -52,7 +52,7 @@ export const TabsTrigger = React.forwardRef<
         "",
         variant === "underline"
           ? "-mb-px h-control-lg border-b-2 border-transparent px-3 hover:text-fg-primary data-[state=active]:border-fg-primary data-[state=active]:text-fg-primary"
-          : "h-control-sm rounded-item px-2.5 hover:text-fg-primary data-[state=active]:bg-bg-surface data-[state=active]:text-fg-primary data-[state=active]:shadow-raised",
+          : "h-control-sm rounded-item px-2.5 hover:text-fg-primary data-[state=active]:bg-bg-elevated data-[state=active]:text-fg-primary data-[state=active]:shadow-raised",
         className
       )}
       {...props}

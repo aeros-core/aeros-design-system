@@ -82,6 +82,7 @@ class AerosTokens {
   static const Color aliasLightBgSurface = Color(0xFFFFFFFF);
   static const Color aliasLightBgElevated = Color(0xFFFFFFFF);
   static const Color aliasLightBgSubtle = Color(0xFFF4F4F5);
+  static const Color aliasLightBgInset = Color(0xFFF4F4F5);
   static const Color aliasLightBgInverse = Color(0xFF141417);
   static const Color aliasLightFgPrimary = Color(0xFF141417);
   static const Color aliasLightFgSecondary = Color(0xFF52525A);
@@ -106,6 +107,7 @@ class AerosTokens {
   static const Color aliasDarkBgSurface = Color(0xFF141417);
   static const Color aliasDarkBgElevated = Color(0xFF1C1C20);
   static const Color aliasDarkBgSubtle = Color(0xFF1C1C20);
+  static const Color aliasDarkBgInset = Color(0xFF0B0B0D);
   static const Color aliasDarkBgInverse = Color(0xFFFAFAFA);
   static const Color aliasDarkFgPrimary = Color(0xFFFAFAFA);
   static const Color aliasDarkFgSecondary = Color(0xFFD2D2D7);

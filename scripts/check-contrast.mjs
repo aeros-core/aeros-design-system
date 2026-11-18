@@ -45,7 +45,10 @@ const pairs = [
   ["fg-secondary", "bg-elevated"],
   ["fg-primary", "bg-subtle"],
   ["fg-primary", "bg-elevated"],
-  ["fg-inverse", "bg-inverse"]
+  ["fg-inverse", "bg-inverse"],
+  // Recessed tracks (segmented tabs): the idle label sits on the inset fill.
+  ["fg-muted", "bg-inset"],
+  ["fg-primary", "bg-inset"]
 ];
 
 let fail = 0;

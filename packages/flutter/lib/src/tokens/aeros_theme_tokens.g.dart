@@ -120,6 +120,7 @@ class AerosAliasColors {
     required this.bgSurface,
     required this.bgElevated,
     required this.bgSubtle,
+    required this.bgInset,
     required this.bgInverse,
     required this.fgPrimary,
     required this.fgSecondary,
@@ -146,6 +147,7 @@ class AerosAliasColors {
   final Color bgSurface;
   final Color bgElevated;
   final Color bgSubtle;
+  final Color bgInset;
   final Color bgInverse;
   final Color fgPrimary;
   final Color fgSecondary;
@@ -172,6 +174,7 @@ class AerosAliasColors {
     bgSurface: AerosTokens.aliasLightBgSurface,
     bgElevated: AerosTokens.aliasLightBgElevated,
     bgSubtle: AerosTokens.aliasLightBgSubtle,
+    bgInset: AerosTokens.aliasLightBgInset,
     bgInverse: AerosTokens.aliasLightBgInverse,
     fgPrimary: AerosTokens.aliasLightFgPrimary,
     fgSecondary: AerosTokens.aliasLightFgSecondary,
@@ -199,6 +202,7 @@ class AerosAliasColors {
     bgSurface: AerosTokens.aliasDarkBgSurface,
     bgElevated: AerosTokens.aliasDarkBgElevated,
     bgSubtle: AerosTokens.aliasDarkBgSubtle,
+    bgInset: AerosTokens.aliasDarkBgInset,
     bgInverse: AerosTokens.aliasDarkBgInverse,
     fgPrimary: AerosTokens.aliasDarkFgPrimary,
     fgSecondary: AerosTokens.aliasDarkFgSecondary,
@@ -229,6 +233,7 @@ class AerosAliasColors {
         bgSurface: Color.lerp(a.bgSurface, b.bgSurface, t)!,
         bgElevated: Color.lerp(a.bgElevated, b.bgElevated, t)!,
         bgSubtle: Color.lerp(a.bgSubtle, b.bgSubtle, t)!,
+        bgInset: Color.lerp(a.bgInset, b.bgInset, t)!,
         bgInverse: Color.lerp(a.bgInverse, b.bgInverse, t)!,
         fgPrimary: Color.lerp(a.fgPrimary, b.fgPrimary, t)!,
         fgSecondary: Color.lerp(a.fgSecondary, b.fgSecondary, t)!,

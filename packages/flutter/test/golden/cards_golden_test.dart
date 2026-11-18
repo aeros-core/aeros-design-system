@@ -58,18 +58,17 @@ void main() {
           width: 340,
           children: [
             GoldenSection(
-              'AerosCard raised',
-              child: AerosCard(variant: AerosCardVariant.raised, child: _body(context)),
-            ),
-            GoldenSection(
-              'AerosCard raised, title and footer',
+              'AerosCard title and footer',
               child: AerosCard(
-                variant: AerosCardVariant.raised,
                 title: 'Order #4821',
                 subtitle: 'Placed 12 Nov 2026',
                 footer: Text('Updated 2 hours ago', style: AerosTypography.caption(color: context.aerosColors.fgMuted)),
                 child: _body(context),
               ),
+            ),
+            GoldenSection(
+              'AerosCard tappable',
+              child: AerosCard(onTap: () {}, title: 'Order #4821', child: _body(context)),
             ),
             GoldenSection(
               'AerosCard tappable, no padding',
@@ -207,6 +206,32 @@ void main() {
     ),
   );
 
+  // A tappable card under the pointer and under keyboard focus.
+  Widget tappable(BuildContext context) => GoldenColumn(
+        width: 340,
+        children: [
+          AerosCard(
+            key: const Key('target'),
+            onTap: () {},
+            title: 'Order #4821',
+            subtitle: 'Placed 12 Nov 2026',
+            child: _body(context),
+          ),
+        ],
+      );
+  goldenMatrix(
+    'cards_tappable_hovered',
+    tappable,
+    size: const Size(380, 170),
+    act: (t) => hover(t, find.byKey(const Key('target'))),
+  );
+  goldenMatrix(
+    'cards_tappable_focused',
+    tappable,
+    size: const Size(380, 170),
+    act: (t) => focus(t, find.byKey(const Key('target'))),
+  );
+
   goldenMatrix(
     'cards_intent_hovered',
     (context) => GoldenColumn(
@@ -223,5 +248,22 @@ void main() {
     ),
     size: const Size(380, 170),
     act: (t) => hover(t, find.byKey(const Key('target'))),
+  );
+  goldenMatrix(
+    'cards_intent_focused',
+    (context) => GoldenColumn(
+      width: 340,
+      children: [
+        AerosIntentCard(
+          key: const Key('target'),
+          title: 'Buy for my business',
+          subtitle: 'Browse the catalogue and request quotes',
+          icon: Icons.shopping_bag_outlined,
+          onTap: () {},
+        ),
+      ],
+    ),
+    size: const Size(380, 170),
+    act: (t) => focus(t, find.byKey(const Key('target'))),
   );
 }
