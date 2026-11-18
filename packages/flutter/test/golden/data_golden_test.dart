@@ -24,7 +24,8 @@ const _orders = [
 ];
 
 List<AerosDataColumn<_Order>> _columns(BuildContext context) => [
-      AerosDataColumn(label: 'Order', sortable: true, cell: (o) => Text(o.id)),
+      // The column a row is known by: fgPrimary at w500. The rest is fgSecondary.
+      AerosDataColumn(label: 'Order', sortable: true, emphasis: true, cell: (o) => Text(o.id)),
       AerosDataColumn(label: 'Buyer', sortable: true, cell: (o) => Text(o.buyer)),
       AerosDataColumn(label: 'Status', cell: (o) => AerosBadge(label: o.status, tone: o.tone)),
       AerosDataColumn(label: 'Total', numeric: true, sortable: true, cell: (o) => Text(o.total)),

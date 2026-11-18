@@ -9,6 +9,7 @@
  *   dist/js/tokens.{js,d.ts}         resolved + raw trees, typed
  *   dist/dart/*.dart                 Dart constants + typed theme classes
  *   ../flutter/lib/src/tokens/*.g.dart   the same Dart, committed (CI checks freshness)
+ *   ../../docs/tokens.md             the written token reference, committed (CI checks freshness)
  *
  * Run: `pnpm --filter @aeros-core/tokens build`
  */
@@ -17,6 +18,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildCss } from "./emit/css";
 import { buildDartTheme, buildDartTokens } from "./emit/dart";
+import { buildTokenDocs } from "./emit/docs";
 import { buildDts, buildJs } from "./emit/js";
 import { buildTheme } from "./emit/theme";
 import { resolveTokens } from "./resolve.mjs";
@@ -46,5 +48,7 @@ write("dist/dart/aeros_theme_tokens.dart", dartTheme.replace("import 'aeros_toke
 // committed, and CI fails if they go stale (build + git diff).
 write("../flutter/lib/src/tokens/aeros_tokens.g.dart", dartTokens);
 write("../flutter/lib/src/tokens/aeros_theme_tokens.g.dart", dartTheme);
+// The written reference is generated too, so it cannot disagree with the values.
+write("../../docs/tokens.md", buildTokenDocs(tokens, raw));
 
 console.log("\n✨ Aeros tokens built.");

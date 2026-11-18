@@ -24,6 +24,7 @@ class AerosDataColumn<T> {
     this.width,
     this.sortable = false,
     this.numeric = false,
+    this.emphasis = false,
   });
 
   /// Column header text.
@@ -40,9 +41,31 @@ class AerosDataColumn<T> {
   /// [AerosDataTable.onSortChanged].
   final bool sortable;
 
-  /// Right-aligns the column and sets its text in mono. Use for numbers /
-  /// amounts.
+  /// Right-aligns the column and sets its text in mono, in `fgPrimary`. Use
+  /// for numbers / amounts.
   final bool numeric;
+
+  /// Marks the column a row is known by — a name, an order number. Its cells
+  /// are `fgPrimary` at w500; every other text cell is `fgSecondary`, so the
+  /// eye lands on this column first. Give a table one emphasised column (two
+  /// at most).
+  ///
+  /// It changes text only: a cell that builds a badge, a button or text with
+  /// its own style is left alone.
+  final bool emphasis;
+
+  /// The default text style of a body cell in this column, for [aliases].
+  ///
+  /// `bodySm` in `fgSecondary`; `fgPrimary` at w500 when [emphasis]; mono in
+  /// `fgPrimary` when [numeric] (w500 when emphasised too).
+  TextStyle cellStyle(AerosAliasColors aliases) {
+    if (numeric) {
+      return AerosTypography.monoMd(color: aliases.fgPrimary, weight: emphasis ? FontWeight.w500 : null);
+    }
+    return emphasis
+        ? AerosTypography.bodySm(color: aliases.fgPrimary, weight: FontWeight.w500)
+        : AerosTypography.bodySm(color: aliases.fgSecondary);
+  }
 }
 
 /// State of a sortable column.
@@ -56,6 +79,10 @@ class AerosDataSort {
 /// hairline-divided rows, optional row selection, sortable columns, a loading
 /// veil and an empty state.
 ///
+/// Body text is `fgSecondary`; mark the column a row is known by with
+/// [AerosDataColumn.emphasis] to set it in `fgPrimary` at w500, and amounts
+/// with [AerosDataColumn.numeric] (mono, `fgPrimary`).
+///
 /// The header and the rows are [AerosSizeTokens.row] high for the density (a
 /// row grows with a taller cell). Hovering a row tints it; a selected row
 /// takes the selected tint. Columns are as wide as their content; when they
@@ -66,7 +93,7 @@ class AerosDataSort {
 /// AerosDataTable<User>(
 ///   rows: state.users,
 ///   columns: [
-///     AerosDataColumn(label: 'Name',  cell: (u) => Text(u.name)),
+///     AerosDataColumn(label: 'Name',  emphasis: true, cell: (u) => Text(u.name)),
 ///     AerosDataColumn(label: 'Email', cell: (u) => Text(u.email)),
 ///     AerosDataColumn(label: 'Status', cell: (u) => AerosBadge(label: u.status)),
 ///   ],
@@ -324,9 +351,7 @@ class _AerosDataTableState<T> extends State<AerosDataTable<T>> {
       child: Align(
         alignment: column.numeric ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart,
         child: DefaultTextStyle.merge(
-          style: column.numeric
-              ? AerosTypography.monoMd(color: a.fgPrimary)
-              : AerosTypography.bodySm(color: a.fgPrimary),
+          style: column.cellStyle(a),
           child: IconTheme.merge(
             data: IconThemeData(color: a.fgMuted, size: AerosSizeTokens.iconMd),
             child: column.cell(row),

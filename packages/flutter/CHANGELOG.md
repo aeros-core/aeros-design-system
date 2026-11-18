@@ -28,7 +28,7 @@ hover and press change **colour only** (no ripple, no lift); there is **one focu
   `focused` = keyboard focus only, `enabled`) to a builder; hand cursor; Enter / Space activation;
   semantics (`button`, `checked`, `mixed`, `toggled`, `selected`, `inMutuallyExclusiveGroup`,
   `semanticLabel`). Its tappable box is at least `AerosSizeTokens.minTarget` for the density (24
-  pointer, 44 touch) without changing the visual's size; `expandHitTarget: false` opts out.
+  pointer, 48 touch) without changing the visual's size; `expandHitTarget: false` opts out.
 - `AerosStateLayer.resolve(aliases, base, hovered:, pressed:, selected:, enabled:)` — composites the
   `stateHover` / `statePressed` / `stateSelected` aliases over a base colour — and `AerosStateFill`,
   a hairline box that animates between state colours in `AerosMotion.quick`.
@@ -81,8 +81,8 @@ hover and press change **colour only** (no ripple, no lift); there is **one focu
   not by `InputDecoration`. `AerosTextField` is now a `StatefulWidget` (constructor unchanged).
 - **Selection controls are custom-drawn, not Material wrappers**: checkbox and radio are 16px (were
   18), the switch is a 32×18 monochrome track on every platform (no Cupertino switch on iOS/macOS).
-  The default hit area is the density minimum target — **44px at touch, where Material padded to
-  48** — and `compact` shrinks it to the glyph. `onChanged` is nullable on all three.
+  The default hit area is the density minimum target — **48px at touch**, as Material padded
+  before — and `compact` shrinks it to the glyph. `onChanged` is nullable on all three.
 - **Status palettes no longer default to light.** `AerosSeverityPalette.of(severity, {isDark})` →
   `AerosSeverityPalette.of(context, severity)` or `.resolve(severity, context.aerosSemantic)`;
   `AerosSelectionPalette.resolve(state, aliases, {isDark})` → `.of(context, state)` or
@@ -293,9 +293,9 @@ last widgets leave `InkWell`. Nothing in `lib` uses `InkWell`, `showDialog`, `sh
   focus ring around what the builder returns. Without `onTap` it only tracks the pointer, as before.
 - **`AerosSearchField`**: Escape with an empty query is no longer swallowed, so it closes the dialog or
   menu the field sits in.
-- **`AerosShadows`** is deprecated (`Use AerosElevation via context.aerosElevation`) and its
-  `card` / `menu` / `dialog` / `popover(bool isDark)` functions are **removed**: use
-  `AerosSurface(level: …)`.
+- **`AerosShadows`** is **removed** (the class and its `card` / `menu` / `dialog` /
+  `popover(bool isDark)` functions): use `AerosSurface(level: …)`, or `context.aerosElevation` for
+  the raw shadow lists.
 
 ### Breaking
 
@@ -314,6 +314,44 @@ last widgets leave `InkWell`. Nothing in `lib` uses `InkWell`, `showDialog`, `sh
 1. Using `GoogleFonts.*` in your app? Add `google_fonts` to your own dependencies.
 2. Replace `AerosTypography.x().copyWith(fontWeight: w)` with `AerosTypography.x(weight: w)` (or `.withWeight(w)`); keep other `copyWith` arguments in a `copyWith` before it.
 3. Re-record golden images: body weight, tracking, widget weights and mono glyphs all change.
+
+### Review fixes — modal headers, menus, disabled states, table emphasis
+
+Six rough edges from the 3.0 review. Two of them change what an app sees.
+
+- **`AerosDataTable` body text is now `fgSecondary`** (it was `fgPrimary`), as in the React table.
+  Mark the column a row is known by — a name, an order number — with the new
+  `AerosDataColumn(emphasis: true)`: its cells are `fgPrimary` at w500. `numeric` columns stay mono in
+  `fgPrimary`. `fgSecondary` on a row is 7.7:1 in light and 12.2:1 in dark (5.6:1 and 6.4:1 at worst,
+  on a selected row being pressed), so cells stay above WCAG AA. A cell that sets its own text style
+  is untouched; to keep a column in `fgPrimary`, mark it `emphasis: true` or style the cell's text.
+  `AerosDataColumn.cellStyle(aliases)` returns the style a column's cells get.
+- **`AerosEnumChips` has a disabled state**: `enabled: false`, or a null `onChanged`, dims the group to
+  `AerosMetricTokens.opacityDisabled`; the chips take no hover, no keyboard focus, and are announced
+  as disabled. A group you passed a null `onChanged` to as "read only" is now dimmed.
+  `AerosAttributeSelector` uses it for an attribute that is `lockedByAdmin`.
+- `AerosDialog` / `AerosSheet`: at touch density the close button keeps its 48dp target but no longer
+  makes the header taller — a title-only header is 60 high (was 72), and a header with a description
+  is the same height as at pointer density.
+- `AerosMenu`, `AerosSelect`, `AerosDropdownSearch` (menu): a list too long for the screen keeps the
+  panel's 4px padding above the first row and below the last at every scroll offset; rows are clipped
+  at the padding, not at the edge of the surface.
+- `AerosRangeSlider` / `AerosNumericRangeBand`: a disabled slider dims its value readout with the
+  track and thumb.
+- `AerosVariantPicker` swatches, and the colour dot in a variant or enum chip, have a `borderStrong`
+  hairline (was `borderDefault`), so a dark sample keeps an edge in dark mode. A hovered swatch's
+  hairline is `fgMuted`.
+
+### Removals — the tokens the restyle replaced
+
+- **`AerosRadii.xl2` / `xl3` / `xl4`** and **`brXl2` / `brXl3` / `brXl4`** are removed (the token
+  scale now ends at `xl` = 12). Use `AerosShapeTokens` (`item`, `control`, `surface`, `modal`,
+  `pill`).
+- **`AerosMotion.emphasized` / `decelerate` / `entrance` / `spring`** are removed. Use
+  `AerosMotion.standard`, and the new `AerosMotion.enter` / `exit` for overlays (`enter` has the
+  value `entrance` had).
+- **`AerosAliasColors.focusRingOffset`** is removed — the focus ring has a transparent offset.
+- **`AerosShadows`** is removed (see above).
 
 ## 2.5.0 — 2026-10-09 (wordmark + pulse orb)
 

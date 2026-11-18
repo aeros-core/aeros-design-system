@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 import 'aeros_attribute_models.dart';
@@ -12,6 +13,9 @@ import 'aeros_slider_theme.dart';
 ///
 /// A Material [Slider] in the design system's slider look: a 2px track, a 14px
 /// thumb with a hairline, no halo, and the focus ring on keyboard focus.
+///
+/// Disabled ([enabled] false or a null [onChanged]), the track, the thumb and
+/// the value readout are all dimmed to [AerosMetricTokens.opacityDisabled].
 ///
 /// For discrete numeric chips, use [AerosEnumChips] with `unitSuffix` instead.
 class AerosRangeSlider extends StatelessWidget {
@@ -66,7 +70,10 @@ class AerosRangeSlider extends StatelessWidget {
       errorText: errorText,
       labelGap: AerosSpacing.s1,
       // Mono ships at 400 and 500 only: the value is the medium face.
-      trailing: Text(_format(value), style: AerosTypography.monoMd(color: a.fgPrimary, weight: FontWeight.w500)),
+      trailing: AerosSliderValue(
+        enabled: active,
+        child: Text(_format(value), style: AerosTypography.monoMd(color: a.fgPrimary, weight: FontWeight.w500)),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

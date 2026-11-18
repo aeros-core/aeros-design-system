@@ -611,8 +611,10 @@ class _AerosMenuListState extends State<AerosMenuList> {
               ),
     ];
 
+    // The panel's padding sits outside the scroll view, so a long menu keeps
+    // it at both ends wherever it is scrolled to: rows are clipped at the
+    // padding, never at the surface's edge.
     Widget list = SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(vertical: AerosMenu.panelPadding),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -620,12 +622,12 @@ class _AerosMenuListState extends State<AerosMenuList> {
       ),
     );
     if (uniform) {
-      list = AerosWholeRows(
-        rowHeight: AerosMenuRow.heightOf(context),
-        leadingPadding: AerosMenu.panelPadding,
-        child: list,
-      );
+      list = AerosWholeRows(rowHeight: AerosMenuRow.heightOf(context), child: list);
     }
+    list = Padding(
+      padding: const EdgeInsets.symmetric(vertical: AerosMenu.panelPadding),
+      child: list,
+    );
 
     return Semantics(
       role: widget.selection || widget.entries.isEmpty ? SemanticsRole.none : SemanticsRole.menu,

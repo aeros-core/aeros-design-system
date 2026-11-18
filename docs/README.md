@@ -1,63 +1,32 @@
-# Aeros Design System — Docs
+# Aeros Design System — documentation
 
-- **[principles.md](./principles.md)** — the design point of view
-- **[tokens.md](./tokens.md)** — colors, type, spacing, radii, shadows, motion
-- **[components.md](./components.md)** — component inventory with React + Flutter usage
-- **[migration.md](./migration.md)** — how to move from the v2 `index.html` kit
+For version 3.0 of `@aeros-core/tokens`, `@aeros-core/react` and `aeros_design_system`.
 
-## Getting started — Next.js (aeros-x.com)
+## Start here
 
-```bash
-pnpm add @aeros-core/react @aeros-core/tokens
-```
+| If you want to | Read |
+|---|---|
+| Add the system to an app | [consuming.md](./consuming.md) |
+| Upgrade an app to 3.0 | [migration.md](./migration.md) |
+| Find a component and its counterpart on the other platform | [components.md](./components.md) |
+| Look up a token, its value and its name on each platform | [tokens.md](./tokens.md) |
+| Understand why the system looks the way it does | [principles.md](./principles.md) |
+| Change the system and ship the change | [releasing.md](./releasing.md) |
 
-Add to your app root (`app/layout.tsx`):
+## All documents
 
-```tsx
-import "@aeros-core/react/styles.css";
+- **[principles.md](./principles.md)** — the design rules of 3.0, each with its reason: surfaces and elevation, radius, colour, type, density, motion, focus, accessibility, platform parity.
+- **[tokens.md](./tokens.md)** — the token reference. Generated from `packages/tokens/src/tokens.json`; do not edit it by hand.
+- **[components.md](./components.md)** — every React export and every Flutter widget, by family, and how components are built from shared recipes and the foundation layer.
+- **[consuming.md](./consuming.md)** — GitHub Packages auth, install, CSS and fonts, the Tailwind theme reset, `data-theme`, `data-density`, the app shell, Flutter pinning, `AerosTheme`, `AerosDensityScope`, Renovate.
+- **[migration.md](./migration.md)** — upgrading to 3.0 step by step, with replacement tables and search-and-replace recipes; the older 1.x → 2.0 notes.
+- **[releasing.md](./releasing.md)** — Changesets, the `next/3.0` integration branch, CI jobs and gates, how image baselines are updated, Flutter tagging.
+- **[configurable-mto.md](./configurable-mto.md)** — the Flutter widgets for configurable made-to-order listings.
+- **[audit-2026-08.md](./audit-2026-08.md)** — the August 2026 audit that led to 2.0 and 2.1. A historical record.
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" data-theme="light" suppressHydrationWarning>
-      <body>{children}</body>
-    </html>
-  );
-}
-```
+## Package READMEs
 
-Use a component:
-
-```tsx
-import { Button, Card, CardHeader, CardTitle, CardBody, StatCard } from "@aeros-core/react";
-
-export default function Page() {
-  return (
-    <main className="p-8 space-y-6">
-      <StatCard label="Output" value="4,820" delta={{ value: "+8%", direction: "up" }} />
-      <Button variant="primary">Create RFQ</Button>
-    </main>
-  );
-}
-```
-
-**Dark mode**: toggle `data-theme="dark"` on `<html>`. We recommend [`next-themes`](https://github.com/pacocoursey/next-themes) with `attribute="data-theme"`.
-
-## Getting started — Flutter
-
-```yaml
-dependencies:
-  aeros_design_system:
-    path: ../aeros-design-system/packages/flutter
-```
-
-```dart
-import 'package:flutter/material.dart';
-import 'package:aeros_design_system/aeros_design_system.dart';
-
-void main() => runApp(MaterialApp(
-  theme: AerosTheme.light(),
-  darkTheme: AerosTheme.dark(),
-  themeMode: ThemeMode.system,
-  home: Scaffold(body: AerosButton.primary(label: 'Go', onPressed: () {})),
-));
-```
+- [`packages/tokens`](../packages/tokens/README.md) — exports, adding a token, the generators.
+- [`packages/react`](../packages/react/README.md) — install, a minimal example, contributing rules, tests.
+- [`packages/flutter`](../packages/flutter/README.md) — install, theme, density, the foundation layer, goldens.
+- [`packages/react-docs`](../packages/react-docs/README.md) — the showcase and the visual and accessibility suites.

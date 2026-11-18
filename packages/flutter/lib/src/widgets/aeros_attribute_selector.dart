@@ -111,6 +111,7 @@ class AerosAttributeSelector extends StatelessWidget {
       AerosAttributeInputVariant.chips => AerosEnumChips(
           label: spec.label,
           required: spec.required,
+          enabled: !disabled,
           options: spec.options,
           selectedId: value.enumValueId,
           unitSuffix: spec.datatype == AerosAttributeDatatype.measurement

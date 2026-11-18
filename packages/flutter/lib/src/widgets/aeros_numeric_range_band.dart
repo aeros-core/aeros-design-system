@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 import 'aeros_attribute_models.dart';
@@ -30,6 +31,9 @@ import 'aeros_slider_theme.dart';
 /// A Material [RangeSlider] in the design system's slider look (2px track,
 /// 14px thumbs with a hairline, no halo). Material's range slider takes no
 /// keyboard focus, so unlike [AerosRangeSlider] it has no focus ring.
+///
+/// Disabled ([enabled] false or a null [onChanged]), the track, the thumbs
+/// and the value readout are all dimmed to [AerosMetricTokens.opacityDisabled].
 ///
 /// For a single-thumb measurement input, use [AerosRangeSlider].
 class AerosNumericRangeBand extends StatelessWidget {
@@ -105,9 +109,12 @@ class AerosNumericRangeBand extends StatelessWidget {
       errorText: errorText,
       labelGap: AerosSpacing.s1,
       // Mono ships at 400 and 500 only: the value is the medium face.
-      trailing: Text(
-        '${_format(safeStart)} – ${_format(safeEnd)}',
-        style: AerosTypography.monoMd(color: a.fgPrimary, weight: FontWeight.w500),
+      trailing: AerosSliderValue(
+        enabled: active,
+        child: Text(
+          '${_format(safeStart)} – ${_format(safeEnd)}',
+          style: AerosTypography.monoMd(color: a.fgPrimary, weight: FontWeight.w500),
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

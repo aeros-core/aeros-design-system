@@ -42,7 +42,7 @@ new attributes or overriding the default with `forceVariant`.
 
 - **Chips beat dropdowns under 6 options**, especially on mobile — the buyer can scan all choices without a second tap.
 - **Sliders beat number fields for narrow ranges with steps** (e.g. 150 ↔ 350 gsm step 25). For ranges spanning several orders of magnitude (quantity 100 ↔ 500,000), the slider becomes useless — switch to the measurement input.
-- **Use `AerosEnumChips.swatchColor`** for colour pickers. The chip renders a colour dot before the label.
+- **Set `AerosAttributeOption.swatchColor`** for colour pickers. `AerosEnumChips` renders a colour dot before the label.
 - **Use `AerosVariantPicker.style = swatch`** when the variant is primarily visual (colour, fabric); use `chip` when it's primarily textual (size labels, fabric names).
 - **Don't double-up labels.** `AerosEnumDropdown`, `AerosEnumChips`, `AerosRangeSlider`, `AerosMeasurementInput`, and `AerosFileUploadButton` all render their own label and required marker. Don't wrap them in `AerosFormField`.
 
@@ -64,7 +64,7 @@ admin) translates API responses into these types.
 
 ## Tokens
 
-Three new token classes back the configurable-MTO surfaces. They live in
+Three token classes back the configurable-MTO surfaces. They live in
 `packages/flutter/lib/src/tokens/states.dart` and are exported from the
 top-level package.
 
@@ -78,19 +78,25 @@ top-level package.
 | `lockedByAdmin` | `bgSubtle` | `borderStrong` (1) | `fgSecondary` | Seller has locked this attribute on the listing |
 | `requiredButMissing` | `dangerBg` | `dangerBorder` (1) | `dangerText` | Submit attempted with the field empty |
 
-Resolve with `AerosSelectionPalette.resolve(state, AerosAliasColors.light)`.
+The number in the Border column is the palette's border width. The chips in
+`AerosEnumChips` and `AerosVariantPicker` draw a 1px hairline in every state;
+swatch tiles use 2px when selected.
+
+Resolve with `AerosSelectionPalette.of(context, state)`, or `AerosSelectionPalette.resolve(state, aliases, semantic)` with explicit colour sets.
 
 ### AerosSeverity (fixed semantics)
 
-`info` / `warn` / `error` map to the existing `royal` / `warning` / `danger`
-ramps. Used by `AerosRoutingSignalBadge` and `AerosConstraintErrorAlert`.
+`info` / `warn` / `error` map to the `info` / `warning` / `danger` status
+colours of the theme (`info` is neutral grey). Resolve with
+`AerosSeverityPalette.of(context, severity)`. Used by `AerosRoutingSignalBadge`
+and `AerosConstraintErrorAlert`.
 
 ### AerosPriceTone
 
 | Tone | Foreground | Inline label | Used for |
 |---|---|---|---|
 | `discountable` | `fgPrimary` | — | Per-unit lines that respond to bulk discounts |
-| `nonDiscountable` | `slate600` | "fixed" | Setup fees, plate fees, shipping |
+| `nonDiscountable` | `fgMuted` | "fixed" | Setup fees, plate fees, shipping |
 | `discount` | `success` | "discount" | Negative breakdown lines |
 
 ## Integration recipes

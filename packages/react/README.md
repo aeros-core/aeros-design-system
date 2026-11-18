@@ -1,52 +1,121 @@
 # @aeros-core/react
 
-Aeros React component library — Radix primitives, Tailwind v4, CVA. Built for Next.js (App Router safe: the published bundle carries `"use client"`).
+The Aeros React components: Radix primitives, Tailwind v4, class-variance-authority. Built for Next.js; the published bundle carries `"use client"`.
+
+Peer dependencies: React 18.2 or 19, Tailwind CSS 4.
 
 ## Install
 
-Published to GitHub Packages — auth setup in [docs/consuming.md](../../docs/consuming.md).
+The package is on GitHub Packages. Auth setup is in [docs/consuming.md](../../docs/consuming.md).
 
 ```bash
 pnpm add @aeros-core/react @aeros-core/tokens
 ```
 
+## CSS
+
+```css
+/* app/globals.css */
+@import "@aeros-core/react/styles.css"; /* Tailwind, the tokens, the Aeros theme, base styles */
+@import "@aeros-core/react/fonts.css";  /* optional: self-hosted Inter, Nunito Sans, IBM Plex Mono */
+```
+
+- `styles.css` does not load fonts. Import `fonts.css`, or load the faces yourself.
+- The theme resets Tailwind's default palette, radii, shadows, easings and font families. Use the alias and token classes: `bg-bg-surface`, `text-fg-muted`, `border-border-default`, `rounded-control`, `shadow-overlay`, `text-body-sm`.
+- Theme with `data-theme="light" | "dark" | "system"` on `<html>` or any element. Touch sizes with `data-density="touch"`.
+
+## A minimal example
+
 ```tsx
 // app/layout.tsx
-import "@aeros-core/react/styles.css";
+import "./globals.css";
+import {
+  AppShell, AppMain, AppHeader, AppHeaderTitle, AppContent,
+  Sidebar, SidebarProvider, SidebarHeader, SidebarBrand, SidebarContent,
+  SidebarSection, SidebarItem, SidebarTrigger, Toaster
+} from "@aeros-core/react";
 
-export default function RootLayout({ children }) {
-  return <html lang="en" data-theme="light">{children}</html>;
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" data-theme="light">
+      <body>
+        <SidebarProvider storageKey="app.sidebar">
+          <AppShell>
+            <Sidebar>
+              <SidebarHeader>
+                <SidebarBrand mark="A" name="Aeros" />
+              </SidebarHeader>
+              <SidebarContent>
+                <SidebarSection label="Workspace">
+                  <SidebarItem href="/orders" active>Orders</SidebarItem>
+                  <SidebarItem href="/catalog">Catalog</SidebarItem>
+                </SidebarSection>
+              </SidebarContent>
+            </Sidebar>
+            <AppMain>
+              <AppHeader>
+                <SidebarTrigger />
+                <AppHeaderTitle>Orders</AppHeaderTitle>
+              </AppHeader>
+              <AppContent>{children}</AppContent>
+            </AppMain>
+          </AppShell>
+        </SidebarProvider>
+        <Toaster />
+      </body>
+    </html>
+  );
 }
 ```
 
-Set `data-theme="dark"` on `<html>` to flip the theme — aliases, status colors, and shadows all follow.
-
-## Use
-
 ```tsx
-import { Button, Field, Input, toast, Toaster } from "@aeros-core/react";
+"use client";
+import { Button, Field, FieldGroup, Input, toast } from "@aeros-core/react";
 
-<Field label="Company" hint="As registered" required>
-  <Input placeholder="Aeros Pvt Ltd" />
-</Field>
-<Button onClick={() => toast({ title: "Saved", variant: "success" })}>Save</Button>
-<Toaster /> {/* once, near the root */}
+export function CompanyForm() {
+  return (
+    <FieldGroup>
+      <Field label="Company" hint="As registered" required>
+        <Input placeholder="Aeros Pvt Ltd" />
+      </Field>
+      <Button onClick={() => toast({ title: "Saved", variant: "success" })}>Save</Button>
+    </FieldGroup>
+  );
+}
 ```
 
-- `Field` wires label / hint / error to its control (`aria-describedby`, `aria-invalid`) automatically.
-- Variants are intent-named everywhere: `success | warning | danger | info | neutral | inverse`.
-- Style with the token classes (`bg-bg-surface`, `text-fg-primary`, `duration-(--aeros-duration-fast)`) — raw hex and arbitrary duration/z values fail CI.
+- `Field` wires label, hint and error to its control. It has no margin; `FieldGroup` stacks fields.
+- Variants are named by intent: `success`, `warning`, `danger`, `info`, `neutral`, `inverse`.
+- `Toaster` is mounted once; `toast()` is called from anywhere.
 
-## Inventory
+The full inventory is in [docs/components.md](../../docs/components.md). Upgrading from 2.x: [docs/migration.md](../../docs/migration.md).
 
-Buttons · Fields (Input/Textarea/Select with `size`/`state`) · Checkbox/Radio/Switch · Badge/Tag/Avatar · Card/StatCard · Alert · Toast (`toast()` + `<Toaster/>`) · Progress/Spinner/Skeleton · Dialog/AlertDialog/Drawer/Popover/Tooltip · DropdownMenu/Command (cmdk) · Tabs/Breadcrumb/Pagination · Table (sortable/selected/loading/empty) · Accordion · Calendar (react-day-picker) · Label/Separator · TopNav/Sidebar · EmptyState · DotMatrix.
+## Contributing
 
-Full inventory + usage: [docs/components.md](../../docs/components.md). Live playground: `packages/react-docs` (light/dark toggle top-right).
+**Components compose recipes; they do not restate styles.** [`src/internal/recipes.ts`](./src/internal/recipes.ts) is the single definition of control sizing, the field look, floating surfaces, menu rows and modal parts. It is not exported.
 
-## Develop
+- Use a recipe when one exists. If two components need the same classes, move them into `recipes.ts`.
+- Token classes only: alias colours, `text-<role>`, `rounded-item|control|surface|modal|pill`, `shadow-raised|overlay|modal`, `h-control-<size>`, `duration-<name>`, `ease-<name>`, `z-<layer>`. No hex, no arbitrary values, no Tailwind default palette or scale steps. `pnpm check:hardcoded` enforces this.
+- State changes are colour only: `transition-colors duration-fast ease-standard`. Nothing lifts or scales.
+- Do not draw a focus ring. The global `:focus-visible` outline in `styles.css` is the ring; move it with `focus-ring-field` or `focus-ring-inset` if needed.
+- A resting surface has a hairline border and no shadow. A floating layer has an elevation and no border class.
+- Merge classes with `cn()`. Forward refs and spread remaining props.
+- A new component needs: an export in `src/index.ts`, a test, a fixture in `packages/react-docs`, a row in `docs/components.md`, and a changeset.
+
+## Test
 
 ```bash
-pnpm build   # tsup + "use client" guard + d.ts
-pnpm test    # vitest + Testing Library + jest-axe
-pnpm lint    # eslint + jsx-a11y
+pnpm build   # tsup, the "use client" guard, declarations
+pnpm test    # vitest, Testing Library, jest-axe
+pnpm lint    # eslint with jsx-a11y
 ```
+
+From the repository root:
+
+```bash
+pnpm check:hardcoded   # src uses tokens only
+pnpm test:visual       # Playwright screenshots of every fixture
+pnpm test:a11y         # axe on every fixture, light and dark
+```
+
+Screenshot baselines are generated on Linux in CI, never on a developer machine. See [docs/releasing.md](../../docs/releasing.md#image-baselines).
