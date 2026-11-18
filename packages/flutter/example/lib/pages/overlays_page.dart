@@ -242,8 +242,8 @@ class _OverlaysPageState extends State<OverlaysPage> {
           'Menu building blocks',
           note: 'AerosMenuList is a menu\'s rows with one shared highlight; AerosMenuRow is the row; '
               'AerosWholeRows cuts a scrolling list at a whole row. Use them to put a list on a surface of your own.',
-          child: Tiles(
-            minWidth: 260,
+          child: AerosResponsiveGrid.auto(
+            tileMinWidth: 260,
             children: [
               AerosSurface(
                 level: AerosSurfaceLevel.overlay,

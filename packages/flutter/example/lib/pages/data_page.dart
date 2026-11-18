@@ -136,8 +136,8 @@ class _DataPageState extends State<DataPage> {
         Section(
           'Price breakdown',
           note: 'How a price was built. Collapsed it is the total; expanded, every step.',
-          child: Tiles(
-            minWidth: 320,
+          child: AerosResponsiveGrid.auto(
+            tileMinWidth: 320,
             children: [
               AerosPriceBreakdown(
                 data: priceFor(quantity: 1000, gsm: gsm, printed: true),
@@ -178,9 +178,10 @@ class _DataPageState extends State<DataPage> {
         Section(
           'Attribute selector',
           note: 'Hand it an attribute spec; it picks the input: chips, a dropdown, a slider, a switch, a file.',
-          child: Tiles(
-            minWidth: 320,
-            spacing: AerosSpacing.s6,
+          child: AerosResponsiveGrid.auto(
+            tileMinWidth: 320,
+            mainAxisSpacing: AerosSpacing.s6,
+            crossAxisSpacing: AerosSpacing.s6,
             children: [
               _attribute(materialSpec),
               _attribute(sizeSpec),

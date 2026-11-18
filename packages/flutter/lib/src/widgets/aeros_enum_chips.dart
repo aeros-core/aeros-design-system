@@ -7,8 +7,8 @@ import '../theme/aeros_theme_extension.dart';
 import '../tokens/aeros_theme_tokens.g.dart';
 import '../tokens/spacing.dart';
 import '../tokens/states.dart';
-import '../tokens/typography.dart';
 import 'aeros_attribute_models.dart';
+import 'aeros_form_field.dart';
 
 /// Chip group for an ENUM-source attribute. Single-select.
 ///
@@ -64,8 +64,6 @@ class AerosEnumChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final a = context.aerosColors;
-    final hasError = errorText != null && errorText!.isNotEmpty;
     final active = enabled && onChanged != null;
 
     Widget chips = Wrap(
@@ -84,35 +82,13 @@ class AerosEnumChips extends StatelessWidget {
     );
     if (!active) chips = Opacity(opacity: AerosMetricTokens.opacityDisabled, child: chips);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (label != null) ...[
-          RichText(
-            text: TextSpan(
-              text: label!,
-              style: AerosTypography.labelSm(color: a.fgSecondary),
-              children: [
-                if (required)
-                  TextSpan(
-                    text: ' *',
-                    style: TextStyle(color: context.aerosSemantic.danger),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AerosSpacing.s2),
-        ],
-        chips,
-        if (hasError) ...[
-          const SizedBox(height: AerosSpacing.s1),
-          Text(
-            errorText!,
-            style: AerosTypography.caption(color: context.aerosSemantic.dangerText),
-          ),
-        ],
-      ],
+    // Hugs the chips: a group is as wide as what it holds.
+    return AerosFormField(
+      label: label,
+      required: required,
+      errorText: errorText,
+      expand: false,
+      child: chips,
     );
   }
 }

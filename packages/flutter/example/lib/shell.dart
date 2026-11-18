@@ -38,7 +38,11 @@ class GalleryShell extends StatefulWidget {
 }
 
 class _GalleryShellState extends State<GalleryShell> {
+  /// Reaches the scaffold from above it, to close the drawer.
+  final _shell = GlobalKey<AerosScaffoldState>();
   late String _page = widget.initialPage ?? destinations.first.id;
+
+  /// The app owns whether the inline sidenav is collapsed to the rail.
   bool _rail = false;
 
   Destination get _current => destinations.firstWhere((d) => d.id == _page);
@@ -47,32 +51,17 @@ class _GalleryShellState extends State<GalleryShell> {
 
   @override
   Widget build(BuildContext context) {
-    // The same test AerosScaffold makes: inline from `md`, a drawer below.
-    final inline = AerosBreakpoints.isAtLeast(context, AerosBreakpoint.md);
     final pointer = widget.density.isPointer;
 
     return GalleryNav(
       open: _open,
       child: AerosScaffold(
+        key: _shell,
+        onRailCollapsedChanged: (collapsed) => setState(() => _rail = collapsed),
         topnav: AerosTopnav(
           title: _current.label,
-          leading: inline
-              ? AerosTooltip(
-                  message: _rail ? 'Expand sidebar' : 'Collapse sidebar',
-                  child: AerosButton.icon(
-                    icon: Icon(_rail ? Icons.menu : Icons.menu_open),
-                    semanticLabel: _rail ? 'Expand sidebar' : 'Collapse sidebar',
-                    onPressed: () => setState(() => _rail = !_rail),
-                  ),
-                )
-              // Below the Scaffold, so it can reach it to open the drawer.
-              : Builder(
-                  builder: (context) => AerosButton.icon(
-                    icon: const Icon(Icons.menu),
-                    semanticLabel: 'Open navigation',
-                    onPressed: () => Scaffold.of(context).openDrawer(),
-                  ),
-                ),
+          // No leading: inside AerosScaffold the bar shows the menu button
+          // (sidenav in a drawer) or the rail toggle (sidenav inline) itself.
           actions: [
             AerosTooltip(
               message: pointer ? 'Density: pointer' : 'Density: touch',
@@ -89,11 +78,7 @@ class _GalleryShellState extends State<GalleryShell> {
           density: pointer ? AerosSidenavDensity.pointer : AerosSidenavDensity.touch,
           collapsed: _rail,
           onExpandRequested: () => setState(() => _rail = false),
-          // The rail has room for a mark only; the full sidebar (and the
-          // drawer, which is never a rail) shows the wordmark.
-          header: _rail && inline
-              ? const AerosSidenavHeader(title: 'Aeros', mark: AerosSidenavMark(letter: 'a'))
-              : const _WordmarkHeader(),
+          header: const AerosSidenavHeader.custom(semanticLabel: 'Aeros Design System', child: _Brand()),
           footer: const AerosSidenavFooter(
             name: 'aeros_design_system',
             subtitle: '3.0 · Crisp precision',
@@ -109,8 +94,8 @@ class _GalleryShellState extends State<GalleryShell> {
                 selected: destination.id == _page,
                 onTap: () {
                   _open(destination.id);
-                  // In the drawer, choosing a page closes it.
-                  if (!inline) Navigator.of(context).maybePop();
+                  // In the drawer, choosing a page closes it (a no-op inline).
+                  _shell.currentState?.closeDrawer();
                 },
               ),
           ],
@@ -122,27 +107,21 @@ class _GalleryShellState extends State<GalleryShell> {
   }
 }
 
-/// The sidebar's top block with the wordmark: one app header high over a
-/// hairline, like [AerosSidenavHeader], whose title can only be text.
-class _WordmarkHeader extends StatelessWidget {
-  const _WordmarkHeader();
+/// What the sidenav's header holds: the wordmark and a version badge — or,
+/// where the rail has room for a mark only, the mark. [AerosSidenavScope]
+/// says which (the drawer is never a rail).
+class _Brand extends StatelessWidget {
+  const _Brand();
 
   @override
   Widget build(BuildContext context) {
-    final a = context.aerosColors;
-    return Container(
-      height: AerosDensity.of(context).sizes.header,
-      padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s5),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: a.borderDefault, width: AerosMetricTokens.borderHairline)),
-      ),
-      child: const Row(
-        children: [
-          AerosWordmark(size: 20),
-          Spacer(),
-          AerosBadge(label: 'Flutter 3.0', showDot: false),
-        ],
-      ),
+    if (AerosSidenavScope.of(context).collapsed) return const AerosSidenavMark(letter: 'a');
+    return const Row(
+      children: [
+        AerosWordmark(size: 20),
+        Spacer(),
+        AerosBadge(label: 'Flutter 3.0', showDot: false),
+      ],
     );
   }
 }

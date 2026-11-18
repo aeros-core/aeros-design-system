@@ -48,7 +48,8 @@ class ResponsivePage extends StatelessWidget {
         ),
         Section(
           'Responsive grid',
-          note: 'Tiles of one shape. Give it a column count per breakpoint, or a minimum tile width.',
+          note: 'Tiles of one shape — or, with .auto, tiles as tall as their content. '
+              'Give it a column count per breakpoint, or a minimum tile width.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -62,6 +63,21 @@ class ResponsivePage extends StatelessWidget {
                 tileMinWidth: 160,
                 aspectRatio: const AerosResponsiveValue.all(1.6),
                 children: [for (var i = 1; i <= 6; i++) tile('≥ 160')],
+              ),
+              const SizedBox(height: AerosSpacing.s5),
+              // .auto: the tiles take the height of their content.
+              const AerosResponsiveGrid.auto(
+                tileMinWidth: 220,
+                equalHeights: true,
+                children: [
+                  AerosCard(title: 'Short', child: Text('One line.')),
+                  AerosCard(
+                    title: 'Taller',
+                    child: Text('AerosResponsiveGrid.auto sizes each row by its tallest tile, '
+                        'so cards keep the height of what is in them.'),
+                  ),
+                  AerosCard(title: 'Short again', child: Text('One line.')),
+                ],
               ),
             ],
           ),
@@ -87,8 +103,8 @@ class ResponsivePage extends StatelessWidget {
           'Viewport scope',
           note: 'AerosViewportScope overrides the width breakpoints are read from. '
               'Each box below is told a different width, so the same widget lays out differently.',
-          child: Tiles(
-            minWidth: 300,
+          child: AerosResponsiveGrid.auto(
+            tileMinWidth: 300,
             children: [
               for (final (label, scopeWidth) in const [('Told 390 (xs)', 390.0), ('Told 1280 (xl)', 1280.0)])
                 AerosCard(

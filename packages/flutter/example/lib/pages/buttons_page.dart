@@ -51,13 +51,11 @@ class _ButtonsPageState extends State<ButtonsPage> {
             children: [
               AerosButton.primary(label: 'New order', leading: const Icon(Icons.add), onPressed: () {}),
               AerosButton.secondary(label: 'Export', leading: const Icon(Icons.download_outlined), onPressed: () {}),
-              AerosButton(
-                label: 'Continue',
-                trailing: const Icon(Icons.arrow_forward),
-                onPressed: () {},
-              ),
-              AerosButton.ghost(label: 'Cancel', onPressed: () {}),
-              AerosButton.danger(label: 'Delete', onPressed: () {}),
+              AerosButton.primary(label: 'Continue', trailing: const Icon(Icons.arrow_forward), onPressed: () {}),
+              AerosButton.ghost(label: 'Filters', leading: const Icon(Icons.tune), onPressed: () {}),
+              AerosButton.danger(label: 'Delete', leading: const Icon(Icons.delete_outline), onPressed: () {}),
+              AerosButton.dangerSubtle(label: 'Remove', onPressed: () {}),
+              AerosButton.link(label: 'Learn more', trailing: const Icon(Icons.open_in_new), onPressed: () {}),
             ],
           ),
         ),

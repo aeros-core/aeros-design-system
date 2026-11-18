@@ -83,8 +83,8 @@ class _SwatchGrid extends StatelessWidget {
   final Map<String, Color> swatches;
 
   @override
-  Widget build(BuildContext context) => Tiles(
-        minWidth: 132,
+  Widget build(BuildContext context) => AerosResponsiveGrid.auto(
+        tileMinWidth: 132,
         children: [for (final entry in swatches.entries) _Swatch(entry.key, entry.value)],
       );
 }
@@ -236,9 +236,10 @@ class _Elevation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    return Tiles(
-      minWidth: 180,
-      spacing: AerosSpacing.s6,
+    return AerosResponsiveGrid.auto(
+      tileMinWidth: 180,
+      mainAxisSpacing: AerosSpacing.s6,
+      crossAxisSpacing: AerosSpacing.s6,
       children: [
         for (final level in AerosSurfaceLevel.values)
           AerosSurface(
@@ -345,8 +346,8 @@ class _ControlSizes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    return Tiles(
-      minWidth: 320,
+    return AerosResponsiveGrid.auto(
+      tileMinWidth: 320,
       children: [
         // Each card pins a density with its own scope, whatever the top bar says.
         for (final density in AerosDensity.values)

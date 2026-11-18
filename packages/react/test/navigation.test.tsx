@@ -8,7 +8,10 @@ import {
   Sidebar,
   SidebarBrand,
   SidebarItem,
+  SidebarProvider,
   SidebarSection,
+  SidebarGroup,
+  SidebarSubItem,
   TabCount,
   Tabs,
   TabsContent,
@@ -20,6 +23,8 @@ import {
   AppHeaderNav,
   AppHeaderActions
 } from "../src";
+
+import { lazyChild } from "./lazy-child";
 
 // Behaviour + semantics only. No class-name or pixel assertions.
 
@@ -371,6 +376,54 @@ describe("Sidebar", () => {
     expect(link).toHaveAttribute("aria-current", "page");
   });
 
+  it("asChild behaves like the default row: icon, label and count inside the child", () => {
+    render(
+      <SidebarItem asChild icon={<svg data-testid="icon" />} count={3}>
+        <a href="/inbox">Inbox</a>
+      </SidebarItem>
+    );
+    const link = screen.getByRole("link", { name: "Inbox , 3" });
+    expect(link).toHaveAttribute("href", "/inbox");
+    expect(within(link).getByTestId("icon")).toBeInTheDocument();
+    expect(within(link).getByText("3")).toBeVisible();
+  });
+
+  it("asChild in the rail keeps the label as the accessible name, announces the count and shows a tooltip", async () => {
+    const user = userEvent.setup();
+    render(
+      <SidebarProvider defaultCollapsed>
+        <Sidebar>
+          <SidebarItem asChild icon={<svg aria-hidden />} count={3}>
+            <a href="/inbox">Inbox</a>
+          </SidebarItem>
+        </Sidebar>
+      </SidebarProvider>
+    );
+    const link = screen.getByRole("link", { name: "Inbox , 3" });
+    // The tooltip defaults to the child's text content.
+    await user.hover(link);
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("Inbox · 3");
+  });
+
+  it("asChild rows render a child that arrives as a lazy (server) reference", () => {
+    render(
+      <Sidebar>
+        <SidebarItem asChild active icon={<svg data-testid="icon" />}>
+          {lazyChild(<a href="/orders">Orders</a>)}
+        </SidebarItem>
+        <SidebarGroup label="Catalog" defaultOpen>
+          <SidebarSubItem asChild active>
+            {lazyChild(<a href="/catalog/cups">Cups</a>)}
+          </SidebarSubItem>
+        </SidebarGroup>
+      </Sidebar>
+    );
+    const orders = screen.getByRole("link", { name: "Orders" });
+    expect(orders).toHaveAttribute("aria-current", "page");
+    expect(within(orders).getByTestId("icon")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Cups" })).toHaveAttribute("aria-current", "page");
+  });
+
   it("a full sidebar has no axe violations", async () => {
     const { container } = render(
       <Sidebar>
@@ -463,6 +516,15 @@ describe("AppHeader", () => {
     expect(link).toHaveAttribute("href", "/orders");
     expect(link).toHaveAttribute("data-router-link");
     expect(link).toHaveAttribute("aria-current", "page");
+  });
+
+  it("asChild renders a child that arrives as a lazy (server) reference", () => {
+    render(
+      <AppHeaderLink asChild active>
+        {lazyChild(<a href="/orders">Orders</a>)}
+      </AppHeaderLink>
+    );
+    expect(screen.getByRole("link", { name: "Orders" })).toHaveAttribute("aria-current", "page");
   });
 
   it("lets the caller rename the links landmark", () => {

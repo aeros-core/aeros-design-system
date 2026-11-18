@@ -59,8 +59,10 @@ class AerosSelect<T> extends StatefulWidget {
     required this.onChanged,
     this.placeholder,
     this.label,
-    this.helper,
-    this.error,
+    this.helperText,
+    this.errorText,
+    @Deprecated('Use helperText') this.helper,
+    @Deprecated('Use errorText') this.error,
     this.enabled = true,
     this.required = false,
     this.size = AerosControlSize.md,
@@ -78,11 +80,21 @@ class AerosSelect<T> extends StatefulWidget {
   final String? placeholder;
   final String? label;
 
-  /// Help text under the field. Hidden while there is an [error].
-  final String? helper;
+  /// Help text under the field. Hidden while there is an [errorText].
+  final String? helperText;
 
   /// Turns the border and the focus ring to the danger colour and shows this
   /// message under the field.
+  final String? errorText;
+
+  /// 3.0: renamed to [helperText], the name every other field uses. Still
+  /// works; [helperText] wins when both are given.
+  @Deprecated('Use helperText')
+  final String? helper;
+
+  /// 3.0: renamed to [errorText], the name every other field uses. Still
+  /// works; [errorText] wins when both are given.
+  @Deprecated('Use errorText')
   final String? error;
   final bool enabled;
 
@@ -146,6 +158,11 @@ class _AerosSelectState<T> extends State<AerosSelect<T>> {
 
   bool get _enabled => widget.enabled && widget.onChanged != null;
 
+  // ignore: deprecated_member_use_from_same_package
+  String? get _helper => widget.helperText ?? widget.helper;
+  // ignore: deprecated_member_use_from_same_package
+  String? get _error => widget.errorText ?? widget.error;
+
   AerosSelectItem<T>? get _selected {
     final value = widget.value;
     if (value == null) return null;
@@ -176,7 +193,8 @@ class _AerosSelectState<T> extends State<AerosSelect<T>> {
     final a = context.aerosColors;
     final size = widget.size;
     final selected = _selected;
-    final hasError = widget.error != null && widget.error!.isNotEmpty;
+    final error = _error;
+    final hasError = error != null && error.isNotEmpty;
 
     final field = CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
@@ -212,12 +230,12 @@ class _AerosSelectState<T> extends State<AerosSelect<T>> {
       ),
     );
 
-    if (widget.label == null && widget.helper == null && !hasError) return field;
+    if (widget.label == null && _helper == null && !hasError) return field;
     return AerosFormField(
       label: widget.label,
       required: widget.required,
-      helperText: widget.helper,
-      errorText: widget.error,
+      helperText: _helper,
+      errorText: error,
       labelGap: AerosSpacing.s1_5,
       child: field,
     );

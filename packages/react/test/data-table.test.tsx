@@ -435,6 +435,56 @@ describe("DataTable — density and scrolling", () => {
   });
 });
 
+describe("DataTable — labels", () => {
+  const labels = {
+    selected: (count: number) => `${count} ausgewählt`,
+    clearSelection: "Auswahl aufheben",
+    selectAll: "Alle Zeilen auswählen",
+    selectRow: (label: string) => `${label} auswählen`,
+    rowPosition: (position: number) => `Zeile ${position}`,
+    scrollRegion: "Scrollbare Tabelle",
+    rangeOf: (from: number, to: number, total: number) => `${from}–${to} von ${total}`,
+    loading: "Lädt…",
+    loadingStatus: "Tabellendaten werden geladen",
+    empty: "Keine Ergebnisse."
+  };
+
+  it("every built-in string can be replaced", async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <Orders labels={labels} selectable selectionActions={() => null} pageSize={2} maxHeight={200} />
+    );
+    expect(screen.getByRole("checkbox", { name: "Alle Zeilen auswählen" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Scrollbare Tabelle" })).toBeInTheDocument();
+    expect(screen.getByText("1–2 von 5")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("checkbox", { name: "Trimurti Packaging auswählen" }));
+    expect(screen.getByRole("status")).toHaveTextContent("1 ausgewählt");
+    await user.click(screen.getByRole("button", { name: "Auswahl aufheben" }));
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+
+    rerender(<Orders labels={labels} selectable getRowLabel={undefined} />);
+    expect(screen.getByRole("checkbox", { name: "Zeile 1 auswählen" })).toBeInTheDocument();
+
+    rerender(<Orders labels={labels} loading />);
+    expect(screen.getByText("Lädt…")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Tabellendaten werden geladen");
+
+    rerender(<Orders labels={labels} data={[]} />);
+    expect(screen.getByText("Keine Ergebnisse.")).toBeInTheDocument();
+    rerender(<Orders labels={labels} data={[]} emptyState="Nichts hier" />);
+    expect(screen.getByText("Nichts hier")).toBeInTheDocument();
+    expect(screen.queryByText("Keine Ergebnisse.")).not.toBeInTheDocument();
+  });
+
+  it("a partial object keeps the English defaults for the rest", () => {
+    render(<Orders labels={{ selectAll: "Tout sélectionner" }} selectable pageSize={2} />);
+    expect(screen.getByRole("checkbox", { name: "Tout sélectionner" })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Select Trimurti Packaging" })).toBeInTheDocument();
+    expect(screen.getByText("1–2 of 5")).toBeInTheDocument();
+  });
+});
+
 describe("DataTable — axe", () => {
   it.each([
     ["default", {}],
@@ -446,5 +496,14 @@ describe("DataTable — axe", () => {
   ] as Array<[string, Partial<DataTableProps<Order>>]>)("%s has no violations", async (_name, props) => {
     const { container } = render(<Orders {...props} />);
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it("keeps cells on one line by default and lets them wrap on request", () => {
+    // jsdom has no layout, so assert the switch the stylesheet keys on.
+    const { rerender } = render(<DataTable aria-label="Orders" columns={columns} data={orders} />);
+    const table = screen.getByRole("table", { name: "Orders" });
+    const nowrap = table.className;
+    rerender(<DataTable aria-label="Orders" columns={columns} data={orders} wrapCells />);
+    expect(screen.getByRole("table", { name: "Orders" }).className).not.toBe(nowrap);
   });
 });

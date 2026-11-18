@@ -746,6 +746,40 @@ describe("FileUpload", () => {
     expect(onReject).toHaveBeenLastCalledWith([{ file: c, reason: "count" }]);
   });
 
+  it("every built-in string can be replaced through `labels`", async () => {
+    const user = userEvent.setup();
+    const labels = {
+      dropPrompt: (multiple: boolean) => (multiple ? "Dateien hierher ziehen oder" : "Datei hierher ziehen oder"),
+      browse: (multiple: boolean) => (multiple ? "Dateien wählen" : "Datei wählen"),
+      selectedFiles: "Gewählte Dateien",
+      remove: (name: string) => `${name} entfernen`,
+      rejectedType: (name: string) => `${name}: Typ nicht erlaubt.`,
+      rejectedSize: (name: string, max: string | undefined) => `${name}: größer als ${max}.`,
+      rejectedCount: (name: string, limit: number) => `${name}: höchstens ${limit}.`
+    };
+    const { container } = render(<FileUpload multiple accept=".pdf" maxSize={1024} maxFiles={1} labels={labels} />);
+    expect(screen.getByText("Dateien hierher ziehen oder")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Dateien wählen" })).toBeInTheDocument();
+
+    drop(container, [file("a.pdf", "application/pdf"), file("b.pdf", "application/pdf"), file("c.exe", "x/y"), file("d.pdf", "application/pdf", 2000)]);
+    expect(screen.getByRole("list", { name: "Gewählte Dateien" })).toBeInTheDocument();
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("c.exe: Typ nicht erlaubt.");
+    expect(alert).toHaveTextContent("d.pdf: größer als 1 KB.");
+    expect(alert).toHaveTextContent("b.pdf: höchstens 1.");
+
+    await user.click(screen.getByRole("button", { name: "a.pdf entfernen" }));
+    expect(screen.queryByRole("list")).not.toBeInTheDocument();
+  });
+
+  it("partial `labels` keep the English defaults, and `browseLabel` still wins for the button", () => {
+    const { rerender } = render(<FileUpload labels={{ browse: () => "Parcourir" }} />);
+    expect(screen.getByRole("button", { name: "Parcourir" })).toBeInTheDocument();
+    expect(screen.getByText("Drag a file here, or")).toBeInTheDocument();
+    rerender(<FileUpload labels={{ browse: () => "Parcourir" }} browseLabel="Upload quote" />);
+    expect(screen.getByRole("button", { name: "Upload quote" })).toBeInTheDocument();
+  });
+
   it("removes a file from its row", async () => {
     const user = userEvent.setup();
     const onFilesChange = vi.fn();

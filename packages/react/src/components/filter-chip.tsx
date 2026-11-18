@@ -2,6 +2,7 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { ChevronDown, X } from "lucide-react";
 import { cn } from "../lib/cn";
+import { slotChildWith } from "../internal/as-child";
 import { colorTransition } from "../internal/recipes";
 import { CountBadge } from "./count-badge";
 
@@ -95,7 +96,7 @@ export const FilterChip = React.forwardRef<HTMLButtonElement, FilterChipProps>(
       >
         {asChild ? (
           <Slot ref={ref} className={controlClass} {...props}>
-            {React.isValidElement(children) ? React.cloneElement(children, undefined, content) : null}
+            {slotChildWith(children, () => content)}
           </Slot>
         ) : (
           <button

@@ -81,14 +81,9 @@ const FAMILY_GROUPS = componentsByFamily();
 
 /** A sidebar row that is a Next `<Link>`. */
 function NavItem({ route, pathname }: { route: SiteRoute; pathname: string }) {
-  const { collapsed, isMobile } = useSidebar();
-  const rail = collapsed && !isMobile;
   return (
-    <SidebarItem asChild active={pathname === route.href} icon={ROUTE_ICON[route.href]} tooltip={route.title}>
-      <Link href={route.href}>
-        {/* With asChild the row's content is ours: hide the label in the rail, truncate it otherwise. */}
-        <span className={rail ? "sr-only" : "min-w-0 flex-1 truncate"}>{route.title}</span>
-      </Link>
+    <SidebarItem asChild active={pathname === route.href} icon={ROUTE_ICON[route.href]}>
+      <Link href={route.href}>{route.title}</Link>
     </SidebarItem>
   );
 }

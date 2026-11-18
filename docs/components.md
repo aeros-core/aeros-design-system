@@ -139,9 +139,9 @@ React names are exports of `@aeros-core/react`. Flutter names are exports of `pa
 
 | Component | React | Flutter | Notes |
 |---|---|---|---|
-| Shell | `AppShell`, `AppMain`, `AppContent`, `AppFooter` | `AerosScaffold` | The page frame. `AerosScaffold` takes `topnav`, `sidenav` and `body`, and moves the sidenav into a drawer below the `md` breakpoint. |
+| Shell | `AppShell`, `AppMain`, `AppContent`, `AppFooter` | `AerosScaffold`, `AerosScaffoldState` | The page frame. `AerosScaffold` takes `topnav`, `sidenav` and `body`, and moves the sidenav into a drawer below the `md` breakpoint. |
 | Header | `AppHeader`, `AppHeaderBrand`, `AppHeaderTitle`, `AppHeaderNav`, `AppHeaderLink`, `AppHeaderActions` | `AerosTopnav` | One header high: 48 at pointer, 56 at touch. Composed parts on the web; `title`, `leading`, `actions` in Flutter. |
-| Sidebar | `Sidebar`, `SidebarProvider`, `useSidebar`, `SidebarHeader`, `SidebarContent`, `SidebarFooter`, `SidebarBrand`, `SidebarSection`, `SidebarItem`, `SidebarGroup`, `SidebarSubItem`, `SidebarTrigger` | `AerosSidenav`, `AerosNavItem`, `AerosSidenavHeader`, `AerosSidenavFooter`, `AerosSidenavMark`, `AerosSidenavDensity`, `AerosSidenavExpanded`, `kAerosSidenavBlockHeight` | 240 wide, 56 as an icon rail, one level of nesting, count pills. Web: `SidebarProvider` owns rail and sheet state, persists it under `storageKey`, and toggles on Cmd/Ctrl+B. Flutter: pass `collapsed` and handle `onExpandRequested`. `kAerosSidenavBlockHeight` is deprecated. |
+| Sidebar | `Sidebar`, `SidebarProvider`, `useSidebar`, `SidebarHeader`, `SidebarContent`, `SidebarFooter`, `SidebarBrand`, `SidebarSection`, `SidebarItem`, `SidebarGroup`, `SidebarSubItem`, `SidebarTrigger` | `AerosSidenav`, `AerosNavItem`, `AerosSidenavHeader`, `AerosSidenavFooter`, `AerosSidenavMark`, `AerosSidenavDensity`, `AerosSidenavExpanded`, `AerosSidenavScope`, `kAerosSidenavBlockHeight` | 240 wide, 56 as an icon rail, one level of nesting, count pills. Web: `SidebarProvider` owns rail and sheet state, persists it under `storageKey`, and toggles on Cmd/Ctrl+B. Flutter: pass `collapsed` and handle `onExpandRequested`. `kAerosSidenavBlockHeight` is deprecated. |
 | Page header | `PageHeader` | `AerosPageHeader` | Title, description, back link and actions above page content. |
 | Scroll area | `ScrollArea` | — | Web only. The Flutter theme styles the platform scrollbar. |
 | Separator | `Separator` | — | Web only. In Flutter use `Divider`; the theme styles it. |
@@ -155,7 +155,7 @@ React names are exports of `@aeros-core/react`. Flutter names are exports of `pa
 | Attribute selector | — | `AerosAttributeSelector`, `AerosAttributeInputVariant` | Flutter only. Picks the input for an attribute. See [configurable-mto.md](./configurable-mto.md). |
 | Inputs | — | `AerosEnumDropdown`, `AerosEnumChips`, `AerosRangeSlider`, `AerosNumericRangeBand`, `AerosMeasurementInput` | Flutter only. |
 | Variant picker | — | `AerosVariantPicker`, `AerosVariantPickerStyle` | Flutter only. Chips or swatches with stock badges. |
-| Price breakdown | — | `AerosPriceBreakdown` | Flutter only. |
+| Price breakdown | — | `AerosPriceBreakdown`, `AerosAmountFormat`, `AerosDigitGrouping`, `AerosAmountFormatter` | Flutter only. Amounts are grouped (Indian grouping for ₹ / INR); pass `formatAmount` to change it. |
 | Routing and constraints | — | `AerosRoutingSignalBadge`, `AerosConstraintErrorAlert` | Flutter only. |
 | Data models | — | `AerosAttributeSpec`, `AerosAttributeValue`, `AerosAttributeOption`, `AerosAttributeDatatype`, `AerosAttributeOptionSource`, `AerosMeasurementUnit`, `AerosNumericRange`, `AerosFileRef`, `AerosVariantOption`, `AerosBreakdownStep`, `AerosPriceBreakdownData`, `AerosRoutingSignal`, `AerosRoutingSeverity` | Flutter only. Plain value classes the host app fills from API responses. |
 | State palettes | — | `AerosSeverity`, `AerosSeverityPalette`, `AerosSelectionState`, `AerosSelectionPalette`, `AerosPriceTone`, `AerosPricePalette` | Flutter only. Resolve with `.of(context, …)`. |

@@ -90,7 +90,8 @@ export const DotMatrix = React.forwardRef<HTMLDivElement, DotMatrixProps>(
           xmlns="http://www.w3.org/2000/svg"
         >
           {points.map((p, i) => {
-            const radius = dotSize * (1 - (p.ring / rings) * falloff);
+            // rings=0 is a single centre dot: there is no ring to fall off towards (and 0 / 0 is NaN).
+            const radius = dotSize * (1 - (rings > 0 ? p.ring / rings : 0) * falloff);
             const delay = variant === "ripple" ? -p.ring * STEP_MS : 0;
             return (
               <circle

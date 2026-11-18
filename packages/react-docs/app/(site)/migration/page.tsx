@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { Alert } from "@aeros-core/react";
+import { Alert, Button } from "@aeros-core/react";
 import { ExternalLink } from "lucide-react";
 import { CodeBlock } from "../../_site/code-block";
-import { LinkButton } from "../../_site/link-button";
 import { Code, PageIntro, Section } from "../../_site/prose";
 import { MIGRATION_GUIDE_URL } from "../../_site/routes";
 
@@ -118,9 +117,9 @@ export default function MigrationPage() {
         The migration guide in <Code>docs/migration.md</Code> is the reference. Review each app visually after
         upgrading — sizes, radii and colours all shifted.
         <div className="mt-3">
-          <LinkButton href={MIGRATION_GUIDE_URL} variant="secondary" size="sm" trailingIcon={<ExternalLink />}>
-            Read the full migration guide
-          </LinkButton>
+          <Button asChild variant="secondary" size="sm" trailingIcon={<ExternalLink />}>
+            <a href={MIGRATION_GUIDE_URL}>Read the full migration guide</a>
+          </Button>
         </div>
       </Alert>
 

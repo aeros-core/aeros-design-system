@@ -417,7 +417,7 @@ void main() {
               child: AerosSelect<String>(
                 label: 'Material',
                 placeholder: 'Select…',
-                helper: 'Shown on the quote.',
+                helperText: 'Shown on the quote.',
                 required: true,
                 items: materials,
                 value: null,
@@ -433,7 +433,7 @@ void main() {
               child: AerosSelect<String>(
                 label: 'Material',
                 placeholder: 'Select…',
-                error: 'Choose a material',
+                errorText: 'Choose a material',
                 items: materials,
                 value: null,
                 onChanged: (_) {},
@@ -472,7 +472,7 @@ void main() {
           key: const Key('target'),
           label: 'Material',
           placeholder: 'Select…',
-          error: error,
+          errorText: error,
           items: materials,
           value: error == null ? 'white' : null,
           onChanged: (_) {},

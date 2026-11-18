@@ -28,7 +28,8 @@ typedef AerosDropdownItemBuilder<T> = Widget Function(
 
 /// Searchable dropdown with dialog / bottom-sheet / inline-menu modes.
 ///
-/// The trigger is a field ([AerosFieldFrame]). The options open in an
+/// The trigger is a field ([AerosFieldFrame]) under an optional [label], with
+/// [helperText] or [errorText] below it, like every other field. The options open in an
 /// [AerosDialog], a bottom [AerosSheet] or an anchored menu surface, by
 /// [mode]; each holds an optional search box and a list of [AerosMenuRow]s
 /// with the chosen one checked. Arrow keys move the highlight and Enter
@@ -44,6 +45,8 @@ class AerosDropdownSearch<T> extends StatefulWidget {
     this.onFind,
     required this.itemAsString,
     this.label,
+    this.helperText,
+    this.errorText,
     this.hint,
     this.popupTitle,
     this.mode = AerosDropdownMode.dialog,
@@ -66,6 +69,13 @@ class AerosDropdownSearch<T> extends StatefulWidget {
   final AerosDropdownItemAsString<T> itemAsString;
 
   final String? label;
+
+  /// Help text under the field. Hidden while there is an [errorText].
+  final String? helperText;
+
+  /// Turns the border and the focus ring to the danger colour and shows this
+  /// message under the field.
+  final String? errorText;
   final String? hint;
   final String? popupTitle;
 
@@ -203,6 +213,8 @@ class _AerosDropdownSearchState<T> extends State<AerosDropdownSearch<T>> {
   Widget build(BuildContext context) {
     final a = context.aerosColors;
     final selectedText = _selected != null ? widget.itemAsString(_selected as T) : null;
+    final error = widget.errorText;
+    final hasError = error != null && error.isNotEmpty;
     final showClear = widget.showClearButton && _selected != null && widget.enabled;
     final height = _size.resolveHeight(context);
     // The clear button is as wide as the field is tall, like the search
@@ -224,6 +236,7 @@ class _AerosDropdownSearchState<T> extends State<AerosDropdownSearch<T>> {
               key: _frameKey,
               size: _size,
               focused: state.focused,
+              hasError: hasError,
               enabled: widget.enabled,
               child: Row(
                 children: [
@@ -268,10 +281,12 @@ class _AerosDropdownSearchState<T> extends State<AerosDropdownSearch<T>> {
       ],
     );
 
-    if (widget.label == null) return field;
+    if (widget.label == null && widget.helperText == null && !hasError) return field;
     return AerosFormField(
       label: widget.label,
       required: widget.required,
+      helperText: widget.helperText,
+      errorText: error,
       labelGap: AerosSpacing.s1_5,
       child: field,
     );

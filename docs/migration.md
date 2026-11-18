@@ -172,6 +172,12 @@ New: the JS export is fully typed, and `rawTokens` gives tokens.json as authored
 | `Checkbox`, `RadioGroupItem` | 18px | 16px | Re-check alignment |
 | `Switch` | 42×24 | 36×20 | Re-check alignment |
 | `Tr selected` | Sets `aria-selected` | Sets `data-selected` | Change selectors and tests from `[aria-selected]` to `[data-selected]` |
+| `Calendar` / date pickers | Day buttons named "Sunday, July 26th, 2026" | Named "26, Sunday, July 2026" (plus ", today" / ", selected"), so the name starts with the visible number | Update tests that find days by name; override with `labels.labelDayButton` |
+| `Card interactive` with `onClick` | A `div` with hover styles; mouse only | `role="button"`, focusable, Enter and Space activate | Do not nest buttons or links inside such a card; use `Card asChild` with an `<a>` for a link card |
+| `SidebarItem asChild` | Threw | The icon, a truncating label and `count` render inside the child; the label is hidden in the rail | Remove any label / count markup you added inside the child |
+| `Button asChild`, `FilterChip asChild` | Rendered nothing when the child came from a Server Component | Works from Server Components | Remove client wrapper components added as a workaround |
+| `CommandSeparator` | `role="separator"` inside the listbox | Decorative (`role="none"`) | Update tests that query `role="separator"` in a command list |
+| `DataTable`, `FileUpload` | — | `labels` prop for every built-in string | Pass translations through `labels` |
 | `Th` | `text-left` | `text-start` | Nothing in LTR |
 | `TableLoadingRow` | Fixed status text | Takes `statusLabel` | Optional |
 | Focus rings | Each component drew a `ring` | The global `:focus-visible` outline is the only ring | Remove `ring-offset-*` and `focus-visible:ring-*` overrides |
@@ -252,6 +258,15 @@ New: the JS export is fully typed, and `rawTokens` gives tokens.json as authored
 | `AerosSidenavDensity` `rowHeight` / `iconSize` / `labelSize` | Getters over the nav tokens; same values | Nothing, unless the enum was constructed with arguments |
 | `AerosFilterChip.touchTargetHeight` | `const`, 44 | A getter, 48 | Do not use it in a `const` expression |
 | `AerosTopnav.height` | 60 | Nullable; null is the density's header height (48 / 56) | Remove a hard-coded 60 |
+| `AerosTopnav` inside `AerosScaffold` | No automatic leading | With no `leading`, shows a menu button when the sidenav is in a drawer, and a collapse / expand button when the scaffold has `onRailCollapsedChanged` | Remove your own menu button, or pass `automaticallyImplyLeading: false` |
+| Opening the scaffold drawer | `Scaffold.of(context).openDrawer()` | `AerosScaffold.of(context).openDrawer()` / `closeDrawer()` / `toggleDrawer()`; `isSidenavInline` | Replace hand-rolled breakpoint checks and `Navigator.maybePop()` |
+| `AerosSidenavHeader.title` | `String` | `String?` (a `.custom(child:)` constructor holds any widget, e.g. the wordmark) | Null-check if you read the field |
+| `AerosSelect` `helper` / `error` | — | Deprecated aliases of `helperText` / `errorText` | Rename |
+| `AerosPageHeader` | Title wrapped without limit; actions overflowed on phones | Title cuts at 2 lines, subtitle at 3; actions move under the title when they do not fit | Remove manual narrow-screen handling |
+| `AerosPagination` numbered | Fixed width, overflowed on phones | Shrinks its page window, then falls back to compact; needs a bounded width | In a `Row`, wrap it in `Flexible` / `Expanded` |
+| `AerosTabs` underline | A plain row, overflowed | Scrolls horizontally and fills its width; arrow keys move focus with selection | Remove your own scroll view |
+| `AerosPriceBreakdown` amounts | Ungrouped ("₹6675.00") | Grouped by default (Indian grouping for ₹ / INR) | Pass `formatAmount` to keep another format |
+| `AerosStatCard(mono: true)` | — | 4px taller, so delta lines align across a row | Check fixed-height layouts |
 | `AerosThemeExtension` | `aliases`, `isDark` | Two more fields: `semantic`, `elevation` | A hand-built `AerosThemeExtension(aliases:, isDark:)` still compiles |
 
 ### 4.3 Widget changes
@@ -345,7 +360,16 @@ An app on 1.x should apply the [1.x → 2.0 section](#1x--200) below first, then
 
 In short, from 1.x you also need to:
 
-- **Use the `@aeros-core` scope.** The packages are published to GitHub Packages as `@aeros-core/tokens` and `@aeros-core/react`. An app that imports `@aeros/tokens` or `@aeros/react` renames the dependency and every import, and adds the `.npmrc` from [consuming.md](./consuming.md#1-authenticate-to-github-packages).
+- **Rename the packages to the `@aeros-core` scope — required.** The packages were renamed from `@aeros/tokens` and `@aeros/react` to `@aeros-core/tokens` and `@aeros-core/react` at 1.1.0 (GitHub Packages scopes npm by the owning org). The old names do not exist at 3.0, so an app still on `@aeros/*` must:
+  1. Rename both dependencies in `package.json` (keep `workspace:*` if the app consumes the `vendor/aeros-design-system` submodule; otherwise use `^3.0.0`).
+  2. Rename every import and CSS `@import`: `@aeros/react` → `@aeros-core/react`, `@aeros/tokens` → `@aeros-core/tokens`.
+
+     ```bash
+     grep -rlE "@aeros/(react|tokens)" --include='*.ts' --include='*.tsx' --include='*.css' --include='*.json' --include='*.mjs' . \
+       | grep -v node_modules | xargs perl -pi -e 's#\@aeros/(react|tokens)#\@aeros-core/$1#g'
+     ```
+  3. If the app uses the submodule, point it at the `aeros-core` org URL and update it to the 3.0 tag.
+  4. If it installs from the registry, add the `.npmrc` from [consuming.md](./consuming.md#1-authenticate-to-github-packages).
 - **Rename colour-word variants to intent.** `blue` → `info`, `green` → `success`, `amber` → `warning`, `red` → `danger`, `grey` → `neutral`, `dark` → `inverse`. `royal` and `slate` are gone; the only ramp is `ink`. There is no blue in the system.
 - **Remove `Button variant="dark"`** (use `primary`) and the `accent` aliases.
 - **Use the unified breakpoints**: 640 / 768 / 1024 / 1280 / 1536 on both platforms.

@@ -1,20 +1,44 @@
 "use client";
 import * as React from "react";
-import { DayPicker, getDefaultClassNames } from "react-day-picker";
+import { DayPicker, getDefaultClassNames, type Labels } from "react-day-picker";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "../lib/cn";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 /**
+ * Accessible name of a day button: "26, Sunday, July 2026" (plus ", today" /
+ * ", selected"). It starts with the number the button shows, so the visible
+ * label is part of the name (WCAG 2.5.3 Label in Name — speech-input users say
+ * what they see) while screen-reader users still hear the full date.
+ * react-day-picker's default, "Sunday, July 26th, 2026", does not contain "26"
+ * as a word. Override with the `labels` prop.
+ */
+const labelDayButton: NonNullable<Labels["labelDayButton"]> = (date, modifiers, _options, dateLib) => {
+  const format = (pattern: string) =>
+    dateLib ? dateLib.format(date, pattern) : new Intl.DateTimeFormat("en-US", INTL[pattern]).format(date);
+  let label = `${format("d")}, ${format("EEEE")}, ${format("LLLL yyyy")}`;
+  if (modifiers.today) label += ", today";
+  if (modifiers.selected) label += ", selected";
+  return label;
+};
+// Only used if react-day-picker ever calls the label without its date library.
+const INTL: Record<string, Intl.DateTimeFormatOptions> = {
+  d: { day: "numeric" },
+  EEEE: { weekday: "long" },
+  "LLLL yyyy": { month: "long", year: "numeric" }
+};
+
+/**
  * Date grid (react-day-picker v9, fully token-styled — no stylesheet import
  * needed). Compose inside a `<Popover>` for a date picker; see the docs page.
  */
-export function Calendar({ className, classNames, showOutsideDays = true, ...props }: CalendarProps) {
+export function Calendar({ className, classNames, labels, showOutsideDays = true, ...props }: CalendarProps) {
   const d = getDefaultClassNames();
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
+      labels={{ labelDayButton, ...labels }}
       className={cn("p-3", className)}
       classNames={{
         months: cn(d.months, "relative flex flex-col gap-4 sm:flex-row"),

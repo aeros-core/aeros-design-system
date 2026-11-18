@@ -31,6 +31,7 @@ class AerosButton extends StatefulWidget {
     this.trailing,
     this.loading = false,
     this.fullWidth = false,
+    this.semanticLabel,
   }) : _iconOnly = false;
 
   /// A square, icon-only button. [semanticLabel] is what a screen reader
@@ -38,7 +39,7 @@ class AerosButton extends StatefulWidget {
   const AerosButton.icon({
     super.key,
     required Widget icon,
-    required String semanticLabel,
+    required String this.semanticLabel,
     required this.onPressed,
     this.variant = AerosButtonVariant.ghost,
     this.size,
@@ -49,17 +50,151 @@ class AerosButton extends StatefulWidget {
         fullWidth = false,
         _iconOnly = true;
 
-  factory AerosButton.primary({Key? key, required String label, required VoidCallback? onPressed, Widget? leading, AerosControlSize? size}) =>
-      AerosButton(key: key, label: label, onPressed: onPressed, leading: leading, size: size);
+  // One named constructor per variant, each with every option of the default
+  // constructor.
 
-  factory AerosButton.secondary({Key? key, required String label, required VoidCallback? onPressed, Widget? leading, AerosControlSize? size}) =>
-      AerosButton(key: key, label: label, onPressed: onPressed, leading: leading, size: size, variant: AerosButtonVariant.secondary);
+  factory AerosButton.primary({
+    Key? key,
+    required String label,
+    required VoidCallback? onPressed,
+    AerosControlSize? size,
+    Widget? leading,
+    Widget? trailing,
+    bool loading = false,
+    bool fullWidth = false,
+    String? semanticLabel,
+  }) =>
+      AerosButton(
+        key: key,
+        label: label,
+        onPressed: onPressed,
+        size: size,
+        leading: leading,
+        trailing: trailing,
+        loading: loading,
+        fullWidth: fullWidth,
+        semanticLabel: semanticLabel,
+      );
 
-  factory AerosButton.ghost({Key? key, required String label, required VoidCallback? onPressed, AerosControlSize? size}) =>
-      AerosButton(key: key, label: label, onPressed: onPressed, size: size, variant: AerosButtonVariant.ghost);
+  factory AerosButton.secondary({
+    Key? key,
+    required String label,
+    required VoidCallback? onPressed,
+    AerosControlSize? size,
+    Widget? leading,
+    Widget? trailing,
+    bool loading = false,
+    bool fullWidth = false,
+    String? semanticLabel,
+  }) =>
+      AerosButton(
+        key: key,
+        label: label,
+        onPressed: onPressed,
+        variant: AerosButtonVariant.secondary,
+        size: size,
+        leading: leading,
+        trailing: trailing,
+        loading: loading,
+        fullWidth: fullWidth,
+        semanticLabel: semanticLabel,
+      );
 
-  factory AerosButton.danger({Key? key, required String label, required VoidCallback? onPressed, AerosControlSize? size}) =>
-      AerosButton(key: key, label: label, onPressed: onPressed, size: size, variant: AerosButtonVariant.danger);
+  factory AerosButton.ghost({
+    Key? key,
+    required String label,
+    required VoidCallback? onPressed,
+    AerosControlSize? size,
+    Widget? leading,
+    Widget? trailing,
+    bool loading = false,
+    bool fullWidth = false,
+    String? semanticLabel,
+  }) =>
+      AerosButton(
+        key: key,
+        label: label,
+        onPressed: onPressed,
+        variant: AerosButtonVariant.ghost,
+        size: size,
+        leading: leading,
+        trailing: trailing,
+        loading: loading,
+        fullWidth: fullWidth,
+        semanticLabel: semanticLabel,
+      );
+
+  factory AerosButton.danger({
+    Key? key,
+    required String label,
+    required VoidCallback? onPressed,
+    AerosControlSize? size,
+    Widget? leading,
+    Widget? trailing,
+    bool loading = false,
+    bool fullWidth = false,
+    String? semanticLabel,
+  }) =>
+      AerosButton(
+        key: key,
+        label: label,
+        onPressed: onPressed,
+        variant: AerosButtonVariant.danger,
+        size: size,
+        leading: leading,
+        trailing: trailing,
+        loading: loading,
+        fullWidth: fullWidth,
+        semanticLabel: semanticLabel,
+      );
+
+  factory AerosButton.dangerSubtle({
+    Key? key,
+    required String label,
+    required VoidCallback? onPressed,
+    AerosControlSize? size,
+    Widget? leading,
+    Widget? trailing,
+    bool loading = false,
+    bool fullWidth = false,
+    String? semanticLabel,
+  }) =>
+      AerosButton(
+        key: key,
+        label: label,
+        onPressed: onPressed,
+        variant: AerosButtonVariant.dangerSubtle,
+        size: size,
+        leading: leading,
+        trailing: trailing,
+        loading: loading,
+        fullWidth: fullWidth,
+        semanticLabel: semanticLabel,
+      );
+
+  factory AerosButton.link({
+    Key? key,
+    required String label,
+    required VoidCallback? onPressed,
+    AerosControlSize? size,
+    Widget? leading,
+    Widget? trailing,
+    bool loading = false,
+    bool fullWidth = false,
+    String? semanticLabel,
+  }) =>
+      AerosButton(
+        key: key,
+        label: label,
+        onPressed: onPressed,
+        variant: AerosButtonVariant.link,
+        size: size,
+        leading: leading,
+        trailing: trailing,
+        loading: loading,
+        fullWidth: fullWidth,
+        semanticLabel: semanticLabel,
+      );
 
   /// The visible label; for [AerosButton.icon], the screen-reader label.
   final String label;
@@ -72,6 +207,11 @@ class AerosButton extends StatefulWidget {
   final Widget? trailing;
   final bool loading;
   final bool fullWidth;
+
+  /// Announced in place of the visible [label] — for a label that needs
+  /// context a sighted user gets from the page ("Delete" → "Delete order
+  /// 4821"). Required for [AerosButton.icon].
+  final String? semanticLabel;
   final bool _iconOnly;
 
   @override
@@ -118,18 +258,17 @@ class _AerosButtonState extends State<AerosButton> {
     final height = size.resolveHeight(context);
     final disabled = widget.onPressed == null || widget.loading;
     final iconOnly = widget._iconOnly;
+    final announced = widget.semanticLabel ?? widget.label;
+    // The visible text is not what is read out.
+    final replaced = iconOnly || widget.semanticLabel != null;
 
     return AerosPressable(
       onPressed: disabled ? null : widget.onPressed,
       // The label is announced once: from the visible text, or — for a
       // loading or icon-only button — from this label, with the subtree's own
       // semantics dropped.
-      semanticLabel: widget.loading
-          ? '${widget.label}, loading'
-          : iconOnly
-              ? widget.label
-              : null,
-      excludeSemantics: widget.loading || iconOnly,
+      semanticLabel: widget.loading ? '$announced, loading' : (replaced ? announced : null),
+      excludeSemantics: widget.loading || replaced,
       builder: (context, state) {
         final c = _colors(a, semantic, state);
         final underline = widget.variant == AerosButtonVariant.link && (state.hovered || state.pressed);

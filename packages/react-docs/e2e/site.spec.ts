@@ -21,10 +21,8 @@ const THEME_KEY = "aeros-docs:theme";
  * A component page renders that component's preview fixtures, so it inherits
  * their known violations — `inheritedViolations()` derives the list from the
  * registry, and the "inherited violations" test below pins it, so the pages
- * that carry component debt are spelled out here:
- *
- *   /components/command   aria-required-children       (the `command` fixture)
- *   /components/calendar  label-content-name-mismatch  (the `calendar` fixture)
+ * that carry component debt are spelled out here. Today there are none: the
+ * two fixtures still listed (`select-open`, `dropdown-menu`) are framed.
  *
  * Only fixtures rendered inline count. A framed fixture is the `/preview/<slug>`
  * document itself, which e2e/a11y.spec.ts already scans at that URL; the scan
@@ -101,10 +99,7 @@ test("the route list has no duplicates", () => {
 });
 
 test("inherited violations are exactly the ones listed above", () => {
-  const expected = {
-    "/components/command": ["aria-required-children"],
-    "/components/calendar": ["label-content-name-mismatch"],
-  };
+  const expected = {};
   for (const theme of THEMES) expect(inheritedViolations(theme), theme).toEqual(expected);
 });
 
