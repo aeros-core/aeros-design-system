@@ -16,6 +16,7 @@
 - `Calendar` / date pickers: day buttons are named with the visible number first — "26, Sunday, July 2026" (plus ", today" / ", selected") instead of "Sunday, July 26th, 2026" — so the label is part of the name (WCAG 2.5.3). Tests that find days by name need updating; pass `labels={{ labelDayButton }}` to change it.
 - `DataTable` and `FileUpload` take a `labels` prop (a partial `DataTableLabels` / `FileUploadLabels`) to localise their built-in strings; the defaults (`defaultDataTableLabels`, `defaultFileUploadLabels`) keep the English text.
 - Fixed: `DotMatrix rings={0}` rendered its dot with `r="NaN"`.
+- `DataTable` keeps cells on one line and scrolls sideways when it is wider than its container; pass `wrapCells` to let text wrap.
 
 ### Major Changes
 

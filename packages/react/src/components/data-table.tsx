@@ -153,6 +153,12 @@ export interface DataTableProps<T extends RowData>
   density?: DataTableDensity;
   /** Keeps the header visible while the body scrolls. Pair with `maxHeight`. */
   stickyHeader?: boolean;
+  /**
+   * Let cell text wrap. Off by default: rows stay one line high and a table
+   * wider than its container scrolls sideways, which is what a data grid needs
+   * on a narrow screen. A cell that renders its own block content is unaffected.
+   */
+  wrapCells?: boolean;
   /** Turns the table area into a vertical scroll container of at most this height. */
   maxHeight?: number | string;
 
@@ -248,6 +254,7 @@ function DataTableInner<T extends RowData>(
     onRowSelectionChange,
     density = "default",
     stickyHeader = false,
+    wrapCells = false,
     maxHeight,
     loading = false,
     emptyState,
@@ -384,7 +391,7 @@ function DataTableInner<T extends RowData>(
             aria-labelledby={ariaLabelledBy}
             aria-busy={loading || undefined}
             // Collapsed borders do not travel with a sticky cell.
-            className={cn(stickyHeader && "border-separate border-spacing-0")}
+            className={cn(stickyHeader && "border-separate border-spacing-0", !wrapCells && "[&_td]:whitespace-nowrap")}
           >
             {caption ? <caption className="sr-only">{caption}</caption> : null}
             <Thead>

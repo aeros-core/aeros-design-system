@@ -497,4 +497,13 @@ describe("DataTable — axe", () => {
     const { container } = render(<Orders {...props} />);
     expect(await axe(container)).toHaveNoViolations();
   });
+
+  it("keeps cells on one line by default and lets them wrap on request", () => {
+    // jsdom has no layout, so assert the switch the stylesheet keys on.
+    const { rerender } = render(<DataTable aria-label="Orders" columns={columns} data={orders} />);
+    const table = screen.getByRole("table", { name: "Orders" });
+    const nowrap = table.className;
+    rerender(<DataTable aria-label="Orders" columns={columns} data={orders} wrapCells />);
+    expect(screen.getByRole("table", { name: "Orders" }).className).not.toBe(nowrap);
+  });
 });
