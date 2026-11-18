@@ -1,5 +1,49 @@
 # @aeros-core/tokens
 
+## 3.0.0
+
+### Major Changes
+
+- b516f24: **3.0 — new token blocks, self-hosted fonts.** No existing token value changes here.
+
+  - **Breaking:** `@aeros-core/react/styles.css` no longer fetches fonts from Google Fonts. Import the new `@aeros-core/react/fonts.css` (self-hosted Inter with its optical-size axis, Nunito Sans with its width axis, IBM Plex Mono 400/500) or load the faces yourself. The font tokens now lead with the variable family names (`'Inter Variable'`, `'Nunito Sans Variable'`) and fall back to the plain ones.
+  - New tokens: control sizes and density (`size`, with `data-density="touch"`), elevation intents (`raised` / `overlay` / `modal`, light + dark), semantic radii (`item` / `control` / `surface` / `modal` / `pill`), focus ring metrics, opacity, border widths, layout widths, state colours (`state-hover` / `state-pressed` / `state-selected`), `scrim`, `fg-disabled`, `danger-hover`, and `enter` / `exit` easings.
+  - New Tailwind utilities from those tokens: `text-<role>` (size + line height + tracking + weight in one class), `h-control-md`, `size-icon-md`, `rounded-control`, `shadow-overlay`, `z-modal`, `duration-fast`, `max-w-dialog-md`, `w-sidebar`, `bg-state-hover`, `bg-scrim`, `opacity-disabled`, `outline-offset-field`.
+  - `cn()` understands the Aeros class names (tailwind-merge v3 configured from the tokens), so `text-body-sm text-fg-muted` keeps both and `rounded-md rounded-control` resolves to the latter.
+  - The default transition timing is the token `fast` / `standard`, not Tailwind's 150ms.
+
+- 4ba5904: **3.0 — removals.** Everything the restyle replaced is gone.
+
+  - Shadows: the `xs`–`xl`, `hairline` and `focus*` shadow tokens (`--aeros-shadow-*`, `shadow-sm` …) are removed. Use the elevation intents `shadow-raised` / `shadow-overlay` / `shadow-modal`; resting surfaces take a hairline border.
+  - Radius: `2xl` / `3xl` / `4xl` are removed. Use `rounded-item|control|surface|modal|pill`.
+  - Motion: the `emphasized`, `decelerate`, `entrance` and `spring` easings are removed. Use `ease-standard`, `ease-enter`, `ease-exit`.
+  - Aliases: `focus-ring-offset` is removed (the focus ring has a transparent offset).
+  - CSS: the `.aeros-text-<role>` classes are removed. Use the Tailwind utilities `text-<role>`.
+
+- 9e3525e: **3.0 — tokens.json is the only source.** The Tailwind v4 theme is now generated (`@aeros-core/tokens/theme.css`) instead of hand-copied into `@aeros-core/react/styles.css`.
+
+  - **Breaking:** the theme resets Tailwind's default palette, radii, shadows and easings. Classes such as `bg-blue-500`, `shadow-2xl` or `ease-out` no longer generate CSS in an app that imports `@aeros-core/react/styles.css` — use the Aeros alias classes (`bg-bg-surface`, `text-fg-muted`, `shadow-overlay`, `ease-standard`, …). `white`, `black` and the `ink-*` ramp remain.
+  - **Breaking:** the unused Tailwind v3 preset export `@aeros-core/tokens/tailwind` is removed.
+  - New: `data-theme="system"` follows the OS colour scheme; `data-theme` now works on any element, so a subtree can be themed on its own; a `dark:` variant is available.
+  - New: token references (`{color.ink.900}`, `{color.ink.900 / 0.05}`); the JS export is fully typed and adds `rawTokens`.
+  - Fix: `styles.css` scans the published `dist/`, so installed (non-monorepo) consumers get the component classes.
+
+- b71425a: **3.0 — the "Crisp precision" values.** Everything shifts; review each app visually when upgrading.
+
+  - **Colour:** the warm stone ink ramp is replaced by a cool neutral one (`ink-0` … `ink-950`, plus a new `ink-850`). Aliases are now references into the ramp: canvas `ink-50`, surface white, text `ink-900`, borders `ink-200` / `ink-300`; dark mode is near-black (`ink-950` canvas, `ink-900` surface, `ink-850` elevated). `info` status colours are ramp references.
+  - **Radius:** the scale tightens — `xs` 2, `sm` 4, `md` 6, `lg` 8, `xl` 12 (were 4 / 6 / 8 / 12 / 16). `2xl` / `3xl` / `4xl` are removed; use the semantic radii (`rounded-control`, `rounded-surface`, `rounded-modal`).
+  - **Motion:** durations are `quick` 80, `fast` 120, `base` 180, `slow` 260 ms (were 90 / 120 / 200 / 320).
+  - **Type scale:** display 48 / 36 / 30, h1 24, h2 20, h3 16, h4 14 — all weight 600; body 16 / 14 / 13 at 450; labels 14 / 13 / 11 at 500; caption 12; mono 20 / 13 / 12 / 11. The `light` and `extrabold` weight tokens are removed.
+  - The contrast gate now also checks every text tier on every surface, the solid danger button, and text over the hover / pressed / selected overlays.
+
+### Minor Changes
+
+- 5350b28: The sidebar spec, shared by web and Flutter.
+
+  **Sidebar (react)**: rows are a fixed 32px (`h-8`) with 16px icons; `SidebarSection` labels are sentence case, 12px medium (were 10px uppercase tracked); `SidebarItem` gains `count`, a pill announced with the label. (Superseded in 3.0: the sidebar now follows the theme — see the app-shell entry.)
+
+  Flutter `AerosSidenav` moves to the same spec in `aeros_design_system` 2.3.0 (see `packages/flutter/CHANGELOG.md`).
+
 ## 2.1.0
 
 ### Minor Changes

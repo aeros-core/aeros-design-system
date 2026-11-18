@@ -51,7 +51,7 @@ export default function SegmentedControlFixture() {
         </SegmentedControl>
       </Group>
       <Group label="On bg-surface">
-        <div className="rounded-lg border border-border-default bg-bg-surface p-4">
+        <div className="rounded-surface border border-border-default bg-bg-surface p-4">
           <SegmentedControl defaultValue="open" aria-label="Order status">
             <SegmentedControlItem value="open">Open</SegmentedControlItem>
             <SegmentedControlItem value="shipped">Shipped</SegmentedControlItem>

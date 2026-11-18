@@ -35,15 +35,15 @@ export interface AlertProps
 }
 
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
-  ({ className, variant = "info", title, icon, role, children, ...props }, ref) => {
+  ({ className, variant = "info", title, icon, children, ...props }, ref) => {
     const Icon = iconMap[variant!];
     return (
       <div
         ref={ref}
         // Only danger interrupts assistive tech; everything else is a polite
-        // status region. Pass role explicitly to override (e.g. role={undefined}
-        // for purely static content).
-        role={role !== undefined ? role : variant === "danger" ? "alert" : "status"}
+        // status region. A `role` prop overrides this — including
+        // role={undefined} for purely static content, because props spread last.
+        role={variant === "danger" ? "alert" : "status"}
         className={cn(alertVariants({ variant }), className)}
         {...props}
       >

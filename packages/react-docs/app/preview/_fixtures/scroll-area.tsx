@@ -13,9 +13,9 @@ export default function ScrollAreaFixture() {
         <ScrollArea
           type="always"
           aria-label="Recent orders"
-          className="h-48 w-full max-w-md rounded-lg border border-border-default bg-bg-surface"
+          className="h-48 w-full max-w-md rounded-surface border border-border-default bg-bg-surface"
         >
-          <ul className="grid gap-2 p-3 text-sm text-fg-secondary">
+          <ul className="grid gap-2 p-3 text-body-md text-fg-secondary">
             {ORDERS.map((order) => (
               <li key={order}>{order}</li>
             ))}
@@ -27,13 +27,13 @@ export default function ScrollAreaFixture() {
           type="always"
           orientation="horizontal"
           aria-label="Columns"
-          className="w-full max-w-md rounded-lg border border-border-default bg-bg-surface"
+          className="w-full max-w-md rounded-surface border border-border-default bg-bg-surface"
         >
           <div className="flex w-max gap-2 p-3">
             {COLUMNS.map((column) => (
               <div
                 key={column}
-                className="flex h-16 w-28 shrink-0 items-center justify-center rounded-md border border-border-default text-sm text-fg-secondary"
+                className="flex h-16 w-28 shrink-0 items-center justify-center rounded-control border border-border-default text-body-md text-fg-secondary"
               >
                 {column}
               </div>
@@ -46,9 +46,9 @@ export default function ScrollAreaFixture() {
           type="always"
           orientation="both"
           aria-label="Order grid"
-          className="h-48 w-full max-w-md rounded-lg border border-border-default bg-bg-surface"
+          className="h-48 w-full max-w-md rounded-surface border border-border-default bg-bg-surface"
         >
-          <div className="grid w-max gap-2 p-3 text-sm text-fg-secondary">
+          <div className="grid w-max gap-2 p-3 text-body-md text-fg-secondary">
             {ORDERS.map((order) => (
               <div key={order} className="whitespace-nowrap">
                 {order} · Dispatched from Pune · BlueDart Surface · Expected 18 Aug 2026
@@ -61,9 +61,9 @@ export default function ScrollAreaFixture() {
         <ScrollArea
           type="always"
           aria-label="Short list"
-          className="h-32 w-full max-w-md rounded-lg border border-border-default bg-bg-surface"
+          className="h-32 w-full max-w-md rounded-surface border border-border-default bg-bg-surface"
         >
-          <ul className="grid gap-2 p-3 text-sm text-fg-secondary">
+          <ul className="grid gap-2 p-3 text-body-md text-fg-secondary">
             {ORDERS.slice(0, 2).map((order) => (
               <li key={order}>{order}</li>
             ))}

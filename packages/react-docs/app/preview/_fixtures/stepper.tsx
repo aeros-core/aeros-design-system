@@ -44,7 +44,7 @@ export default function StepperFixture() {
         />
       </Group>
       <Group label="Narrow (390px) — labels truncate" className="flex-col items-start">
-        <div className="w-[358px] max-w-full rounded-lg border border-border-default bg-bg-surface p-4">
+        <div className="w-[358px] max-w-full rounded-surface border border-border-default bg-bg-surface p-4">
           <Stepper steps={DETAILED} current={1} aria-label="Seller onboarding, narrow" />
         </div>
       </Group>

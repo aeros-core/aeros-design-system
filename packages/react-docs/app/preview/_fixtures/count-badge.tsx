@@ -22,7 +22,7 @@ export default function CountBadgeFixture() {
         <CountBadge count={1250} max={999} tone="muted" />
       </Group>
       <Group label="Zero — hidden by default, shown with showZero">
-        <span className="text-sm text-fg-secondary">
+        <span className="text-body-md text-fg-secondary">
           Hidden: [<CountBadge count={0} />]
         </span>
         {TONES.map((tone) => (
@@ -30,18 +30,18 @@ export default function CountBadgeFixture() {
         ))}
       </Group>
       <Group label="Inline with a label">
-        <span className="inline-flex items-center gap-2 text-sm text-fg-primary">
+        <span className="inline-flex items-center gap-2 text-body-md text-fg-primary">
           Inbox <CountBadge count={3} aria-label="3 unread" />
         </span>
-        <span className="inline-flex items-center gap-2 text-sm text-fg-primary">
+        <span className="inline-flex items-center gap-2 text-body-md text-fg-primary">
           Drafts <CountBadge count={12} tone="muted" aria-label="12 drafts" />
         </span>
-        <span className="inline-flex items-center gap-2 text-sm text-fg-primary">
+        <span className="inline-flex items-center gap-2 text-body-md text-fg-primary">
           Failed <CountBadge count={128} tone="danger" aria-label="more than 99 failed" />
         </span>
       </Group>
       <Group label="On bg-surface">
-        <div className="flex flex-wrap gap-3 rounded-lg border border-border-default bg-bg-surface p-4">
+        <div className="flex flex-wrap gap-3 rounded-surface border border-border-default bg-bg-surface p-4">
           {TONES.map((tone) => (
             <CountBadge key={tone} tone={tone} count={8} />
           ))}

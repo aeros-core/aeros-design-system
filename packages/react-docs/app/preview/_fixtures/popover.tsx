@@ -14,7 +14,7 @@ export default function PopoverFixture() {
           </Button>
         </PopoverTrigger>
         <PopoverContent align="start">
-          <div className="text-sm font-semibold text-fg-primary">Dispatch window</div>
+          <div className="text-body-md font-semibold text-fg-primary">Dispatch window</div>
           <p className="mt-1 text-[13px] leading-relaxed text-fg-secondary">
             Orders cleared by QC before 2 pm ship the same day.
           </p>

@@ -28,12 +28,12 @@ export default function KbdFixture() {
         </KbdGroup>
         <KbdGroup>
           <Kbd>G</Kbd>
-          <span className="text-xs text-fg-muted">then</span>
+          <span className="text-caption text-fg-muted">then</span>
           <Kbd>O</Kbd>
         </KbdGroup>
       </Group>
       <Group label="Inline in text">
-        <p className="text-sm text-fg-secondary">
+        <p className="text-body-md text-fg-secondary">
           Press{" "}
           <KbdGroup>
             <Kbd>⌘</Kbd>
@@ -43,7 +43,7 @@ export default function KbdFixture() {
         </p>
       </Group>
       <Group label="As a trailing hint in a row">
-        <div className="flex w-64 items-center justify-between rounded-lg border border-border-default bg-bg-surface px-3 py-2 text-sm text-fg-primary">
+        <div className="flex w-64 items-center justify-between rounded-surface border border-border-default bg-bg-surface px-3 py-2 text-body-md text-fg-primary">
           New order
           <KbdGroup>
             <Kbd>⌘</Kbd>

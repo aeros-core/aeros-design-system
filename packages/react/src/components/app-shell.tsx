@@ -16,8 +16,9 @@ import { colorTransition } from "../internal/recipes";
 //     </AppShell>
 //   </SidebarProvider>
 //
-// All of it follows the theme. No "use client": these are plain layout
-// elements and can render in server components.
+// All of it follows the theme. These are plain layout elements with no hooks.
+// (The published bundle is one client module, so they render as client
+// components; Server Components can still compose them.)
 
 export const AppShell = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
@@ -69,11 +70,22 @@ export const AppHeaderBrand = React.forwardRef<HTMLDivElement, AppHeaderBrandPro
 );
 AppHeaderBrand.displayName = "AppHeaderBrand";
 
+export interface AppHeaderTitleProps extends React.HTMLAttributes<HTMLElement> {
+  /**
+   * The element to render. `h1` by default; use `"div"` (or `"h2"`) when the page
+   * body has its own `h1`, e.g. a `PageHeader`, so the page keeps a single h1.
+   */
+  as?: "h1" | "h2" | "div";
+}
+
 /** The page or section title. */
-export const AppHeaderTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
-  ({ className, ...props }, ref) => (
-    // eslint-disable-next-line jsx-a11y/heading-has-content -- content comes from props.children
-    <h1 ref={ref} className={cn("min-w-0 truncate text-h4 text-fg-primary", className)} {...props} />
+export const AppHeaderTitle = React.forwardRef<HTMLElement, AppHeaderTitleProps>(
+  ({ className, as: Comp = "h1", ...props }, ref) => (
+    <Comp
+      ref={ref as React.Ref<HTMLHeadingElement & HTMLDivElement>}
+      className={cn("min-w-0 truncate text-h4 text-fg-primary", className)}
+      {...props}
+    />
   )
 );
 AppHeaderTitle.displayName = "AppHeaderTitle";

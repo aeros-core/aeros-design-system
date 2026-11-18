@@ -1,6 +1,6 @@
 # aeros_design_system
 
-## 3.0.0 (unreleased)
+## 3.0.0
 
 ### The "Crisp precision" values
 

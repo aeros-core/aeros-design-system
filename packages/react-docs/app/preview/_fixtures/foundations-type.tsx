@@ -47,12 +47,12 @@ export default function FoundationsTypeFixture() {
         </p>
       </Group>
       <Group label="Font families + weights" className="flex-col items-start gap-1">
-        <p className="font-sans text-base font-normal text-fg-primary">Inter 400 — 0123456789 ₹1,24,000</p>
-        <p className="font-sans text-base font-medium text-fg-primary">Inter 500 — 0123456789 ₹1,24,000</p>
-        <p className="font-sans text-base font-semibold text-fg-primary">Inter 600 — 0123456789 ₹1,24,000</p>
-        <p className="font-sans text-base font-bold text-fg-primary">Inter 700 — 0123456789 ₹1,24,000</p>
-        <p className="font-mono text-base font-normal text-fg-primary">IBM Plex Mono 400 — 0123456789 ₹1,24,000</p>
-        <p className="font-mono text-base font-medium text-fg-primary">IBM Plex Mono 500 — 0123456789 ₹1,24,000</p>
+        <p className="font-sans text-body-lg font-normal text-fg-primary">Inter 400 — 0123456789 ₹1,24,000</p>
+        <p className="font-sans text-body-lg font-medium text-fg-primary">Inter 500 — 0123456789 ₹1,24,000</p>
+        <p className="font-sans text-body-lg font-semibold text-fg-primary">Inter 600 — 0123456789 ₹1,24,000</p>
+        <p className="font-sans text-body-lg font-bold text-fg-primary">Inter 700 — 0123456789 ₹1,24,000</p>
+        <p className="font-mono text-body-lg font-normal text-fg-primary">IBM Plex Mono 400 — 0123456789 ₹1,24,000</p>
+        <p className="font-mono text-body-lg font-medium text-fg-primary">IBM Plex Mono 500 — 0123456789 ₹1,24,000</p>
       </Group>
       <Group label="Wordmark (aeros-logo)">
         <div className="aeros-logo text-[44px] text-fg-primary">Aeros</div>

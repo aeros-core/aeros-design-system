@@ -8,7 +8,8 @@
     "start": "next start",
     "test:visual": "playwright test --project=desktop --project=mobile",
     "test:visual:update": "playwright test --project=desktop --project=mobile --update-snapshots",
-    "test:a11y": "playwright test --project=a11y"
+    "test:a11y": "playwright test --project=a11y",
+    "test:site": "playwright test --project=site"
   },
   "dependencies": {
     "@aeros-core/react": "workspace:*",

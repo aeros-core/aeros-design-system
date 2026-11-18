@@ -3,7 +3,7 @@
 import { Switch } from "@aeros-core/react";
 import { Group } from "./kit";
 
-const row = "inline-flex items-center gap-3 text-sm text-fg-secondary";
+const row = "inline-flex items-center gap-3 text-body-md text-fg-secondary";
 
 export default function SwitchFixture() {
   return (

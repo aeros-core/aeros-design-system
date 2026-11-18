@@ -79,6 +79,10 @@ jobs:
       - name: Accessibility (axe)
         if: ${{ !cancelled() }}
         run: pnpm test:a11y
+      # Every showcase page: loads cleanly, one h1, axe, no overflow at 390px.
+      - name: Showcase site
+        if: ${{ !cancelled() }}
+        run: pnpm test:site
 
   flutter:
     name: Analyze + test (flutter)

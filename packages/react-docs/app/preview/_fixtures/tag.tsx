@@ -13,7 +13,7 @@ export default function TagFixture() {
         <Tag>default</Tag>
       </Group>
       <Group label="On bg-surface">
-        <div className="flex flex-wrap gap-3 rounded-lg border border-border-default bg-bg-surface p-4">
+        <div className="flex flex-wrap gap-3 rounded-surface border border-border-default bg-bg-surface p-4">
           <Tag variant="neutral">v1.0.0</Tag>
           <Tag variant="info">beta</Tag>
           <Tag variant="inverse">internal</Tag>
