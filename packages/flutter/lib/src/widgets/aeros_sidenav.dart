@@ -108,17 +108,52 @@ class AerosSidenavExpanded extends InheritedWidget {
   bool updateShouldNotify(AerosSidenavExpanded oldWidget) => false;
 }
 
-/// Tells the blocks inside a rail whether it is collapsed to icons.
-class _RailScope extends InheritedWidget {
-  const _RailScope({required this.collapsed, required super.child});
+/// What an [AerosSidenav] tells the widgets inside it — read it from a custom
+/// header or footer to follow the rail:
+///
+/// ```dart
+/// final collapsed = AerosSidenavScope.of(context).collapsed;
+/// return collapsed ? const AerosSidenavMark(letter: 'a') : const AerosWordmark(size: 20);
+/// ```
+///
+/// Read-only: [AerosSidenav] places it; an app never builds one itself. The
+/// calling widget rebuilds when the rail collapses or expands.
+class AerosSidenavScope extends InheritedWidget {
+  const AerosSidenavScope._({required this.collapsed, required this.density, required super.child});
 
+  /// The sidenav is showing as the icon-only rail
+  /// ([AerosMetricTokens.layoutSidebarRail] wide). Always false in the
+  /// scaffold's drawer, whatever [AerosSidenav.collapsed] says.
   final bool collapsed;
 
-  static bool of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_RailScope>()?.collapsed ?? false;
+  /// The row sizing of the sidenav.
+  final AerosSidenavDensity density;
+
+  /// The scope of the nearest [AerosSidenav] above [context]. Throws when
+  /// there is none.
+  static AerosSidenavScope of(BuildContext context) {
+    final scope = maybeOf(context);
+    assert(() {
+      if (scope == null) {
+        throw FlutterError(
+          'AerosSidenavScope.of() was called with a context that is not inside an AerosSidenav.\n'
+          'Use AerosSidenavScope.maybeOf() for a widget that is also used outside one.',
+        );
+      }
+      return true;
+    }());
+    return scope!;
+  }
+
+  /// Like [of], but null outside an [AerosSidenav].
+  static AerosSidenavScope? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<AerosSidenavScope>();
+
+  static bool _collapsedOf(BuildContext context) => maybeOf(context)?.collapsed ?? false;
 
   @override
-  bool updateShouldNotify(_RailScope oldWidget) => oldWidget.collapsed != collapsed;
+  bool updateShouldNotify(AerosSidenavScope oldWidget) =>
+      oldWidget.collapsed != collapsed || oldWidget.density != density;
 }
 
 /// Vertical navigation rail rendered inline on wide layouts or inside a Drawer.
@@ -192,8 +227,9 @@ class AerosSidenav extends StatelessWidget {
         onExpandRequested: onExpandRequested,
       ));
     }
-    return _RailScope(
+    return AerosSidenavScope._(
       collapsed: rail,
+      density: density,
       child: Container(
         color: a.bgSurface,
         child: Column(
@@ -499,17 +535,50 @@ class _TwoLines extends StatelessWidget {
 /// One app header high ([AerosSizeTokens.header] for the ambient [AerosDensity]) over a hairline,
 /// so it sits level with `AerosTopnav` and `AerosPageHeader`. [mark] is drawn at 24px; it defaults
 /// to an [AerosSidenavMark] with the title's first letter. In a collapsed rail only the mark shows.
+///
+/// For anything that is not a mark and two lines of text — a wordmark, a logo, a badge — use
+/// [AerosSidenavHeader.custom]: the same block (height, hairline, the rail's leading edge) around a
+/// widget of your own, which reads [AerosSidenavScope] to follow the rail.
 class AerosSidenavHeader extends StatelessWidget {
   const AerosSidenavHeader({
     super.key,
-    required this.title,
+    required String this.title,
     this.subtitle,
     this.mark,
     this.onTap,
     this.semanticLabel,
-  });
+  }) : child = null;
 
-  final String title;
+  /// The header block around [child], in place of the mark and the two lines of text.
+  ///
+  /// [child] starts on the rail's leading edge (20px in, like every icon and group label) and is
+  /// centred in a collapsed rail, where it has [AerosMetricTokens.layoutSidebarRail] to fit in:
+  /// switch what it shows on `AerosSidenavScope.of(context).collapsed`.
+  ///
+  /// ```dart
+  /// AerosSidenavHeader.custom(
+  ///   semanticLabel: 'Aeros',
+  ///   child: Builder(
+  ///     builder: (context) => AerosSidenavScope.of(context).collapsed
+  ///         ? const AerosSidenavMark(letter: 'a')
+  ///         : const AerosWordmark(size: 20),
+  ///   ),
+  /// )
+  /// ```
+  ///
+  /// With [onTap] the whole block is one button. [semanticLabel], when given, is announced in
+  /// place of whatever [child] says.
+  const AerosSidenavHeader.custom({
+    super.key,
+    required Widget this.child,
+    this.onTap,
+    this.semanticLabel,
+  })  : title = null,
+        subtitle = null,
+        mark = null;
+
+  /// The workspace name. Null for [AerosSidenavHeader.custom].
+  final String? title;
   final String? subtitle;
   final Widget? mark;
   final VoidCallback? onTap;
@@ -517,26 +586,43 @@ class AerosSidenavHeader extends StatelessWidget {
   /// Announced instead of the title — e.g. 'Switch account — Acme Ltd'.
   final String? semanticLabel;
 
+  /// The content of an [AerosSidenavHeader.custom]; null otherwise.
+  final Widget? child;
+
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final rail = _RailScope.of(context);
-    final markBox = SizedBox.square(
-      dimension: AerosSizeTokens.avatarSm,
-      child: mark ?? AerosSidenavMark(letter: title),
-    );
-    final content = rail
-        ? Center(child: markBox)
-        : Row(
-            children: [
-              markBox,
-              const SizedBox(width: _iconGap),
-              Expanded(child: _TwoLines(title, subtitle?.trim() ?? '')),
-              if (onTap != null) Icon(Icons.unfold_more_rounded, size: AerosSizeTokens.iconMd, color: a.fgMuted),
-            ],
-          );
+    final rail = AerosSidenavScope._collapsedOf(context);
+    final custom = child;
+    final Widget content;
+    if (custom != null) {
+      content = rail ? Center(child: custom) : Align(alignment: AlignmentDirectional.centerStart, child: custom);
+    } else {
+      final markBox = SizedBox.square(
+        dimension: AerosSizeTokens.avatarSm,
+        child: mark ?? AerosSidenavMark(letter: title!),
+      );
+      content = rail
+          ? Center(child: markBox)
+          : Row(
+              children: [
+                markBox,
+                const SizedBox(width: _iconGap),
+                Expanded(child: _TwoLines(title!, subtitle?.trim() ?? '')),
+                if (onTap != null) Icon(Icons.unfold_more_rounded, size: AerosSizeTokens.iconMd, color: a.fgMuted),
+              ],
+            );
+    }
     // The pressable fill's hairline is part of its box, so it comes off the padding there.
     const hairline = AerosMetricTokens.borderHairline;
+    final label = semanticLabel ?? title;
+
+    Widget resting = Padding(
+      padding: EdgeInsets.symmetric(horizontal: rail ? 0 : _pad),
+      child: content,
+    );
+    // A custom child with no label speaks for itself.
+    if (label != null) resting = Semantics(label: label, excludeSemantics: true, child: resting);
 
     return Container(
       height: AerosDensity.of(context).sizes.header,
@@ -545,19 +631,12 @@ class AerosSidenavHeader extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: _inset, vertical: AerosSpacing.s1_5),
       child: onTap == null
-          ? Semantics(
-              label: semanticLabel ?? title,
-              excludeSemantics: true,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: rail ? 0 : _pad),
-                child: content,
-              ),
-            )
+          ? resting
           : AerosPressable(
               onPressed: onTap,
               expandHitTarget: false,
-              semanticLabel: semanticLabel ?? title,
-              excludeSemantics: true,
+              semanticLabel: label,
+              excludeSemantics: label != null,
               builder: (context, state) => _RailFill(
                 state: state,
                 padding: EdgeInsets.symmetric(horizontal: rail ? 0 : _pad - hairline),
@@ -599,7 +678,7 @@ class AerosSidenavFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final rail = _RailScope.of(context);
+    final rail = AerosSidenavScope._collapsedOf(context);
     final who = name.trim();
     final avatarBox = SizedBox.square(
       dimension: AerosSizeTokens.avatarSm,

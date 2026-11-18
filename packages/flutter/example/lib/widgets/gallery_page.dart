@@ -26,10 +26,6 @@ class GalleryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gutter = gutterOf(context);
-    // AerosPageHeader keeps its actions beside the title. On a phone there is
-    // no room for both, so they go on a row of their own under the header.
-    final wide = AerosBreakpoints.isAtLeast(context, AerosBreakpoint.md);
-    final actions = this.actions;
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(gutter, AerosSpacing.s3, gutter, AerosSpacing.s16),
       child: Align(
@@ -43,13 +39,10 @@ class GalleryPage extends StatelessWidget {
                 title: title,
                 subtitle: summary,
                 breadcrumbs: breadcrumbs,
-                actions: wide ? actions : null,
+                // Beside the title where they fit, under it where they do not.
+                actions: actions,
                 padding: EdgeInsets.zero,
               ),
-              if (!wide && actions != null) ...[
-                const SizedBox(height: AerosSpacing.s2),
-                Wrap(spacing: AerosSpacing.s2, runSpacing: AerosSpacing.s2, children: actions),
-              ],
               const SizedBox(height: AerosSpacing.s6),
               ...children,
             ],
@@ -134,59 +127,6 @@ class Stacked extends StatelessWidget {
             ],
           ),
         ),
-      );
-}
-
-/// Tiles of equal width that take their own height: as many columns as fit
-/// at [minWidth]. (`AerosResponsiveGrid` is for tiles of a fixed aspect ratio.)
-class Tiles extends StatelessWidget {
-  const Tiles({
-    super.key,
-    required this.children,
-    this.minWidth = 260,
-    this.spacing = AerosSpacing.s3,
-    this.equalHeights = false,
-  });
-
-  final List<Widget> children;
-  final double minWidth;
-  final double spacing;
-
-  /// Makes the tiles of a row as tall as the tallest — for rows of cards.
-  final bool equalHeights;
-
-  @override
-  Widget build(BuildContext context) => LayoutBuilder(
-        builder: (context, constraints) {
-          final columns = ((constraints.maxWidth + spacing) / (minWidth + spacing)).floor().clamp(1, children.length);
-          final width = (constraints.maxWidth - spacing * (columns - 1)) / columns;
-          if (equalHeights) {
-            return Column(
-              children: [
-                for (var start = 0; start < children.length; start += columns) ...[
-                  if (start > 0) SizedBox(height: spacing),
-                  IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        for (var i = start; i < start + columns; i++) ...[
-                          if (i > start) SizedBox(width: spacing),
-                          // An empty cell keeps the last row's tiles the same width.
-                          Expanded(child: i < children.length ? children[i] : const SizedBox.shrink()),
-                        ],
-                      ],
-                    ),
-                  ),
-                ],
-              ],
-            );
-          }
-          return Wrap(
-            spacing: spacing,
-            runSpacing: spacing,
-            children: [for (final child in children) SizedBox(width: width.floorToDouble(), child: child)],
-          );
-        },
       );
 }
 

@@ -117,8 +117,8 @@ class _OrdersPageState extends State<OrdersPage> {
         ),
       ],
       children: [
-        Tiles(
-          minWidth: 200,
+        AerosResponsiveGrid.auto(
+          tileMinWidth: 200,
           equalHeights: true,
           children: [
             AerosStatCard(
@@ -268,23 +268,25 @@ class _OrdersPageState extends State<OrdersPage> {
           ],
           footer: Row(
             children: [
-              Expanded(
-                child: Text(
-                  rows.isEmpty
-                      ? 'No orders'
-                      : '${(page - 1) * _pageSize + 1}–${(page - 1) * _pageSize + visible.length} of ${rows.length}',
-                  style: AerosTypography.caption(color: context.aerosColors.fgMuted),
-                ),
+              Text(
+                rows.isEmpty
+                    ? 'No orders'
+                    : '${(page - 1) * _pageSize + 1}–${(page - 1) * _pageSize + visible.length} of ${rows.length}',
+                style: AerosTypography.caption(color: context.aerosColors.fgMuted),
               ),
-              AerosPagination(
-                page: page,
-                totalPages: pages,
-                // Numbered where there is room; previous / next on a phone.
-                variant: const AerosResponsiveValue<AerosPaginationVariant>(
-                  xs: AerosPaginationVariant.compact,
-                  md: AerosPaginationVariant.numbered,
-                ).resolve(context),
-                onChanged: (p) => setState(() => _page = p),
+              const SizedBox(width: AerosSpacing.s3),
+              // The pagination takes the rest of the row and shows the page
+              // numbers that fit in it (previous / next alone on a phone).
+              Expanded(
+                child: Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: AerosPagination(
+                    page: page,
+                    totalPages: pages,
+                    variant: AerosPaginationVariant.numbered,
+                    onChanged: (p) => setState(() => _page = p),
+                  ),
+                ),
               ),
             ],
           ),

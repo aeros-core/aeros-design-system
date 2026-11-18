@@ -353,6 +353,61 @@ Six rough edges from the 3.0 review. Two of them change what an app sees.
 - **`AerosAliasColors.focusRingOffset`** is removed — the focus ring has a transparent offset.
 - **`AerosShadows`** is removed (see above).
 
+### API gaps closed before release
+
+What building the example gallery showed was missing. All additive, except where "changes" is
+written.
+
+- **`AerosPageHeader` fits its width.** The actions sit beside the title while the title block
+  fits whole or keeps a readable measure (240), and move to a wrapping row under it when it cannot
+  — no page has to move them itself. Changes: the title is cut after two lines and the subtitle
+  after three (they wrapped without limit); a long breadcrumb trail scrolls sideways; the trail
+  has 6px more air above the title.
+- **`AerosPagination` numbered fits its width.** It shows up to `maxVisiblePages` numbers and
+  fewer when they do not fit — first, last, current and the "…" always stay — and the compact form
+  ("6 / 12") when even those do not. Give it a bounded width: in a `Row`, wrap it in `Flexible` /
+  `Expanded`. The numbered variant reads its constraints, so it cannot be measured by
+  `IntrinsicWidth` / `IntrinsicHeight`.
+- **`AerosTabs`.** Underline tabs scroll sideways when they do not fit, fade at a clipped edge and
+  bring the active tab into view (first build and on selection change). Pill segments that do not
+  fit share the width equally and truncate. Arrow keys now move the focus with the selection, and
+  Home / End select the first / last tab. Changes: an underline strip now fills the width it is
+  given even under loose constraints (the baseline runs edge to edge); in a `Row` give it an
+  `Expanded`.
+- **`AerosScaffold.of(context)` / `maybeOf`** return the new `AerosScaffoldState`: `hasSidenav`,
+  `isSidenavInline`, `isSidenavInDrawer`, `isDrawerOpen`, `openDrawer()`, `closeDrawer()`,
+  `toggleDrawer()`, `isRailCollapsed`, `canToggleRail`, `toggleRail()`. From above the scaffold use
+  a `GlobalKey<AerosScaffoldState>`. New `AerosScaffold.onDrawerChanged` and
+  `onRailCollapsedChanged`. **The app still owns the rail** (`AerosSidenav.collapsed`);
+  `toggleRail()` only asks for the change through `onRailCollapsedChanged`.
+- **`AerosTopnav` shows the sidenav's button itself.** Changes: inside an `AerosScaffold`, with no
+  `leading`, the bar now shows a menu button ("Open navigation") while the sidenav is in a drawer,
+  and a collapse / expand button when the scaffold has `onRailCollapsedChanged`. Remove your own
+  menu button, or pass `automaticallyImplyLeading: false`. Labels: `openNavigationLabel`,
+  `collapseSidebarLabel`, `expandSidebarLabel`.
+- **`AerosSidenavHeader.custom(child:, onTap:, semanticLabel:)`** — the header block around any
+  widget (a wordmark, a logo). **`AerosSidenavScope.of(context)`** (`collapsed`, `density`) tells a
+  custom header or footer whether the sidenav is the icon rail. `AerosSidenavHeader.title` is now
+  `String?` (null for `.custom`).
+- **`AerosButton`**: `.primary` / `.secondary` / `.ghost` / `.danger` take every option of the
+  default constructor (`leading`, `trailing`, `size`, `loading`, `fullWidth`, `semanticLabel`);
+  new `.dangerSubtle` and `.link`; new `semanticLabel` on the default constructor (announced in
+  place of the visible label).
+- **`AerosResponsiveGrid.auto`** — equal-width tiles that take the height of their content, each
+  row as tall as its tallest tile; `equalHeights: true` stretches a row's tiles. The default
+  constructor is unchanged.
+- **Field naming.** `AerosSelect` takes `helperText` / `errorText`; `helper` / `error` still work
+  and are deprecated. `AerosDropdownSearch` gains `helperText` / `errorText` (danger frame
+  included). `AerosFormField` gains `expand` (false hugs its content). `AerosEnumChips` and the
+  attribute switch row now draw their label / message through `AerosFormField` — no pixel changes.
+- **`AerosPriceBreakdown` groups its amounts** — changes: `₹6675.00` is now `₹6,675.00`, Indian
+  grouping for the rupee (`₹12,34,567.00`), thousands otherwise. `formatAmount:` replaces it. The
+  formatter is public: `AerosAmountFormat.group` / `.money`, `AerosDigitGrouping`.
+- **Small visual fixes** (re-record goldens): `AerosStatCard`'s value block is one `h1` line high
+  for `mono` too, so the delta lines of a row are level (a mono card is 4px taller);
+  `AerosVariantPicker` swatches and their names are start-aligned, flush with the label (were
+  inset 8px); `AerosRepeatingRows`' Add button has a plus and starts on the rows' leading edge.
+
 ## 2.5.0 — 2026-10-09 (wordmark + pulse orb)
 
 ### Changed

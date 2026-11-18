@@ -73,8 +73,8 @@ class OverviewPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AerosSpacing.s3),
-        Tiles(
-          minWidth: 200,
+        AerosResponsiveGrid.auto(
+          tileMinWidth: 200,
           equalHeights: true,
           children: [
             AerosStatCard(label: 'Pages in this gallery', value: '${destinations.length}'),
@@ -86,8 +86,8 @@ class OverviewPage extends StatelessWidget {
         const SizedBox(height: AerosSpacing.s10),
         Section(
           'Principles',
-          child: Tiles(
-            minWidth: 280,
+          child: AerosResponsiveGrid.auto(
+            tileMinWidth: 280,
             equalHeights: true,
             children: [
               for (final (icon, title, body) in _principles)
@@ -116,8 +116,8 @@ class OverviewPage extends StatelessWidget {
         Section(
           'Browse',
           note: 'One page per family, then two patterns that put the families together.',
-          child: Tiles(
-            minWidth: 280,
+          child: AerosResponsiveGrid.auto(
+            tileMinWidth: 280,
             equalHeights: true,
             children: [
               for (final page in pages)

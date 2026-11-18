@@ -45,8 +45,8 @@ const orders = <Order>[
 
 const cities = ['Ahmedabad', 'Bengaluru', 'Chennai', 'Delhi', 'Hyderabad', 'Kolkata', 'Mumbai', 'Pune'];
 
-/// 48200 → "₹ 48,200".
-String rupees(num amount) => '₹ ${grouped(amount.round())}';
+/// 48200 → "₹ 48,200"; 395350 → "₹ 3,95,350" (the rupee groups the Indian way).
+String rupees(num amount) => AerosAmountFormat.money(amount, currencySymbol: '₹ ', fractionDigits: 0);
 
 /// 12000 → "12,000".
 String grouped(int value) {

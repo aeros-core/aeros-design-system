@@ -101,11 +101,20 @@ class AerosRepeatingRows<T> extends StatelessWidget {
         if (_canAdd) ...[
           SizedBox(height: rowGap),
           Align(
-            alignment: Alignment.centerLeft,
-            child: AerosButton.ghost(
-              label: addLabel,
-              onPressed: onAdd,
-              size: AerosControlSize.sm,
+            alignment: AlignmentDirectional.centerStart,
+            // A ghost button has no edge of its own: pulled back by its
+            // padding, its plus sits on the rows' leading edge.
+            child: Transform.translate(
+              offset: Offset(
+                (Directionality.of(context) == TextDirection.rtl ? 1 : -1) * AerosControlSize.sm.padH,
+                0,
+              ),
+              child: AerosButton.ghost(
+                label: addLabel,
+                leading: const Icon(Icons.add),
+                onPressed: onAdd,
+                size: AerosControlSize.sm,
+              ),
             ),
           ),
         ],

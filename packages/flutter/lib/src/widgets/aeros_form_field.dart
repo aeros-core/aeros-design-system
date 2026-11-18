@@ -8,9 +8,10 @@ import '../tokens/typography.dart';
 ///
 /// Use it for inputs that don't already include their own label rendering
 /// (e.g. [AerosCheckbox], [AerosRadio], [AerosSwitch], date pickers,
-/// composite controls). [AerosTextField] and [AerosDropdownSearch] already
-/// render their own labels; passing them through this widget will double
-/// up — pass them directly instead.
+/// composite controls). [AerosTextField], [AerosSelect] and
+/// [AerosDropdownSearch] take `label` / `helperText` / `errorText` / `required`
+/// themselves (and draw them with this widget); passing them through it as
+/// well will double up — pass them directly instead.
 class AerosFormField extends StatelessWidget {
   const AerosFormField({
     super.key,
@@ -21,6 +22,7 @@ class AerosFormField extends StatelessWidget {
     this.required = false,
     this.trailing,
     this.labelGap = AerosSpacing.s2,
+    this.expand = true,
   });
 
   final Widget child;
@@ -36,6 +38,12 @@ class AerosFormField extends StatelessWidget {
   /// [AerosSpacing.s1_5], the gap [AerosTextField] has.
   final double labelGap;
 
+  /// True (the default) fills the width given, [child] included. False hugs
+  /// the content, start-aligned — for a group that is as wide as what it
+  /// holds (a row of chips), and the only form that works where the width is
+  /// unbounded.
+  final bool expand;
+
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
@@ -45,13 +53,15 @@ class AerosFormField extends StatelessWidget {
     final hasHelper = !hasError && helperText != null && helperText!.isNotEmpty;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: expand ? CrossAxisAlignment.stretch : CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         if (hasLabel) ...[
           Row(
+            mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
             children: [
-              Expanded(
+              Flexible(
+                fit: expand ? FlexFit.tight : FlexFit.loose,
                 child: RichText(
                   text: TextSpan(
                     text: label!,

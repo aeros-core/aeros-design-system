@@ -36,21 +36,21 @@ class _NavigationPageState extends State<NavigationPage> {
           'Tabs',
           note: 'Underline for the sections of a page; pill for a view switch inside a toolbar.',
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // The tab row is as wide as its tabs; on a narrow phone it scrolls.
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: AerosTabs(tabs: _tabs, selectedIndex: _tab, onChanged: (i) => setState(() => _tab = i)),
-              ),
+              // Fills the width; scrolls sideways by itself when the tabs do not fit.
+              AerosTabs(tabs: _tabs, selectedIndex: _tab, onChanged: (i) => setState(() => _tab = i)),
               const SizedBox(height: AerosSpacing.s3),
               Text('Showing: ${_tabs[_tab]}', style: AerosTypography.bodySm(color: a.fgSecondary)),
               const SizedBox(height: AerosSpacing.s6),
-              AerosTabs(
-                tabs: const ['Day', 'Week', 'Month'],
-                variant: AerosTabVariant.pill,
-                selectedIndex: _segment,
-                onChanged: (i) => setState(() => _segment = i),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: AerosTabs(
+                  tabs: const ['Day', 'Week', 'Month'],
+                  variant: AerosTabVariant.pill,
+                  selectedIndex: _segment,
+                  onChanged: (i) => setState(() => _segment = i),
+                ),
               ),
             ],
           ),
@@ -91,16 +91,12 @@ class _NavigationPageState extends State<NavigationPage> {
             children: [
               AerosPagination(page: _page, totalPages: 12, onChanged: (p) => setState(() => _page = p)),
               const SizedBox(height: AerosSpacing.s4),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: AerosPagination(
-                  page: _page,
-                  totalPages: 12,
-                  variant: AerosPaginationVariant.numbered,
-                  // Fewer page buttons on a phone: the row does not shrink by itself.
-                  maxVisiblePages: const AerosResponsiveValue<int>(xs: 3, sm: 5).resolve(context),
-                  onChanged: (p) => setState(() => _page = p),
-                ),
+              // Shows as many page numbers as fit, and the compact form when none do.
+              AerosPagination(
+                page: _page,
+                totalPages: 12,
+                variant: AerosPaginationVariant.numbered,
+                onChanged: (p) => setState(() => _page = p),
               ),
             ],
           ),
@@ -147,8 +143,8 @@ class _MiniShells extends StatelessWidget {
   const _MiniShells();
 
   @override
-  Widget build(BuildContext context) => const Tiles(
-        minWidth: 420,
+  Widget build(BuildContext context) => const AerosResponsiveGrid.auto(
+        tileMinWidth: 420,
         children: [
           _MiniShell(collapsed: false),
           _MiniShell(collapsed: true),
@@ -188,16 +184,9 @@ class _MiniShellState extends State<_MiniShell> {
         child: AerosViewportScope(
           width: AerosBreakpoints.lg,
           child: AerosScaffold(
-            topnav: AerosTopnav(
-              title: _selected,
-              actions: [
-                AerosButton.icon(
-                  icon: Icon(_collapsed ? Icons.menu : Icons.menu_open),
-                  semanticLabel: _collapsed ? 'Expand sidebar' : 'Collapse sidebar',
-                  onPressed: () => setState(() => _collapsed = !_collapsed),
-                ),
-              ],
-            ),
+            // The rail is this widget's state; the bar shows the toggle itself.
+            onRailCollapsedChanged: (collapsed) => setState(() => _collapsed = collapsed),
+            topnav: AerosTopnav(title: _selected),
             sidenav: AerosSidenav(
               collapsed: _collapsed,
               onExpandRequested: () => setState(() => _collapsed = false),

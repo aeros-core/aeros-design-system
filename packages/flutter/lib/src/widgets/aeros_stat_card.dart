@@ -58,6 +58,7 @@ class AerosStatCard extends StatelessWidget {
       AerosDelta.down => Icons.arrow_downward_rounded,
       AerosDelta.flat => Icons.remove_rounded,
     };
+    final h1 = AerosTypography.h1(color: a.fgPrimary);
     return MergeSemantics(
       child: AerosSurface(
         padding: const EdgeInsets.all(AerosSpacing.s4),
@@ -72,17 +73,20 @@ class AerosStatCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: AerosSpacing.s1),
-            // Shrink-to-fit so large values / narrow cards / big text scales never
-            // overflow the card horizontally.
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: AlignmentDirectional.centerStart,
-              child: Text(
-                value,
-                maxLines: 1,
-                style: mono
-                    ? AerosTypography.monoLg(color: a.fgPrimary, weight: FontWeight.w500)
-                    : AerosTypography.h1(color: a.fgPrimary),
+            // One height for both faces (the taller, `h1`), so the line under
+            // the value sits level across a row of cards, mono or not.
+            SizedBox(
+              height: MediaQuery.textScalerOf(context).scale(h1.fontSize!) * h1.height!,
+              // Shrink-to-fit so large values / narrow cards / big text scales never
+              // overflow the card horizontally.
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(
+                  value,
+                  maxLines: 1,
+                  style: mono ? AerosTypography.monoLg(color: a.fgPrimary, weight: FontWeight.w500) : h1,
+                ),
               ),
             ),
             if (delta != null) ...[

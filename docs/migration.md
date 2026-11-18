@@ -258,6 +258,15 @@ New: the JS export is fully typed, and `rawTokens` gives tokens.json as authored
 | `AerosSidenavDensity` `rowHeight` / `iconSize` / `labelSize` | Getters over the nav tokens; same values | Nothing, unless the enum was constructed with arguments |
 | `AerosFilterChip.touchTargetHeight` | `const`, 44 | A getter, 48 | Do not use it in a `const` expression |
 | `AerosTopnav.height` | 60 | Nullable; null is the density's header height (48 / 56) | Remove a hard-coded 60 |
+| `AerosTopnav` inside `AerosScaffold` | No automatic leading | With no `leading`, shows a menu button when the sidenav is in a drawer, and a collapse / expand button when the scaffold has `onRailCollapsedChanged` | Remove your own menu button, or pass `automaticallyImplyLeading: false` |
+| Opening the scaffold drawer | `Scaffold.of(context).openDrawer()` | `AerosScaffold.of(context).openDrawer()` / `closeDrawer()` / `toggleDrawer()`; `isSidenavInline` | Replace hand-rolled breakpoint checks and `Navigator.maybePop()` |
+| `AerosSidenavHeader.title` | `String` | `String?` (a `.custom(child:)` constructor holds any widget, e.g. the wordmark) | Null-check if you read the field |
+| `AerosSelect` `helper` / `error` | — | Deprecated aliases of `helperText` / `errorText` | Rename |
+| `AerosPageHeader` | Title wrapped without limit; actions overflowed on phones | Title cuts at 2 lines, subtitle at 3; actions move under the title when they do not fit | Remove manual narrow-screen handling |
+| `AerosPagination` numbered | Fixed width, overflowed on phones | Shrinks its page window, then falls back to compact; needs a bounded width | In a `Row`, wrap it in `Flexible` / `Expanded` |
+| `AerosTabs` underline | A plain row, overflowed | Scrolls horizontally and fills its width; arrow keys move focus with selection | Remove your own scroll view |
+| `AerosPriceBreakdown` amounts | Ungrouped ("₹6675.00") | Grouped by default (Indian grouping for ₹ / INR) | Pass `formatAmount` to keep another format |
+| `AerosStatCard(mono: true)` | — | 4px taller, so delta lines align across a row | Check fixed-height layouts |
 | `AerosThemeExtension` | `aliases`, `isDark` | Two more fields: `semantic`, `elevation` | A hand-built `AerosThemeExtension(aliases:, isDark:)` still compiles |
 
 ### 4.3 Widget changes

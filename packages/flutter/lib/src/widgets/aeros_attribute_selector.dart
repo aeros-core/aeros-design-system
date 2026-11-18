@@ -7,6 +7,7 @@ import 'aeros_attribute_models.dart';
 import 'aeros_enum_chips.dart';
 import 'aeros_enum_dropdown.dart';
 import 'aeros_file_upload_button.dart';
+import 'aeros_form_field.dart';
 import 'aeros_measurement_input.dart';
 import 'aeros_range_slider.dart';
 import 'aeros_switch.dart';
@@ -220,42 +221,33 @@ class _SwitchRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    final hasError = errorText != null && errorText!.isNotEmpty;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: RichText(
-                text: TextSpan(
-                  text: spec.label,
-                  style: AerosTypography.labelMd(color: a.fgPrimary),
-                  children: [
-                    if (spec.required)
-                      TextSpan(
-                        text: ' *',
-                        style: TextStyle(color: context.aerosSemantic.danger),
-                      ),
-                  ],
-                ),
+    // The label sits beside the switch, so it is drawn here; the message
+    // under the row is the form field's.
+    return AerosFormField(
+      errorText: errorText,
+      child: Row(
+        children: [
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                text: spec.label,
+                style: AerosTypography.labelMd(color: a.fgPrimary),
+                children: [
+                  if (spec.required)
+                    TextSpan(
+                      text: ' *',
+                      style: TextStyle(color: context.aerosSemantic.danger),
+                    ),
+                ],
               ),
             ),
-            AerosSwitch(
-              value: value,
-              onChanged: enabled ? onChanged : null,
-            ),
-          ],
-        ),
-        if (hasError) ...[
-          const SizedBox(height: AerosSpacing.s1),
-          Text(
-            errorText!,
-            style: AerosTypography.caption(color: context.aerosSemantic.dangerText),
+          ),
+          AerosSwitch(
+            value: value,
+            onChanged: enabled ? onChanged : null,
           ),
         ],
-      ],
+      ),
     );
   }
 }

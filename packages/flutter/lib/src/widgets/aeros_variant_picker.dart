@@ -163,8 +163,11 @@ class _VariantTile extends StatelessWidget {
     final hasColor = variant.swatchColor != null;
     return SizedBox(
       width: _swatchColumn,
+      // Start-aligned: the first swatch sits on the picker's leading edge,
+      // level with the label above and a row of chips.
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AnimatedContainer(
             duration: AerosStateLayer.duration(context),
@@ -206,7 +209,6 @@ class _VariantTile extends StatelessWidget {
             ),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
-            textAlign: TextAlign.center,
           ),
           if (showStockBadge && !variant.inStock)
             Text('Out', style: AerosTypography.caption(color: context.aerosSemantic.dangerText)),

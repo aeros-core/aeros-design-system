@@ -26,8 +26,8 @@ class _CardsPageState extends State<CardsPage> {
         Section(
           'Card',
           note: 'Header, body and footer are optional blocks divided by hairlines.',
-          child: Tiles(
-            minWidth: 300,
+          child: AerosResponsiveGrid.auto(
+            tileMinWidth: 300,
             equalHeights: true,
             children: [
               AerosCard(child: body('The plainest card: a padded surface.')),
@@ -60,8 +60,8 @@ class _CardsPageState extends State<CardsPage> {
         const Section(
           'Stat card',
           note: 'One number and how it moved. Mono for amounts.',
-          child: Tiles(
-            minWidth: 200,
+          child: AerosResponsiveGrid.auto(
+            tileMinWidth: 200,
             equalHeights: true,
             children: [
               AerosStatCard(label: 'Orders', value: '128', delta: '12% vs last month', deltaDirection: AerosDelta.up),
@@ -80,8 +80,8 @@ class _CardsPageState extends State<CardsPage> {
         Section(
           'Intent card',
           note: 'A choice between ways forward. One can be selected.',
-          child: Tiles(
-            minWidth: 280,
+          child: AerosResponsiveGrid.auto(
+            tileMinWidth: 280,
             equalHeights: true,
             children: [
               for (final (id, icon, title, subtitle, badge) in const [
@@ -103,8 +103,8 @@ class _CardsPageState extends State<CardsPage> {
         Section(
           'Empty state',
           note: 'What goes where the content will be: what is missing, and the way to add it.',
-          child: Tiles(
-            minWidth: 300,
+          child: AerosResponsiveGrid.auto(
+            tileMinWidth: 300,
             equalHeights: true,
             children: [
               AerosCard(

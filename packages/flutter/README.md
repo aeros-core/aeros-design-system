@@ -64,6 +64,8 @@ Controls are 24 / 28 / 32 / 36 / 40 high at pointer and 32 / 36 / 40 / 44 / 48 a
 
 ```dart
 AerosButton.primary(label: 'Create RFQ', onPressed: () {})
+// Every variant has a named constructor with the same options as the default one.
+AerosButton.secondary(label: 'Export', trailing: const Icon(Icons.expand_more), onPressed: () {})
 AerosButton.icon(icon: const Icon(Icons.edit), semanticLabel: 'Edit', onPressed: () {})
 
 AerosCard(
@@ -81,6 +83,29 @@ final ok = await AerosConfirmDialog.show(
   destructive: true,
 );
 ```
+
+The app shell is `AerosScaffold` with an `AerosTopnav` and an `AerosSidenav`. The sidenav is inline from the `md` breakpoint and in a drawer below it; the top bar shows the menu button itself, and anything below the scaffold reaches it with `AerosScaffold.of(context)` (`isSidenavInline`, `isDrawerOpen`, `openDrawer()`, `closeDrawer()`), the widget that builds it with a `GlobalKey<AerosScaffoldState>`:
+
+```dart
+final shell = GlobalKey<AerosScaffoldState>();
+
+AerosScaffold(
+  key: shell,
+  topnav: const AerosTopnav(title: 'Orders'),
+  sidenav: AerosSidenav(
+    header: const AerosSidenavHeader.custom(child: AerosWordmark(size: 20)),
+    items: [
+      AerosNavItem(label: 'Orders', icon: Icons.receipt_long_outlined, onTap: () {
+        // …navigate, then:
+        shell.currentState?.closeDrawer(); // a no-op while the sidenav is inline
+      }),
+    ],
+  ),
+  body: const AerosPageHeader(title: 'Orders'), // moves its actions under the title when they do not fit
+)
+```
+
+Fields share one vocabulary — `label`, `helperText`, `errorText`, `required` — on `AerosTextField`, `AerosSelect`, `AerosDropdownSearch` and the rest.
 
 Use the package's overlays, not Material's: `AerosDialog`, `AerosSheet`, `AerosMenu`, `AerosPopover`, `AerosSelect`, `AerosSnackbar`.
 

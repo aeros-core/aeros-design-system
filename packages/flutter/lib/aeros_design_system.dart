@@ -86,5 +86,6 @@ export 'src/widgets/aeros_measurement_input.dart';
 export 'src/widgets/aeros_file_upload_button.dart';
 export 'src/widgets/aeros_variant_picker.dart';
 export 'src/widgets/aeros_price_breakdown.dart';
+export 'src/widgets/aeros_amount_format.dart';
 export 'src/widgets/aeros_routing_signal_badge.dart';
 export 'src/widgets/aeros_constraint_error_alert.dart';

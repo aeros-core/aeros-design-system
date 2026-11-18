@@ -103,7 +103,7 @@ class _FieldsPageState extends State<FieldsPage> {
             children: [
               AerosSelect<String>(
                 label: 'Payment terms',
-                helper: 'Applies to every order from this buyer',
+                helperText: 'Applies to every order from this buyer',
                 value: _payment,
                 onChanged: (value) => setState(() => _payment = value),
                 items: const [
@@ -122,7 +122,7 @@ class _FieldsPageState extends State<FieldsPage> {
               AerosSelect<String>(
                 label: 'Currency',
                 placeholder: 'Select…',
-                error: 'Choose a currency',
+                errorText: 'Choose a currency',
                 required: true,
                 value: null,
                 onChanged: (_) {},
@@ -165,6 +165,7 @@ class _FieldsPageState extends State<FieldsPage> {
               ),
               AerosDropdownSearch<String>(
                 label: 'City (sheet)',
+                helperText: 'Where the order ships from',
                 hint: 'Select a city',
                 popupTitle: 'Choose a city',
                 items: cities,
@@ -181,6 +182,7 @@ class _FieldsPageState extends State<FieldsPage> {
                 itemAsString: (warehouse) => warehouse,
                 mode: AerosDropdownMode.menu,
                 required: true,
+                errorText: _warehouse == null ? 'Choose a warehouse' : null,
                 onChanged: (warehouse) => setState(() => _warehouse = warehouse),
               ),
             ],

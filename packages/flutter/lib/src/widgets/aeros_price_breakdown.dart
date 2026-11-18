@@ -8,6 +8,7 @@ import '../tokens/aeros_theme_tokens.g.dart';
 import '../tokens/spacing.dart';
 import '../tokens/states.dart';
 import '../tokens/typography.dart';
+import 'aeros_amount_format.dart';
 import 'aeros_attribute_models.dart';
 
 /// Collapsible price-breakdown card.
@@ -19,6 +20,12 @@ import 'aeros_attribute_models.dart';
 /// list. The discountable / non-discountable subtotal split is rendered with
 /// the [AerosPriceTone] colour tokens so buyers can see at a glance which
 /// pieces respond to bulk discounts and which (setup fees, shipping) don't.
+///
+/// Amounts are grouped and carry two decimals: Indian grouping for the rupee
+/// (`₹12,34,567.00`), thousands otherwise (`$1,234,567.00`), chosen from
+/// [AerosPriceBreakdownData.currencySymbol] (see [AerosAmountFormat.money]).
+/// Pass [formatAmount] to print them your own way — a locale-aware `intl`
+/// format, no decimals, the currency after the number.
 class AerosPriceBreakdown extends StatefulWidget {
   const AerosPriceBreakdown({
     super.key,
@@ -26,12 +33,17 @@ class AerosPriceBreakdown extends StatefulWidget {
     this.title = 'Price breakdown',
     this.initiallyExpanded = false,
     this.dense = false,
+    this.formatAmount,
   });
 
   final AerosPriceBreakdownData data;
   final String title;
   final bool initiallyExpanded;
   final bool dense;
+
+  /// Turns an amount into the text shown, sign and currency included. Null
+  /// uses [AerosAmountFormat.money] with the data's currency symbol.
+  final AerosAmountFormatter? formatAmount;
 
   @override
   State<AerosPriceBreakdown> createState() => _AerosPriceBreakdownState();
@@ -46,12 +58,8 @@ class _AerosPriceBreakdownState extends State<AerosPriceBreakdown> {
     _expanded = widget.initiallyExpanded;
   }
 
-  String _money(num n) {
-    final negative = n < 0;
-    final abs = n.abs();
-    final formatted = abs.toStringAsFixed(2);
-    return '${negative ? '−' : ''}${widget.data.currencySymbol}$formatted';
-  }
+  String _money(num n) =>
+      widget.formatAmount?.call(n) ?? AerosAmountFormat.money(n, currencySymbol: widget.data.currencySymbol);
 
   @override
   Widget build(BuildContext context) {
