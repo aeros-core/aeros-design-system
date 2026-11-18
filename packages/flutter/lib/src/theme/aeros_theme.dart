@@ -111,8 +111,8 @@ class AerosTheme {
       splashFactory: NoSplash.splashFactory,
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
-      // Raw Material widgets (and Aeros widgets not yet on AerosPressable) keep
-      // a hover tint — the same state overlay the foundation layer uses.
+      // Raw Material widgets in an app keep a hover tint — the same state
+      // overlay the foundation layer uses.
       hoverColor: aliases.stateHover,
       visualDensity: VisualDensity.standard,
       appBarTheme: AppBarTheme(

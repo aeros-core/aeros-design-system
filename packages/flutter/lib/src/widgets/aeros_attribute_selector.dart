@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/aeros_theme_extension.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 import 'aeros_attribute_models.dart';
@@ -229,8 +230,7 @@ class _SwitchRow extends StatelessWidget {
               child: RichText(
                 text: TextSpan(
                   text: spec.label,
-                  style: AerosTypography.bodyMd(color: a.fgPrimary)
-                      .withWeight(FontWeight.w600),
+                  style: AerosTypography.labelMd(color: a.fgPrimary),
                   children: [
                     if (spec.required)
                       TextSpan(
@@ -243,9 +243,7 @@ class _SwitchRow extends StatelessWidget {
             ),
             AerosSwitch(
               value: value,
-              onChanged: enabled && onChanged != null
-                  ? (v) => onChanged!(v)
-                  : (_) {},
+              onChanged: enabled ? onChanged : null,
             ),
           ],
         ),
@@ -268,8 +266,8 @@ class _LockedHint extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.lock_outline, size: 14, color: a.fgMuted),
-        const SizedBox(width: 6),
+        Icon(Icons.lock_outline, size: AerosSizeTokens.iconSm, color: a.fgMuted),
+        const SizedBox(width: AerosSpacing.s1_5),
         Text(
           'Locked by seller',
           style: AerosTypography.caption(color: a.fgMuted),

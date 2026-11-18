@@ -75,7 +75,28 @@ class AerosPressable extends StatefulWidget {
     this.toggled,
     this.selected,
     this.inMutuallyExclusiveGroup,
-  });
+  }) : _hoverOnly = false;
+
+  /// Only tracks the mouse: [builder] is told when a pointer is over it
+  /// (`AerosInteraction.hovered`) and nothing else. It takes no taps and no
+  /// focus and adds no semantics — for a row or card that changes on hover
+  /// but is not itself a control.
+  const AerosPressable.hover({super.key, required this.builder, this.cursor})
+      : onPressed = null,
+        onLongPress = null,
+        enabled = true,
+        focusNode = null,
+        autofocus = false,
+        expandHitTarget = false,
+        semanticLabel = null,
+        excludeSemantics = false,
+        button = false,
+        checked = null,
+        mixed = null,
+        toggled = null,
+        selected = null,
+        inMutuallyExclusiveGroup = null,
+        _hoverOnly = true;
 
   final AerosPressableBuilder builder;
 
@@ -107,6 +128,7 @@ class AerosPressable extends StatefulWidget {
   final bool? toggled;
   final bool? selected;
   final bool? inMutuallyExclusiveGroup;
+  final bool _hoverOnly;
 
   @override
   State<AerosPressable> createState() => _AerosPressableState();
@@ -180,6 +202,14 @@ class _AerosPressableState extends State<AerosPressable> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget._hoverOnly) {
+      return MouseRegion(
+        cursor: widget.cursor ?? MouseCursor.defer,
+        onEnter: (_) => _set(hovered: true),
+        onExit: (_) => _set(hovered: false),
+        child: widget.builder(context, AerosInteraction(hovered: _hovered)),
+      );
+    }
     final enabled = _enabled;
     final state = AerosInteraction(
       hovered: enabled && _hovered,

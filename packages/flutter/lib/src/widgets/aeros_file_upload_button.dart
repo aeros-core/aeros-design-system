@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import '../foundation/aeros_control_size.dart';
+import '../foundation/aeros_focus_ring.dart';
+import '../foundation/aeros_pressable.dart';
+import '../foundation/aeros_state_layer.dart';
+import '../foundation/aeros_surface.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/radii.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 import 'aeros_attribute_models.dart';
+import 'aeros_button.dart';
+import 'aeros_form_field.dart';
 
 /// Trigger button for an artwork / asset upload.
 ///
@@ -70,95 +77,80 @@ class _AerosFileUploadButtonState extends State<AerosFileUploadButton> {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
+    final semantic = context.aerosSemantic;
     final hasError = widget.errorText != null && widget.errorText!.isNotEmpty;
-    final borderColor = hasError ? context.aerosSemantic.danger : a.borderDefault;
+    final file = widget.value;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (widget.label != null) ...[
-          RichText(
-            text: TextSpan(
-              text: widget.label!,
-              style: AerosTypography.bodySm(color: a.fgSecondary)
-                  .withWeight(FontWeight.w600),
-              children: [
-                if (widget.required)
-                  TextSpan(
-                    text: ' *',
-                    style: TextStyle(color: context.aerosSemantic.danger),
-                  ),
-              ],
+    final Widget body;
+    if (file != null) {
+      body = _AttachedFile(
+        file: file,
+        formatBytes: _formatBytes,
+        onReplace: widget.enabled ? _pick : null,
+        onRemove: widget.enabled ? widget.onRemove : null,
+        busy: _busy,
+      );
+    } else {
+      body = AerosPressable(
+        onPressed: widget.enabled && !_busy ? _pick : null,
+        // A drop zone is far larger than the minimum target.
+        expandHitTarget: false,
+        builder: (context, state) => AerosFocusRing(
+          focused: state.focused,
+          radius: _radius,
+          tone: hasError ? AerosFocusRingTone.danger : AerosFocusRingTone.neutral,
+          child: CustomPaint(
+            painter: _DashedOutlinePainter(
+              color: hasError
+                  ? semantic.danger
+                  : state.hovered || state.pressed
+                      ? a.fgMuted
+                      : a.borderStrong,
             ),
-          ),
-          const SizedBox(height: AerosSpacing.s2),
-        ],
-        if (widget.value != null)
-          _AttachedFile(
-            file: widget.value!,
-            formatBytes: _formatBytes,
-            onReplace: widget.enabled ? _pick : null,
-            onRemove: widget.enabled ? widget.onRemove : null,
-            busy: _busy,
-          )
-        else
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: widget.enabled && !_busy ? _pick : null,
-              borderRadius: AerosRadii.brLg,
-              child: _DottedDashedBorder(
-                color: borderColor,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AerosSpacing.s4,
-                    AerosSpacing.s5,
-                    AerosSpacing.s4,
-                    AerosSpacing.s5,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _busy
-                          ? SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: a.fgPrimary,
-                              ),
-                            )
-                          : Icon(
-                              Icons.cloud_upload_outlined,
-                              size: 22,
-                              color: a.fgSecondary,
-                            ),
-                      const SizedBox(height: AerosSpacing.s2),
-                      Text(
-                        widget.hint,
-                        style: AerosTypography.bodyMd(color: a.fgPrimary)
-                            .withWeight(FontWeight.w600),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        widget.acceptHint,
-                        style: AerosTypography.caption(color: a.fgMuted),
-                      ),
-                    ],
-                  ),
+            child: AnimatedContainer(
+              duration: AerosStateLayer.duration(context),
+              curve: AerosStateLayer.curve,
+              decoration: BoxDecoration(
+                color: AerosStateLayer.resolve(
+                  a,
+                  Colors.transparent,
+                  hovered: state.hovered,
+                  pressed: state.pressed,
                 ),
+                borderRadius: _radius,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s4, vertical: AerosSpacing.s5),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox.square(
+                    dimension: AerosSizeTokens.iconLg,
+                    child: _busy
+                        ? CircularProgressIndicator(strokeWidth: AerosMetricTokens.borderThick, color: a.fgPrimary)
+                        : Icon(Icons.cloud_upload_outlined, size: AerosSizeTokens.iconLg, color: a.fgMuted),
+                  ),
+                  const SizedBox(height: AerosSpacing.s2),
+                  Text(widget.hint, textAlign: TextAlign.center, style: AerosTypography.labelSm(color: a.fgPrimary)),
+                  const SizedBox(height: AerosSpacing.s0_5),
+                  Text(
+                    widget.acceptHint,
+                    textAlign: TextAlign.center,
+                    style: AerosTypography.caption(color: a.fgMuted),
+                  ),
+                ],
               ),
             ),
           ),
-        if (hasError) ...[
-          const SizedBox(height: AerosSpacing.s1),
-          Text(
-            widget.errorText!,
-            style: AerosTypography.caption(color: context.aerosSemantic.dangerText),
-          ),
-        ],
-      ],
+        ),
+      );
+    }
+
+    return AerosFormField(
+      label: widget.label,
+      required: widget.required,
+      errorText: widget.errorText,
+      labelGap: AerosSpacing.s1_5,
+      child: widget.enabled ? body : Opacity(opacity: AerosMetricTokens.opacityDisabled, child: body),
     );
   }
 }
@@ -181,19 +173,11 @@ class _AttachedFile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AerosSpacing.s3,
-        vertical: AerosSpacing.s2,
-      ),
-      decoration: BoxDecoration(
-        color: a.bgSubtle,
-        borderRadius: AerosRadii.brMd,
-        border: Border.all(color: a.borderDefault),
-      ),
+    return AerosSurface(
+      padding: const EdgeInsetsDirectional.fromSTEB(AerosSpacing.s3, AerosSpacing.s2, AerosSpacing.s2, AerosSpacing.s2),
       child: Row(
         children: [
-          Icon(Icons.description_outlined, size: 22, color: a.fgSecondary),
+          Icon(Icons.description_outlined, size: AerosSizeTokens.iconLg, color: a.fgMuted),
           const SizedBox(width: AerosSpacing.s3),
           Expanded(
             child: Column(
@@ -202,32 +186,31 @@ class _AttachedFile extends StatelessWidget {
               children: [
                 Text(
                   file.name,
-                  style: AerosTypography.bodyMd(color: a.fgPrimary)
-                      .withWeight(FontWeight.w600),
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  style: AerosTypography.labelSm(color: a.fgPrimary),
                 ),
                 if (file.sizeBytes != null)
-                  Text(
-                    formatBytes(file.sizeBytes!),
-                    style: AerosTypography.caption(color: a.fgMuted),
-                  ),
+                  Text(formatBytes(file.sizeBytes!), style: AerosTypography.caption(color: a.fgMuted)),
               ],
             ),
           ),
-          if (onReplace != null)
-            TextButton(
-              onPressed: busy ? null : onReplace,
-              child: Text(
-                'Replace',
-                style: AerosTypography.bodySm(color: a.brandPrimary)
-                    .withWeight(FontWeight.w600),
-              ),
+          if (onReplace != null) ...[
+            const SizedBox(width: AerosSpacing.s2),
+            AerosButton(
+              label: 'Replace',
+              variant: AerosButtonVariant.ghost,
+              size: AerosControlSize.sm,
+              loading: busy,
+              onPressed: onReplace,
             ),
+          ],
           if (onRemove != null)
-            IconButton(
+            AerosButton.icon(
+              icon: const Icon(Icons.close),
+              semanticLabel: 'Remove',
+              size: AerosControlSize.sm,
               onPressed: busy ? null : onRemove,
-              tooltip: 'Remove',
-              icon: Icon(Icons.close, size: 18, color: a.fgMuted),
             ),
         ],
       ),
@@ -235,60 +218,33 @@ class _AttachedFile extends StatelessWidget {
   }
 }
 
-/// Lightweight dashed-border container used by the empty file-upload state.
-class _DottedDashedBorder extends StatelessWidget {
-  const _DottedDashedBorder({required this.color, required this.child});
+const BorderRadius _radius = BorderRadius.all(Radius.circular(AerosShapeTokens.surface));
+
+/// The dashed hairline of the empty drop zone — the same dash as
+/// [AerosEmptyState].
+class _DashedOutlinePainter extends CustomPainter {
+  const _DashedOutlinePainter({required this.color});
 
   final Color color;
-  final Widget child;
+
+  static const double _width = AerosMetricTokens.borderHairline;
+  static const double _dash = AerosSpacing.s1;
 
   @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: _DashedBorderDecoration(color: color),
-      child: child,
-    );
-  }
-}
-
-class _DashedBorderDecoration extends Decoration {
-  const _DashedBorderDecoration({required this.color});
-  final Color color;
-
-  @override
-  BoxPainter createBoxPainter([VoidCallback? onChanged]) =>
-      _DashedBorderPainter(color: color);
-}
-
-class _DashedBorderPainter extends BoxPainter {
-  _DashedBorderPainter({required this.color});
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
-    final size = configuration.size ?? Size.zero;
-    final rect = offset & size;
-    final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(12));
+  void paint(Canvas canvas, Size size) {
+    final rect = (Offset.zero & size).deflate(_width / 2);
+    final outline = Path()..addRRect(_radius.toRRect(rect));
     final paint = Paint()
-      ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2;
-
-    const dashWidth = 6.0;
-    const dashSpace = 4.0;
-    final path = Path()..addRRect(rrect);
-    final dashed = Path();
-    for (final metric in path.computeMetrics()) {
-      double distance = 0;
-      while (distance < metric.length) {
-        final next = distance + dashWidth;
-        dashed.addPath(
-          metric.extractPath(distance, next.clamp(0, metric.length)),
-          Offset.zero,
-        );
-        distance = next + dashSpace;
+      ..strokeWidth = _width
+      ..color = color;
+    for (final metric in outline.computeMetrics()) {
+      for (var at = 0.0; at < metric.length; at += _dash * 2) {
+        canvas.drawPath(metric.extractPath(at, at + _dash), paint);
       }
     }
-    canvas.drawPath(dashed, paint);
   }
+
+  @override
+  bool shouldRepaint(_DashedOutlinePainter old) => old.color != color;
 }

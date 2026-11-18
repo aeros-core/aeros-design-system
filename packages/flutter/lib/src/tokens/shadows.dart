@@ -6,8 +6,10 @@ import 'aeros_theme_tokens.g.dart';
 /// [AerosShadowTokens] (parsed from the `shadow` block in tokens.json by
 /// `pnpm build:tokens`), so web and Flutter cannot drift.
 ///
-/// Light-mode values; in dark mode elevation is carried by the lighter surface
-/// fills (bgSurface → bgElevated), not shadow — see the intents below.
+/// 3.0: resting surfaces carry a hairline and no shadow; floating layers take
+/// theirs from [AerosElevation] through `AerosSurface`. Nothing in the design
+/// system reads this class any more.
+@Deprecated('Use AerosElevation via context.aerosElevation')
 class AerosShadows {
   AerosShadows._();
 
@@ -25,12 +27,4 @@ class AerosShadows {
 
   /// A crisp 1px edge drawn as a shadow (no layout border).
   static const List<BoxShadow> hairline = AerosShadowTokens.hairline;
-
-  // ─── Brightness-aware intents ───
-  // Light mode floats surfaces with shadow; dark mode carries elevation via
-  // the lighter surface fills (bgSurface -> bgElevated), so shadows are off.
-  static List<BoxShadow> card(bool isDark) => isDark ? const [] : sm;
-  static List<BoxShadow> menu(bool isDark) => isDark ? const [] : lg;
-  static List<BoxShadow> dialog(bool isDark) => isDark ? const [] : xl;
-  static List<BoxShadow> popover(bool isDark) => isDark ? const [] : md;
 }

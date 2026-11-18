@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
+import '../foundation/aeros_control_size.dart';
+import '../foundation/aeros_focus_ring.dart';
+import '../foundation/aeros_pressable.dart';
+import '../foundation/aeros_state_layer.dart';
 import '../theme/aeros_theme_extension.dart';
-import '../tokens/radii.dart';
+import '../tokens/aeros_theme_tokens.g.dart';
 import '../tokens/spacing.dart';
 import '../tokens/states.dart';
 import '../tokens/typography.dart';
 import 'aeros_attribute_models.dart';
+import 'aeros_badge.dart';
+import 'aeros_form_field.dart';
 
 /// Single-select variant picker (size, colour, fabric, …).
 ///
-/// Renders one [AerosVariantOption] per chip / swatch with an in-stock badge
-/// derived from [AerosVariantOption.stockQty]. Tap selects; tapping the
+/// Renders one [AerosVariantOption] per chip / swatch with a stock badge
+/// derived from [AerosVariantOption.stockQty]. A chip is the same control as
+/// an [AerosEnumChips] chip; hover and press change the fill only, keyboard
+/// focus draws the focus ring. Tap selects; tapping the
 /// selected variant again is a no-op.
 ///
 /// Deep-linking is supported by the parent: pass the desired
@@ -39,52 +47,24 @@ class AerosVariantPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final a = context.aerosColors;
-    final hasError = errorText != null && errorText!.isNotEmpty;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        RichText(
-          text: TextSpan(
-            text: label,
-            style: AerosTypography.bodySm(color: a.fgSecondary)
-                .withWeight(FontWeight.w600),
-            children: [
-              if (required)
-                TextSpan(
-                  text: ' *',
-                  style: TextStyle(color: context.aerosSemantic.danger),
-                ),
-            ],
-          ),
-        ),
-        const SizedBox(height: AerosSpacing.s2),
-        Wrap(
-          spacing: AerosSpacing.s2,
-          runSpacing: AerosSpacing.s2,
-          children: [
-            for (final v in variants)
-              _VariantTile(
-                variant: v,
-                style: style,
-                showStockBadge: showStockBadge,
-                selected: v.id == selectedVariantId,
-                onTap: v.disabled || !v.inStock || onChanged == null
-                    ? null
-                    : () => onChanged!(v.id),
-              ),
-          ],
-        ),
-        if (hasError) ...[
-          const SizedBox(height: AerosSpacing.s1),
-          Text(
-            errorText!,
-            style: AerosTypography.caption(color: context.aerosSemantic.dangerText),
-          ),
+    return AerosFormField(
+      label: label,
+      required: required,
+      errorText: errorText,
+      child: Wrap(
+        spacing: AerosSpacing.s2,
+        runSpacing: AerosSpacing.s2,
+        children: [
+          for (final v in variants)
+            _VariantTile(
+              variant: v,
+              style: style,
+              showStockBadge: showStockBadge,
+              selected: v.id == selectedVariantId,
+              onTap: v.disabled || !v.inStock || onChanged == null ? null : () => onChanged!(v.id),
+            ),
         ],
-      ],
+      ),
     );
   }
 }
@@ -112,154 +92,145 @@ class _VariantTile extends StatelessWidget {
   final bool selected;
   final VoidCallback? onTap;
 
+  static const AerosControlSize _size = AerosControlSize.sm;
+
+  // No swatch-size token: the largest avatar (56) is the tile, and the
+  // column is one 2x step wider on each side.
+  static const double _swatch = AerosSizeTokens.avatarXl;
+  static const double _swatchColumn = _swatch + 2 * AerosSpacing.s2;
+
+  bool get _unavailable => variant.disabled || !variant.inStock;
+
   AerosSelectionState _state() {
-    if (variant.disabled) return AerosSelectionState.disabled;
-    if (!variant.inStock) return AerosSelectionState.disabled;
+    if (_unavailable) return AerosSelectionState.disabled;
     if (selected) return AerosSelectionState.selected;
     return AerosSelectionState.unselected;
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget? _stockBadge() {
+    if (!showStockBadge) return null;
+    if (!variant.inStock) return const AerosBadge(label: 'Out of stock', showDot: false);
+    final qty = variant.stockQty;
+    if (qty != null && qty > 0 && qty < 10) {
+      return AerosBadge(label: '$qty left', tone: AerosBadgeTone.warning, showDot: false);
+    }
+    return null;
+  }
+
+  Widget _chip(BuildContext context, AerosInteraction state, AerosSelectionPalette palette) {
     final a = context.aerosColors;
-    final palette = AerosSelectionPalette.of(context, _state());
-
-    Widget tile = switch (style) {
-      AerosVariantPickerStyle.chip => Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AerosSpacing.s3,
-            vertical: AerosSpacing.s2,
-          ),
-          decoration: BoxDecoration(
-            color: palette.background,
-            borderRadius: AerosRadii.brMd,
-            border: Border.all(
-              color: palette.border,
-              width: palette.borderWidth,
+    final badge = _stockBadge();
+    return AerosStateFill(
+      color: AerosStateLayer.resolve(a, palette.background, hovered: state.hovered, pressed: state.pressed),
+      borderColor: palette.border,
+      radius: _size.radius,
+      constraints: BoxConstraints.tightFor(height: _size.resolveHeight(context)),
+      padding: EdgeInsets.symmetric(horizontal: _size.padH - AerosMetricTokens.borderHairline),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (variant.swatchColor != null) ...[
+            Container(
+              width: _size.iconSize,
+              height: _size.iconSize,
+              decoration: BoxDecoration(
+                color: Color(variant.swatchColor!),
+                shape: BoxShape.circle,
+                border: Border.all(color: a.borderDefault, width: AerosMetricTokens.borderHairline),
+              ),
             ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (variant.swatchColor != null) ...[
-                Container(
-                  width: 14,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: Color(variant.swatchColor!),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: a.borderDefault),
-                  ),
-                ),
-                const SizedBox(width: AerosSpacing.s2),
-              ],
-              Text(
-                variant.label,
-                style: AerosTypography.bodySm(color: palette.foreground)
-                    .withWeight(FontWeight.w600),
-              ),
-              if (showStockBadge && !variant.inStock) ...[
-                const SizedBox(width: AerosSpacing.s2),
-                _Badge(label: 'Out of stock', tone: _BadgeTone.muted),
-              ] else if (showStockBadge &&
-                  variant.stockQty != null &&
-                  variant.stockQty! > 0 &&
-                  variant.stockQty! < 10) ...[
-                const SizedBox(width: AerosSpacing.s2),
-                _Badge(label: '${variant.stockQty} left', tone: _BadgeTone.amber),
-              ],
-            ],
-          ),
-        ),
-      AerosVariantPickerStyle.swatch => SizedBox(
-          width: 72,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: variant.swatchColor != null
-                      ? Color(variant.swatchColor!)
-                      : palette.background,
-                  borderRadius: AerosRadii.brMd,
-                  border: Border.all(
-                    color: palette.border,
-                    width: palette.borderWidth,
-                  ),
-                ),
-                alignment: Alignment.center,
-                child: variant.swatchColor == null
-                    ? Text(
-                        variant.label.isEmpty ? '?' : variant.label[0],
-                        style: AerosTypography.bodyMd(
-                          color: palette.foreground,
-                        ).withWeight(FontWeight.w800),
-                      )
-                    : null,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                variant.label,
-                style: AerosTypography.caption(color: palette.foreground)
-                    .withWeight(FontWeight.w600),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                textAlign: TextAlign.center,
-              ),
-              if (showStockBadge && !variant.inStock)
-                Text(
-                  'Out',
-                  style: AerosTypography.caption(color: context.aerosSemantic.dangerText),
-                ),
-            ],
-          ),
-        ),
-    };
-
-    return Tooltip(
-      message: variant.disabled && variant.disabledReason != null
-          ? variant.disabledReason!
-          : (!variant.inStock ? 'Out of stock' : ''),
-      triggerMode: TooltipTriggerMode.tap,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: AerosRadii.brMd,
-          child: tile,
-        ),
+            SizedBox(width: _size.gap),
+          ],
+          Text(variant.label, maxLines: 1, softWrap: false, style: _size.labelStyle(color: palette.foreground)),
+          if (badge != null) ...[
+            SizedBox(width: _size.gap),
+            badge,
+          ] else if (selected) ...[
+            SizedBox(width: _size.gap),
+            Icon(Icons.check_rounded, size: _size.iconSize, color: palette.foreground),
+          ],
+        ],
       ),
     );
   }
-}
 
-enum _BadgeTone { muted, amber }
-
-class _Badge extends StatelessWidget {
-  const _Badge({required this.label, required this.tone});
-  final String label;
-  final _BadgeTone tone;
+  Widget _swatchTile(BuildContext context, AerosInteraction state, AerosSelectionPalette palette) {
+    final a = context.aerosColors;
+    final hasColor = variant.swatchColor != null;
+    return SizedBox(
+      width: _swatchColumn,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedContainer(
+            duration: AerosStateLayer.duration(context),
+            curve: AerosStateLayer.curve,
+            width: _swatch,
+            height: _swatch,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: hasColor
+                  ? Color(variant.swatchColor!)
+                  : AerosStateLayer.resolve(a, palette.background, hovered: state.hovered, pressed: state.pressed),
+              borderRadius: _size.radius,
+              // A swatch is a sample, not a control: the chosen one is marked
+              // with the thick border so it reads over any colour.
+              border: Border.all(
+                color: selected
+                    ? a.fgPrimary
+                    : state.hovered || state.pressed
+                        ? a.borderStrong
+                        : a.borderDefault,
+                width: selected ? AerosMetricTokens.borderThick : AerosMetricTokens.borderHairline,
+              ),
+            ),
+            child: hasColor
+                ? null
+                : Text(
+                    variant.label.isEmpty ? '?' : variant.label[0],
+                    style: AerosTypography.labelMd(color: palette.foreground),
+                  ),
+          ),
+          const SizedBox(height: AerosSpacing.s1),
+          Text(
+            variant.label,
+            style: AerosTypography.caption(
+              color: _unavailable ? a.fgMuted : a.fgPrimary,
+              weight: selected ? FontWeight.w500 : null,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            textAlign: TextAlign.center,
+          ),
+          if (showStockBadge && !variant.inStock)
+            Text('Out', style: AerosTypography.caption(color: context.aerosSemantic.dangerText)),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final a = context.aerosColors;
-    final (bg, fg) = switch (tone) {
-      _BadgeTone.muted => (a.bgSubtle, a.fgMuted),
-      _BadgeTone.amber => (context.aerosSemantic.warningBg, context.aerosSemantic.warningText),
-    };
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label,
-        style: AerosTypography.caption(color: fg)
-            .copyWith(fontSize: 10, height: 1).withWeight(FontWeight.w700),
+    final palette = AerosSelectionPalette.of(context, _state());
+    final swatch = style == AerosVariantPickerStyle.swatch;
+
+    final tile = AerosPressable(
+      onPressed: onTap,
+      selected: selected,
+      inMutuallyExclusiveGroup: true,
+      // The swatch tile is larger than any minimum target already.
+      expandHitTarget: !swatch,
+      builder: (context, state) => AerosFocusRing(
+        focused: state.focused,
+        radius: _size.radius,
+        child: swatch ? _swatchTile(context, state, palette) : _chip(context, state, palette),
       ),
     );
+
+    final reason = variant.disabled && variant.disabledReason != null
+        ? variant.disabledReason!
+        : (!variant.inStock ? 'Out of stock' : '');
+    if (reason.isEmpty) return tile;
+    return Tooltip(message: reason, triggerMode: TooltipTriggerMode.tap, child: tile);
   }
 }
