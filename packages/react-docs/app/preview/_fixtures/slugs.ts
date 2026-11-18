@@ -50,6 +50,22 @@ export const FIXTURE_SLUGS = [
   "pagination",
   "command",
   "calendar",
+  "data-table",
+  "toggle",
+  "segmented-control",
+  "collapsible",
+  "scroll-area",
+  "count-badge",
+  "filter-chip",
+  "kbd",
+  "page-header",
+  "file-upload",
+  "stepper",
+  "combobox",
+  "combobox-open",
+  "date-picker",
+  "date-picker-open",
+  "number-input",
 ] as const;
 
 export type FixtureSlug = (typeof FIXTURE_SLUGS)[number];

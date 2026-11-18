@@ -111,7 +111,7 @@ describe("Button", () => {
 });
 
 describe("Table semantics", () => {
-  it("sets scope, aria-sort and selected state", () => {
+  it("sets scope and aria-sort, and marks a selected row without aria-selected", () => {
     render(
       <Table>
         <Thead>
@@ -132,7 +132,11 @@ describe("Table semantics", () => {
     expect(sorted).toHaveAttribute("scope", "col");
     expect(sorted).toHaveAttribute("aria-sort", "ascending");
     expect(plain).not.toHaveAttribute("aria-sort");
-    expect(screen.getByRole("row", { selected: true })).toBeInTheDocument();
+    // A selected row is marked for styling only: aria-selected is invalid on a
+    // row of a plain table, so the row's own control carries the state.
+    const selected = screen.getAllByRole("row").filter((row) => row.hasAttribute("data-selected"));
+    expect(selected).toHaveLength(1);
+    expect(selected[0]).not.toHaveAttribute("aria-selected");
   });
 });
 

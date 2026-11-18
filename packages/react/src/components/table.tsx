@@ -42,7 +42,11 @@ export const Tbody = React.forwardRef<HTMLTableSectionElement, React.HTMLAttribu
 Tbody.displayName = "Tbody";
 
 export interface TrProps extends React.HTMLAttributes<HTMLTableRowElement> {
-  /** Marks the row as selected (`aria-selected` + persistent tint). */
+  /**
+   * Marks the row as selected (persistent tint, `data-selected`). It does not set
+   * `aria-selected`: that attribute is invalid on a row of a plain table — expose
+   * the state through the row's own control (a checkbox) instead.
+   */
   selected?: boolean;
 }
 
@@ -50,7 +54,6 @@ export const Tr = React.forwardRef<HTMLTableRowElement, TrProps>(
   ({ className, selected, ...props }, ref) => (
     <tr
       ref={ref}
-      aria-selected={selected || undefined}
       data-selected={selected || undefined}
       className={cn(
         "hover:[&>td]:bg-state-hover [&>td]:transition-colors [&>td]:duration-quick",
@@ -82,7 +85,7 @@ export const Th = React.forwardRef<HTMLTableCellElement, ThProps>(
           : undefined
       }
       className={cn(
-        "whitespace-nowrap border-b border-border-default text-left text-label-xs text-fg-muted",
+        "whitespace-nowrap border-b border-border-default text-start text-label-xs text-fg-muted",
         sortable ? "p-0" : "h-control-lg px-3",
         className
       )}
@@ -101,11 +104,11 @@ export const Th = React.forwardRef<HTMLTableCellElement, ThProps>(
         >
           {children}
           {sortDirection === "asc" ? (
-            <ArrowUp className="h-3 w-3" aria-hidden />
+            <ArrowUp className="size-icon-xs" aria-hidden />
           ) : sortDirection === "desc" ? (
-            <ArrowDown className="h-3 w-3" aria-hidden />
+            <ArrowDown className="size-icon-xs" aria-hidden />
           ) : (
-            <ArrowUpDown className="h-3 w-3 opacity-50" aria-hidden />
+            <ArrowUpDown className="size-icon-xs opacity-muted" aria-hidden />
           )}
         </button>
       ) : (
@@ -137,14 +140,19 @@ export interface TableStateRowProps extends React.HTMLAttributes<HTMLTableRowEle
   colSpan: number;
 }
 
-export const TableLoadingRow = ({ colSpan, className, children, ...props }: TableStateRowProps) => (
+export interface TableLoadingRowProps extends TableStateRowProps {
+  /** What assistive tech hears. Defaults to "Loading table data". */
+  statusLabel?: string;
+}
+
+export const TableLoadingRow = ({ colSpan, className, children, statusLabel = "Loading table data", ...props }: TableLoadingRowProps) => (
   <tr {...props}>
     <td colSpan={colSpan} className={cn("px-3 py-10 text-center", className)}>
       <span className="inline-flex items-center gap-2 text-body-sm text-fg-muted">
         <Spinner size="sm" label="" aria-hidden />
         {children ?? "Loading…"}
       </span>
-      <span className="sr-only" role="status">Loading table data</span>
+      <span className="sr-only" role="status">{statusLabel}</span>
     </td>
   </tr>
 );

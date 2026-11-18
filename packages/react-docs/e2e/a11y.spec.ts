@@ -47,6 +47,12 @@ const KNOWN_VIOLATIONS: Partial<Record<FixtureSlug, Partial<Record<Theme, string
     light: ["label-content-name-mismatch"],
     dark: ["label-content-name-mismatch"],
   },
+
+  // Same cause as `calendar`: the range picker's open popover contains it.
+  "date-picker-open": {
+    light: ["label-content-name-mismatch"],
+    dark: ["label-content-name-mismatch"],
+  },
 };
 
 for (const slug of FIXTURE_SLUGS) {
