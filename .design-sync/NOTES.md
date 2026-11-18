@@ -2,7 +2,13 @@
 
 Repo-specific gotchas for syncing `@aeros-core/react` to Claude Design. Read this before a re-sync.
 
-Inputs were brought up to **Design System 3.0.0** on 2026-11-18. The section "3.0 re-sync" at the end lists what changed and what the first 3.0 sync has to do in the project.
+Inputs were brought up to **Design System 3.0.0** on 2026-11-18.
+
+## Status: `/design-sync` cannot reach the project (2026-11-19)
+- The Claude Design project in `config.json` (`197959a9…`) **moved to Claude**. It is now the design system at https://claude.ai/code/artifact/716ee6ad-ab79-4f96-bce9-da504889b400, and the server refuses `/design-sync` uploads to it ("/design-sync can't send updates to Claude yet"). Standalone Claude Design closes by 2026-12-14.
+- **The repository and the showcase site are the source of truth.** The design system in Claude is a viewing copy. It was updated to 3.0.0 by hand on 2026-11-19 (bundle, tokens, component pages and previews built from these inputs and published to the artifact directly), and it does not update itself.
+- These inputs are kept so a sync can resume if `/design-sync` gains support for moved design systems. Until then nothing here runs. Check `get_project` on the project id before trying: a `moveState` in the result means it is still refused.
+- The rest of this file describes the `/design-sync` pipeline as it worked against standalone Claude Design.
 
 ## Shape & scope
 - Shape: **package** (no Storybook). 3.0 exports **176 PascalCase symbols**: about 56 primary components and their compound sub-parts (Card, Table, Dialog, AlertDialog, Drawer, Popover, DropdownMenu, Select, Command, Tabs, Accordion, Collapsible, Toast, Sidebar, AppShell / AppHeader, Tooltip families). The inventory is `docs/components.md` (React column), written from `packages/react/src/index.ts`.
@@ -70,4 +76,4 @@ What changed in the inputs, so the incremental sync knows what to expect in the 
 - **Renamed:** `TopNav`, `TopNavBrand`, `TopNavLinks`, `TopNavLink`, `TopNavRight` are gone; the replacements are `AppHeader`, `AppHeaderBrand`, `AppHeaderNav`, `AppHeaderLink`, `AppHeaderActions`, plus the new `AppHeaderTitle`. The five `TopNav*` component folders in the project must be **deleted**, not left beside the new ones.
 - **Added:** about 100 exports across the new families: AppShell, DataTable, Combobox / MultiCombobox, DatePicker / DateRangePicker / Calendar, NumberInput, FileUpload, Command, AlertDialog, Drawer, Popover, Toast, Accordion, Collapsible, Pagination, Stepper, PageHeader, Toggle / ToggleGroup / SegmentedControl, FilterChip, CountBadge, Kbd, Label, Separator, Spinner, Skeleton, ScrollArea, and the new Sidebar parts.
 - **Changed everywhere:** every existing card re-renders (new ramp, radii, flat surfaces, sizes, type scale), so expect the whole project to be rewritten, not a small diff. `styles.css` / `_ds_bundle.css`, the README header (`conventions.md`) and the three guidelines files all change.
-- The previews type-check against the 3.0 build and the CSS compiles, but the 3.0 inputs **have not been through the render check or uploaded** as of 2026-11-18. Treat every card as unverified until `/design-sync` has run.
+- The previews type-check against the 3.0 build and the CSS compiles. They have **not been through the `/design-sync` render check** (see Status above). All 56 did render without errors on React 18 in a local copy of the artifact's preview frame on 2026-11-19.
