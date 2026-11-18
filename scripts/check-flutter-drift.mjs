@@ -92,10 +92,16 @@ for (const [role, s] of Object.entries(tokens.text)) {
   }
   expectIn(THEME, block, "package: 'aeros_design_system'", `text.${role} resolves the bundled font`);
 }
-for (const [set, suffix] of [["shadow", ""], ["shadowDark", "Dark"]]) {
-  for (const k of Object.keys(tokens[set])) {
-    expectIn(THEME, theme, `static const List<BoxShadow> ${camel(k)}${suffix} =`, `${set}.${k}`);
-  }
+for (const k of Object.keys(tokens.elevation.light)) {
+  expectIn(THEME, theme, `final List<BoxShadow> ${camel(k)};`, `elevation.${k}`);
+}
+expectIn(THEME, theme, "static const AerosElevation light = AerosElevation(", "AerosElevation.light");
+expectIn(THEME, theme, "static const AerosElevation dark = AerosElevation(", "AerosElevation.dark");
+for (const d of ["pointer", "touch"]) {
+  expectIn(THEME, theme, `static const AerosSizeTokens ${d} = AerosSizeTokens(`, `AerosSizeTokens.${d}`);
+}
+for (const k of Object.keys(tokens.shape)) {
+  expectIn(THEME, theme, `static const double ${camel(k)} = `, `shape.${k}`);
 }
 
 // (b) adoption — hand token files must alias the generated constants.
@@ -105,8 +111,7 @@ const ADOPT = {
   "spacing.dart": "AerosTokens.",
   "radii.dart": "AerosTokens.",
   "breakpoints.dart": "AerosTokens.",
-  "motion.dart": "AerosTokens.",
-  "shadows.dart": "AerosShadowTokens."
+  "motion.dart": "AerosTokens."
 };
 for (const [file, ref] of Object.entries(ADOPT)) {
   const src = read(file);

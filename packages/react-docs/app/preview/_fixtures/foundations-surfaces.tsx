@@ -55,34 +55,27 @@ const BORDERS = [
   ["border-border-focus", "border-focus"],
 ] as const;
 
+// Elevation intents — resting surfaces carry a hairline and no shadow.
 const SHADOWS = [
-  ["shadow-hairline", "shadow-hairline"],
-  ["shadow-xs", "shadow-xs"],
-  ["shadow-sm", "shadow-sm"],
-  ["shadow-md", "shadow-md"],
-  ["shadow-lg", "shadow-lg"],
-  ["shadow-xl", "shadow-xl"],
-  ["shadow-focus", "shadow-focus"],
-  ["shadow-focus-danger", "shadow-focus-danger"],
-  ["shadow-focus-success", "shadow-focus-success"],
+  ["border border-border-default", "resting (hairline)"],
+  ["shadow-raised", "shadow-raised"],
+  ["shadow-overlay", "shadow-overlay"],
+  ["shadow-modal", "shadow-modal"],
 ] as const;
 
+// Semantic radii — what components use.
 const RADII = [
-  ["rounded-none", "none"],
-  ["rounded-xs", "xs"],
-  ["rounded-sm", "sm"],
-  ["rounded-md", "md"],
-  ["rounded-lg", "lg"],
-  ["rounded-xl", "xl"],
-  ["rounded-2xl", "2xl"],
-  ["rounded-3xl", "3xl"],
-  ["rounded-full", "full"],
+  ["rounded-item", "item · 4"],
+  ["rounded-control", "control · 6"],
+  ["rounded-surface", "surface · 8"],
+  ["rounded-modal", "modal · 12"],
+  ["rounded-pill", "pill"],
 ] as const;
 
 function Swatch({ cls, name }: { cls: string; name: string }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <div className={"h-14 w-full rounded-lg border border-border-default " + cls} />
+      <div className={"h-14 w-full rounded-surface border border-border-default " + cls} />
       <div className="font-mono text-[11px] text-fg-primary">{name}</div>
     </div>
   );
@@ -109,7 +102,7 @@ export default function FoundationsSurfacesFixture() {
       <Group label="Borders" className="grid grid-cols-2 items-stretch gap-4 sm:grid-cols-4">
         {BORDERS.map(([cls, name]) => (
           <div key={cls} className="flex flex-col gap-1.5">
-            <div className={"h-14 w-full rounded-lg border-2 bg-bg-surface " + cls} />
+            <div className={"h-14 w-full rounded-surface border-2 bg-bg-surface " + cls} />
             <div className="font-mono text-[11px] text-fg-primary">{name}</div>
           </div>
         ))}
@@ -117,7 +110,7 @@ export default function FoundationsSurfacesFixture() {
       <Group label="Shadows (on bg-surface)" className="grid grid-cols-2 items-stretch gap-8 p-4 sm:grid-cols-3">
         {SHADOWS.map(([cls, name]) => (
           <div key={cls} className="flex flex-col gap-3">
-            <div className={"h-16 w-full rounded-lg bg-bg-surface " + cls} />
+            <div className={"h-16 w-full rounded-surface bg-bg-surface " + cls} />
             <div className="font-mono text-[11px] text-fg-primary">{name}</div>
           </div>
         ))}

@@ -60,7 +60,7 @@ class _AerosThinkingOrbState extends State<AerosThinkingOrb>
   late final AnimationController _entrance =
       AnimationController(vsync: this, duration: AerosMotion.slow);
   late final Animation<double> _entranceCurve =
-      CurvedAnimation(parent: _entrance, curve: AerosMotion.entrance);
+      CurvedAnimation(parent: _entrance, curve: AerosMotion.enter);
 
   @override
   void didChangeDependencies() {

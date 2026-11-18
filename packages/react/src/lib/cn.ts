@@ -16,7 +16,7 @@ const twMerge = extendTailwindMerge<"z" | "duration">({
     theme: {
       text: keys(tokens.text),
       radius: [...keys(tokens.radius), ...keys(tokens.shape)],
-      shadow: [...keys(tokens.shadow), ...keys(tokens.elevation.light)],
+      shadow: keys(tokens.elevation.light),
       ease: keys(tokens.motion.ease),
       spacing: [...sizeNames, "sidebar", "sidebar-rail", "sidebar-mobile"]
     },

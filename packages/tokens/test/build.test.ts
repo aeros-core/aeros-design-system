@@ -113,7 +113,6 @@ describe("emitters (real tokens.json)", () => {
       expect(css.split(`--aeros-${k}: `).length - 1, k).toBe(3);
     }
     expect(Object.keys(tokens.alias.dark).sort()).toEqual(Object.keys(tokens.alias.light).sort());
-    expect(Object.keys(tokens.shadowDark).sort()).toEqual(Object.keys(tokens.shadow).sort());
   });
 
   it("Tailwind theme resets the default palette and maps every alias inline", () => {
@@ -123,7 +122,6 @@ describe("emitters (real tokens.json)", () => {
     expect(theme).toContain("@custom-variant dark {");
     for (const k of Object.keys(tokens.alias.light)) expect(theme).toContain(`--color-${k}: var(--aeros-${k});`);
     for (const k of Object.keys(tokens.color.semantic)) expect(theme).toContain(`--color-${k}: var(--aeros-color-semantic-${k});`);
-    for (const k of Object.keys(tokens.shadow)) expect(theme).toContain(`--shadow-${k}: var(--aeros-shadow-${k});`);
     // no hue other than the neutral ramp and black/white is defined statically
     const staticColours = [...theme.matchAll(/--color-([a-z]+)[-:]/g)].map((m) => m[1]);
     expect(new Set(staticColours)).toEqual(
@@ -178,7 +176,7 @@ describe("emitters (real tokens.json)", () => {
     expect(dts).not.toContain(": any");
   });
 
-  it("Dart output covers every alias, status colour, text role and shadow", () => {
+  it("Dart output covers every alias, status colour and text role", () => {
     const base = buildDartTokens(tokens);
     const theme = buildDartTheme(tokens);
     for (const k of Object.keys(tokens.alias.light)) {
@@ -189,11 +187,6 @@ describe("emitters (real tokens.json)", () => {
     for (const role of Object.keys(tokens.text)) {
       const name = role.replace(/-([a-z0-9])/g, (_m: string, c: string) => c.toUpperCase());
       expect(theme).toContain(`static const TextStyle ${name} = TextStyle(`);
-    }
-    for (const k of Object.keys(tokens.shadow)) {
-      const name = k.replace(/-([a-z0-9])/g, (_m: string, c: string) => c.toUpperCase());
-      expect(theme).toContain(`static const List<BoxShadow> ${name} =`);
-      expect(theme).toContain(`static const List<BoxShadow> ${name}Dark =`);
     }
     // sans styles pin the variable-font axes and resolve the bundled family
     expect(theme).toMatch(/package: 'aeros_design_system',\n\s+fontSize: 14\.0,/);

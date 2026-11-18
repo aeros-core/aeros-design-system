@@ -13,7 +13,7 @@ describe("cn", () => {
     expect(cn("text-fg-muted", "text-fg-primary")).toBe("text-fg-primary");
     expect(cn("rounded-md", "rounded-control")).toBe("rounded-control");
     expect(cn("rounded-control", "rounded-full")).toBe("rounded-full");
-    expect(cn("shadow-sm", "shadow-overlay")).toBe("shadow-overlay");
+    expect(cn("shadow-raised", "shadow-overlay")).toBe("shadow-overlay");
   });
 
   it("merges token-named sizes, z-index, duration and easing", () => {

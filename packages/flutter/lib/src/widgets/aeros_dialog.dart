@@ -121,7 +121,7 @@ class AerosDialog extends StatelessWidget {
         transitionBuilder: (context, animation, _, child) {
           final curved = CurvedAnimation(
             parent: animation,
-            curve: AerosMotion.decelerate,
+            curve: AerosMotion.enter,
             reverseCurve: AerosMotion.standard,
           );
           return FadeTransition(

@@ -3,7 +3,7 @@
 import { Calendar } from "@aeros-core/react";
 import { FIXED_MONTH, FIXED_TODAY, Group } from "./kit";
 
-const box = "inline-block rounded-xl border border-border-default bg-bg-surface shadow-sm";
+const box = "inline-block rounded-xl border border-border-default bg-bg-surface ";
 
 // Everything is pinned to August 2026: `month` (controlled, so the grid can
 // never drift) and `today` (so the "today" style does not follow the clock).

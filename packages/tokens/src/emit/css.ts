@@ -15,11 +15,10 @@ export function buildCss(tokens: Tokens): string {
   const light = tokens.alias.light as Record<string, string>;
   const dark = tokens.alias.dark as Record<string, string>;
 
-  const themed = (indent: string, aliases: Record<string, string>, set: "semantic" | "semanticDark", shadows: Record<string, string>, scheme: "light" | "dark") => {
+  const themed = (indent: string, aliases: Record<string, string>, set: "semantic" | "semanticDark", scheme: "light" | "dark") => {
     L.push(`${indent}color-scheme: ${scheme};`);
     for (const [k, v] of Object.entries(aliases)) L.push(`${indent}--aeros-${k}: ${v};`);
     for (const [k, v] of Object.entries(semantic(tokens, set))) L.push(`${indent}--aeros-color-semantic-${k}: ${v};`);
-    for (const [k, v] of Object.entries(shadows)) L.push(`${indent}--aeros-shadow-${k}: ${v};`);
     for (const [k, v] of Object.entries(tokens.elevation[scheme])) L.push(`${indent}--aeros-elevation-${k}: ${v};`);
   };
 
@@ -65,7 +64,7 @@ export function buildCss(tokens: Tokens): string {
 
   L.push("/* Light (default) */");
   L.push(":root, [data-theme='light'] {");
-  themed("  ", light, "semantic", tokens.shadow, "light");
+  themed("  ", light, "semantic", "light");
   L.push("}");
   L.push("");
 
@@ -73,14 +72,14 @@ export function buildCss(tokens: Tokens): string {
   // values carry their own light hairline.
   L.push("/* Dark */");
   L.push("[data-theme='dark'] {");
-  themed("  ", dark, "semanticDark", tokens.shadowDark, "dark");
+  themed("  ", dark, "semanticDark", "dark");
   L.push("}");
   L.push("");
 
   L.push("/* System — opt in with data-theme=\"system\"; follows the OS setting. */");
   L.push("@media (prefers-color-scheme: dark) {");
   L.push("  [data-theme='system'] {");
-  themed("    ", dark, "semanticDark", tokens.shadowDark, "dark");
+  themed("    ", dark, "semanticDark", "dark");
   L.push("  }");
   L.push("}");
   L.push("");
@@ -90,17 +89,5 @@ export function buildCss(tokens: Tokens): string {
   L.push("}");
   L.push("");
 
-  // Type scale utility classes (.aeros-text-<role>) — kept for 2.x consumers.
-  L.push("/* Type scale — utility classes (.aeros-text-<role>) */");
-  for (const [name, s] of Object.entries(tokens.text as Record<string, Tokens>)) {
-    L.push(`.aeros-text-${name} {`);
-    L.push(`  font-family: ${s.family === "mono" ? "var(--aeros-font-mono)" : "var(--aeros-font-sans)"};`);
-    L.push(`  font-size: ${s.size}px;`);
-    L.push(`  font-weight: ${s.weight};`);
-    L.push(`  line-height: ${s.lineHeight};`);
-    L.push(`  letter-spacing: ${s.tracking};`);
-    if (s.transform) L.push(`  text-transform: ${s.transform};`);
-    L.push("}");
-  }
   return L.join("\n") + "\n";
 }

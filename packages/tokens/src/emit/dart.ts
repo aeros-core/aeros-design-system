@@ -129,7 +129,7 @@ function shadowList(value: string, label: string): string {
 
 /**
  * aeros_theme_tokens.g.dart — typed, theme-aware classes built on AerosTokens:
- * alias + status colour sets, the type scale and shadows. Generated whole, so a
+ * alias + status colour sets, the type scale, elevation, sizes and metrics. Generated whole, so a
  * token added to tokens.json appears in Dart without a hand edit.
  */
 export function buildDartTheme(tokens: Tokens): string {
@@ -192,20 +192,6 @@ export function buildDartTheme(tokens: Tokens): string {
       L.push(`    fontVariations: [FontVariation('wght', ${num(Number(s.weight))}), FontVariation('opsz', ${num(Number(opsz))})],`);
     }
     L.push("  );");
-  }
-  L.push("}");
-  L.push("");
-
-  L.push("/// Shadows (`shadow` / `shadowDark` in tokens.json), parsed from the CSS values.");
-  L.push("class AerosShadowTokens {");
-  L.push("  AerosShadowTokens._();");
-  L.push("");
-  for (const [k, v] of Object.entries(tokens.shadow as Record<string, string>)) {
-    L.push(`  static const List<BoxShadow> ${camel(k)} = ${shadowList(v, `shadow.${k}`)};`);
-  }
-  L.push("");
-  for (const [k, v] of Object.entries(tokens.shadowDark as Record<string, string>)) {
-    L.push(`  static const List<BoxShadow> ${camel(k)}Dark = ${shadowList(v, `shadowDark.${k}`)};`);
   }
   L.push("}");
   L.push("");

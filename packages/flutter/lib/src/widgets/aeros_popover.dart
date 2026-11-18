@@ -349,7 +349,7 @@ class _AerosPopoverRoute<T> extends PopupRoute<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    final curved = CurvedAnimation(parent: animation, curve: AerosMotion.decelerate, reverseCurve: AerosMotion.standard);
+    final curved = CurvedAnimation(parent: animation, curve: AerosMotion.enter, reverseCurve: AerosMotion.standard);
     return FadeTransition(
       opacity: curved,
       child: ScaleTransition(scale: Tween<double>(begin: _enterScale, end: 1).animate(curved), child: child),

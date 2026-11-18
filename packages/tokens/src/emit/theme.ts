@@ -78,8 +78,6 @@ export function buildTheme(tokens: Tokens): string {
   L.push("  /* Aliases */");
   for (const k of Object.keys(tokens.alias.light)) L.push(`  --color-${k}: var(--aeros-${k});`);
   L.push("");
-  for (const k of Object.keys(tokens.shadow)) L.push(`  --shadow-${k}: var(--aeros-shadow-${k});`);
-  L.push("");
   for (const k of Object.keys(tokens.motion.ease)) L.push(`  --ease-${k}: var(--aeros-ease-${k});`);
   for (const k of Object.keys(tokens.motion.duration)) L.push(`  --transition-duration-${k}: var(--aeros-duration-${k});`);
   L.push("");

@@ -7,7 +7,6 @@ export 'src/tokens/colors.dart';
 export 'src/tokens/typography.dart';
 export 'src/tokens/spacing.dart';
 export 'src/tokens/radii.dart';
-export 'src/tokens/shadows.dart';
 export 'src/tokens/motion.dart';
 export 'src/tokens/states.dart';
 export 'src/tokens/breakpoints.dart';
