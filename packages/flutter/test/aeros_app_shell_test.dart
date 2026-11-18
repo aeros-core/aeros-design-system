@@ -615,15 +615,23 @@ void main() {
       );
     }
 
-    testWidgets('the sidenav is inline from the md breakpoint and a drawer below it', (tester) async {
+    testWidgets('the sidenav is a drawer below md, a rail from md, and full width from lg', (tester) async {
       expect(const AerosScaffold(body: SizedBox()).sidenavBreakpoint, AerosBreakpoints.md);
       expect(AerosBreakpoints.md, 768);
 
-      _setView(tester, const Size(AerosBreakpoints.md, 700));
+      expect(const AerosScaffold(body: SizedBox()).railBreakpoint, AerosBreakpoints.lg);
+      _setView(tester, const Size(AerosBreakpoints.lg, 700));
       await tester.pumpWidget(shell());
       expect(find.byType(AerosSidenav), findsOneWidget);
       expect(tester.getSize(find.byType(AerosSidenav)).width,
           AerosMetricTokens.layoutSidebar - AerosMetricTokens.borderHairline);
+      expect(tester.firstState<ScaffoldState>(find.byType(Scaffold)).hasDrawer, isFalse);
+
+      _setView(tester, const Size(AerosBreakpoints.md, 700));
+      await tester.pumpWidget(shell());
+      await tester.pumpAndSettle();
+      expect(tester.getSize(find.byType(AerosSidenav)).width,
+          AerosMetricTokens.layoutSidebarRail - AerosMetricTokens.borderHairline);
       expect(tester.firstState<ScaffoldState>(find.byType(Scaffold)).hasDrawer, isFalse);
 
       _setView(tester, const Size(AerosBreakpoints.md - 1, 700));
@@ -754,9 +762,14 @@ void main() {
       expect(find.bySemanticsLabel('Orders, 4'), findsOneWidget);
       expect(find.byIcon(Icons.logout), findsNothing);
 
-      // A parent cannot show its children here: it asks the rail to open.
+      // A parent shows its children in a menu beside it; the rail stays collapsed.
       await tester.tap(find.byIcon(Icons.inventory_2_outlined));
-      expect(expand, 1);
+      await tester.pumpAndSettle();
+      expect(expand, 0);
+      expect(find.byType(AerosMenuList), findsOneWidget);
+      expect(tester.getTopLeft(find.byType(AerosMenuList)).dx, greaterThan(AerosMetricTokens.layoutSidebarRail));
+      expect(tester.getSize(find.byType(AerosSidenav)).width,
+          AerosMetricTokens.layoutSidebarRail - AerosMetricTokens.borderHairline);
       handle.dispose();
     });
 

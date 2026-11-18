@@ -22,7 +22,7 @@ export function SidebarNav() {
       <SidebarContent>
         <SidebarSection label="Workspace">
           <SidebarItem href="#" active icon={<Home />}>Dashboard</SidebarItem>
-          <SidebarItem href="#" icon={<Inbox />} count={3}>Inbox</SidebarItem>
+          <SidebarItem href="#" icon={<Inbox />} count={3} countTone="solid">Inbox</SidebarItem>
           <SidebarItem href="#" icon={<Box />} count={128}>Orders</SidebarItem>
           <SidebarItem href="#" icon={<Truck />} count={0}>Shipments</SidebarItem>
           <SidebarGroup label="Catalog" icon={<Tags />} defaultOpen>

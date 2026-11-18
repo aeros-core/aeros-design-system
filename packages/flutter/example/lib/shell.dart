@@ -42,8 +42,15 @@ class _GalleryShellState extends State<GalleryShell> {
   final _shell = GlobalKey<AerosScaffoldState>();
   late String _page = widget.initialPage ?? destinations.first.id;
 
-  /// The app owns whether the inline sidenav is collapsed to the rail.
-  bool _rail = false;
+  /// Owns whether the wide-window sidenav is collapsed to the rail. An app would give it `load`
+  /// and `save` to remember the choice.
+  final _sidebar = AerosSidebarController();
+
+  @override
+  void dispose() {
+    _sidebar.dispose();
+    super.dispose();
+  }
 
   Destination get _current => destinations.firstWhere((d) => d.id == _page);
 
@@ -57,7 +64,7 @@ class _GalleryShellState extends State<GalleryShell> {
       open: _open,
       child: AerosScaffold(
         key: _shell,
-        onRailCollapsedChanged: (collapsed) => setState(() => _rail = collapsed),
+        sidebarController: _sidebar,
         topnav: AerosTopnav(
           title: _current.label,
           // No leading: inside AerosScaffold the bar shows the menu button
@@ -76,8 +83,6 @@ class _GalleryShellState extends State<GalleryShell> {
         ),
         sidenav: AerosSidenav(
           density: pointer ? AerosSidenavDensity.pointer : AerosSidenavDensity.touch,
-          collapsed: _rail,
-          onExpandRequested: () => setState(() => _rail = false),
           header: const AerosSidenavHeader.custom(semanticLabel: 'Aeros Design System', child: _Brand()),
           footer: const AerosSidenavFooter(
             name: 'aeros_design_system',

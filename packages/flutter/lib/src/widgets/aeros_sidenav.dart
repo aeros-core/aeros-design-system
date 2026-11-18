@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import '../foundation/aeros_focus_ring.dart';
 import '../foundation/aeros_pressable.dart';
 import '../foundation/aeros_state_layer.dart';
@@ -10,6 +11,8 @@ import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 import 'aeros_avatar.dart';
 import 'aeros_count_badge.dart';
+import 'aeros_menu.dart';
+import 'aeros_popover.dart';
 
 /// Single navigation entry — leaf or expandable parent.
 class AerosNavItem {
@@ -21,6 +24,7 @@ class AerosNavItem {
     this.selected = false,
     this.section,
     this.count = 0,
+    this.countEmphasis = false,
     this.key,
   });
 
@@ -34,8 +38,12 @@ class AerosNavItem {
   /// is drawn wherever the section changes, so keep a section's items contiguous.
   final String? section;
 
-  /// Shown as a count pill when above zero (unread, pending). Announced with the label.
+  /// Shown when above zero (unread, pending) and announced with the label: a quiet number at the
+  /// row's end, and a dot on the icon in the collapsed rail.
   final int count;
+
+  /// Draw [count] as a filled pill, for a count that needs attention.
+  final bool countEmphasis;
 
   /// Key for the row — handy for tests (`ValueKey('nav:/orders')`).
   final Key? key;
@@ -88,10 +96,17 @@ const double _rowGap = AerosSpacing.s0_5; // between rows, so a hovered row neve
 const double _labelGap = AerosSpacing.s1_5; // under a group label
 const double _iconGap = AerosSpacing.s2_5; // icon to label
 
-/// Gutter between the rail's edge and a row, and the padding inside the row. Together they put
-/// every leading edge — the header mark, icons, group labels, the footer avatar — 20px in.
+/// Gutter between the rail's edge and a row, and the padding inside a row for text that starts it
+/// (group labels, children).
 const double _inset = AerosSpacing.s3;
 const double _pad = AerosSpacing.s2;
+
+/// The line every icon, the header mark and the footer avatar are centred on: half the collapsed
+/// rail. Because it is the same line expanded and collapsed, collapsing never moves an icon.
+const double _centre = AerosMetricTokens.layoutSidebarRail / 2;
+
+/// Start padding inside a row (which already sits [_inset] in) that centres a [size] box on [_centre].
+double _leadFor(double size) => _centre - _inset - size / 2;
 
 const BorderRadius _itemRadius = BorderRadius.all(Radius.circular(AerosShapeTokens.item));
 
@@ -161,56 +176,96 @@ class AerosSidenavScope extends InheritedWidget {
 /// Spec (shared with the web `Sidebar`):
 /// - it is [AerosMetricTokens.layoutSidebar] (240) wide — its parent sets the width — and
 ///   [AerosMetricTokens.layoutSidebarRail] (56) when [collapsed] to icons;
-/// - rows are inset [AerosSpacing.s3] from the rail and padded [AerosSpacing.s2], with
-///   [AerosShapeTokens.item] corners; every leading edge — icon, group label, and the
-///   [AerosSidenavHeader] mark / [AerosSidenavFooter] avatar — sits on one line 20px in;
+/// - rows are inset [AerosSpacing.s3] from the rail, with [AerosShapeTokens.item] corners; every
+///   icon, the [AerosSidenavHeader] mark and the [AerosSidenavFooter] avatar are centred 28px in
+///   (half the collapsed rail), expanded and collapsed alike, so collapsing never moves them;
 /// - row height, icon size and label size are the `navRow` / `navIcon` / `navLabel` size tokens for
 ///   the [density];
 /// - at rest the label is `fgSecondary` and the icon `fgMuted`; hover and press lay the
 ///   `stateHover` / `statePressed` overlay on the rail and lift the label to `fgPrimary`; the
-///   selected row fills `bgSubtle` and is `fgPrimary` at w600; keyboard focus draws the focus ring;
-///   nothing ripples;
+///   selected row takes the `stateSelected` overlay and `fgPrimary` at the same weight (so labels
+///   never reflow); keyboard focus draws the focus ring; nothing ripples;
 /// - group labels are sentence case, `caption` in `fgMuted` — they sort the destinations, they do
 ///   not compete with them;
-/// - children indent so their labels align with the parent's label; a parent opens by itself when
-///   it holds the selected item.
+/// - children sit under a hairline guide below the parent's icon; a parent opens by itself when
+///   it comes to hold the selected item.
 ///
 /// Put an [AerosSidenavHeader] in [header] (the workspace, and the way to switch it) and an
 /// [AerosSidenavFooter] in [footer] (who is signed in, and sign out). Both are one app header high
 /// ([AerosSizeTokens.header] for the ambient [AerosDensity]), like `AerosTopnav`.
 ///
-/// [collapsed] shows icons only: labels become tooltips, group labels become hairlines, children
-/// are hidden (tapping a parent calls [onExpandRequested]), and the header and footer keep only
-/// their mark and avatar. Every row is still announced by its full label.
+/// [collapsed] shows icons only: labels become tooltips beside the row, group labels become
+/// hairlines, a count becomes a dot, a parent opens its children in a menu beside it, and the
+/// header and footer keep only their mark and avatar. Every row is still announced by its full
+/// label.
+///
+/// [density] defaults to the `AerosDensityScope` above it, and to pointer rows with no scope.
 class AerosSidenav extends StatelessWidget {
   const AerosSidenav({
     super.key,
     required this.items,
     this.header,
     this.footer,
-    this.density = AerosSidenavDensity.pointer,
+    this.density,
     this.collapsed = false,
     this.onExpandRequested,
+    this.onNavigate,
+    this.semanticLabel = 'Navigation',
     this.padding = const EdgeInsets.fromLTRB(_inset, AerosSpacing.s2, _inset, AerosSpacing.s3),
   });
 
   final List<AerosNavItem> items;
   final Widget? header;
   final Widget? footer;
-  final AerosSidenavDensity density;
+
+  /// Row sizing. Null (the default) follows the `AerosDensityScope` above; pointer with none.
+  final AerosSidenavDensity? density;
 
   /// Icon-only rail ([AerosMetricTokens.layoutSidebarRail] wide).
   final bool collapsed;
 
-  /// Called when a collapsed rail should open: a parent row was tapped, and its children have
-  /// nowhere to show.
+  /// Called when a parent row is tapped in a collapsed rail that has no Navigator to open its
+  /// menu in (a rail drawn above the app's Navigator). Otherwise the parent opens a menu.
   final VoidCallback? onExpandRequested;
+
+  /// Called after any destination is chosen, from a row or from a rail menu. `AerosScaffold` sets
+  /// it to close its drawer or floating sidebar.
+  final VoidCallback? onNavigate;
+
+  /// The name of the navigation landmark.
+  final String semanticLabel;
   final EdgeInsetsGeometry padding;
+
+  /// This sidenav with some values replaced. `AerosScaffold` uses it to present the app's sidenav
+  /// as a rail, a floating panel or a drawer.
+  AerosSidenav copyWith({
+    bool? collapsed,
+    AerosSidenavDensity? density,
+    VoidCallback? onNavigate,
+  }) =>
+      AerosSidenav(
+        key: key,
+        items: items,
+        header: header,
+        footer: footer,
+        density: density ?? this.density,
+        collapsed: collapsed ?? this.collapsed,
+        onExpandRequested: onExpandRequested,
+        onNavigate: onNavigate ?? this.onNavigate,
+        semanticLabel: semanticLabel,
+        padding: padding,
+      );
 
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
     final rail = collapsed && !AerosSidenavExpanded._of(context);
+    // With no density of its own the sidenav follows an AerosDensityScope above it; with neither
+    // it keeps the pointer rows it always had.
+    final density = this.density ??
+        (AerosDensityScope.maybeOf(context) == AerosDensity.touch
+            ? AerosSidenavDensity.touch
+            : AerosSidenavDensity.pointer);
     final rows = <Widget>[];
     String? section;
     for (final item in items) {
@@ -222,23 +277,29 @@ class AerosSidenav extends StatelessWidget {
         item: item,
         depth: 0,
         density: density,
-        parentHasIcon: false,
         rail: rail,
         onExpandRequested: onExpandRequested,
+        onNavigate: onNavigate,
       ));
     }
     return AerosSidenavScope._(
       collapsed: rail,
       density: density,
-      child: Container(
-        color: a.bgSurface,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (header != null) header!,
-            Expanded(child: ListView(padding: padding, children: rows)),
-            if (footer != null) footer!,
-          ],
+      child: Semantics(
+        container: true,
+        explicitChildNodes: true,
+        role: SemanticsRole.navigation,
+        label: semanticLabel,
+        child: Container(
+          color: a.bgSurface,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (header != null) header!,
+              Expanded(child: ListView(padding: padding, children: rows)),
+              if (footer != null) footer!,
+            ],
+          ),
         ),
       ),
     );
@@ -246,7 +307,7 @@ class AerosSidenav extends StatelessWidget {
 }
 
 /// The fill every interactive thing in the rail shares: the rail's own colour at rest, the state
-/// overlay under the pointer, `bgSubtle` when [selected] — inside the focus ring.
+/// overlay under the pointer, the `stateSelected` overlay when [selected] — inside the focus ring.
 class _RailFill extends StatelessWidget {
   const _RailFill({
     required this.state,
@@ -273,9 +334,10 @@ class _RailFill extends StatelessWidget {
       child: AerosStateFill(
         color: AerosStateLayer.resolve(
           a,
-          selected ? a.bgSubtle : a.bgSurface,
+          a.bgSurface,
           hovered: state.hovered,
           pressed: state.pressed,
+          selected: selected,
         ),
         radius: _itemRadius,
         constraints: BoxConstraints.tightFor(height: height),
@@ -300,6 +362,72 @@ Widget _withTooltip(BuildContext context, String label, Widget child) {
   );
 }
 
+/// A rail row's name, shown beside it (toward the page) the moment the row is hovered or takes
+/// keyboard focus. Material's Tooltip can only sit above or below, and waits.
+class _SideTip extends StatefulWidget {
+  const _SideTip({required this.show, required this.message, required this.child});
+
+  final bool show;
+  final String message;
+  final Widget child;
+
+  @override
+  State<_SideTip> createState() => _SideTipState();
+}
+
+class _SideTipState extends State<_SideTip> {
+  final OverlayPortalController _portal = OverlayPortalController();
+  final LayerLink _link = LayerLink();
+
+  void _sync() {
+    final want = widget.show && widget.message.isNotEmpty;
+    if (want == _portal.isShowing) return;
+    // Showing an overlay child changes the tree: not during build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final want = widget.show && widget.message.isNotEmpty;
+      if (want && !_portal.isShowing) _portal.show();
+      if (!want && _portal.isShowing) _portal.hide();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // A rail drawn above the app's Navigator has no Overlay; the row is still announced.
+    if (Overlay.maybeOf(context) == null) return widget.child;
+    _sync();
+    final a = context.aerosColors;
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    return CompositedTransformTarget(
+      link: _link,
+      child: OverlayPortal(
+        controller: _portal,
+        overlayChildBuilder: (context) => Align(
+          alignment: Alignment.topLeft,
+          child: CompositedTransformFollower(
+            link: _link,
+            showWhenUnlinked: false,
+            targetAnchor: rtl ? Alignment.centerLeft : Alignment.centerRight,
+            followerAnchor: rtl ? Alignment.centerRight : Alignment.centerLeft,
+            // Clear of the rail's edge: the row ends one inset short of it.
+            offset: Offset((rtl ? -1 : 1) * (_inset + AerosSpacing.s1_5), 0),
+            child: IgnorePointer(
+              child: ExcludeSemantics(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s2, vertical: AerosSpacing.s1),
+                  decoration: BoxDecoration(color: a.bgInverse, borderRadius: _itemRadius),
+                  child: Text(widget.message, maxLines: 1, style: AerosTypography.caption(color: a.fgInverse)),
+                ),
+              ),
+            ),
+          ),
+        ),
+        child: widget.child,
+      ),
+    );
+  }
+}
+
 class _SectionLabel extends StatelessWidget {
   const _SectionLabel(this.title, {required this.rail});
   final String title;
@@ -308,25 +436,39 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
-    if (rail) {
-      // No room for the words: a hairline marks the group, the name is still announced.
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: AerosSpacing.s2),
-        child: Semantics(
-          header: true,
-          label: title,
-          child: ColoredBox(
-            color: a.borderDefault,
-            child: const SizedBox(height: AerosMetricTokens.borderHairline),
-          ),
-        ),
-      );
-    }
+    final caption = AerosTypography.caption(color: a.fgMuted);
+    // The same block expanded and collapsed, so rows keep their positions: in the rail the words
+    // give way to a hairline, and the name is still announced.
     return Padding(
-      padding: const EdgeInsets.fromLTRB(_pad, AerosSpacing.s4, _pad, _labelGap),
+      padding: EdgeInsets.fromLTRB(rail ? 0 : _pad, AerosSpacing.s4, rail ? 0 : _pad, _labelGap),
       child: Semantics(
         header: true,
-        child: Text(title, style: AerosTypography.caption(color: a.fgMuted)),
+        label: title,
+        excludeSemantics: true,
+        child: Stack(
+          alignment: AlignmentDirectional.centerStart,
+          children: [
+            if (!rail)
+              Text(
+                title,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.clip,
+                style: caption,
+              )
+            else ...[
+              // As tall as the words it replaces.
+              SizedBox(height: MediaQuery.textScalerOf(context).scale(caption.fontSize!) * (caption.height ?? 1)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s1),
+                child: ColoredBox(
+                  color: a.borderDefault,
+                  child: const SizedBox(height: AerosMetricTokens.borderHairline, width: double.infinity),
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -337,17 +479,17 @@ class _NavEntry extends StatefulWidget {
     required this.item,
     required this.depth,
     required this.density,
-    required this.parentHasIcon,
     required this.rail,
     required this.onExpandRequested,
+    required this.onNavigate,
   });
 
   final AerosNavItem item;
   final int depth;
   final AerosSidenavDensity density;
-  final bool parentHasIcon;
   final bool rail;
   final VoidCallback? onExpandRequested;
+  final VoidCallback? onNavigate;
 
   @override
   State<_NavEntry> createState() => _NavEntryState();
@@ -357,94 +499,179 @@ class _NavEntryState extends State<_NavEntry> {
   late bool _expanded = widget.item._containsSelection;
 
   @override
+  void didUpdateWidget(_NavEntry oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Opens when it comes to hold the current page; the user can still close it.
+    if (widget.item._containsSelection && !oldWidget.item._containsSelection) _expanded = true;
+  }
+
+  void _choose(AerosNavItem item) {
+    item.onTap?.call();
+    widget.onNavigate?.call();
+  }
+
+  /// The children of a rail parent, as menu entries: a nested parent becomes a label over its own.
+  List<AerosMenuEntry> _menuEntries(List<AerosNavItem> children) => [
+        for (final child in children)
+          if (child.hasChildren) ...[
+            AerosMenuLabel(child.label),
+            ..._menuEntries(child.children!),
+          ] else
+            AerosMenuItem<void>(
+              label: child.count > 0 ? '${child.label} · ${child.count}' : child.label,
+              onSelected: () => _choose(child),
+            ),
+      ];
+
+  /// In the rail a parent opens its children in a menu beside it; the sidebar stays collapsed.
+  void _openMenu() {
+    if (Navigator.maybeOf(context) == null) {
+      // A rail drawn above the app's Navigator cannot push a menu: ask the app to expand instead.
+      widget.onExpandRequested?.call();
+      return;
+    }
+    final row = AerosPopover.anchorRectOf(context);
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    // The menu hangs below-start of its anchor: a point just past the rail, level with the row.
+    final x = rtl ? row.left - _inset - AerosSpacing.s1_5 : row.right + _inset + AerosSpacing.s1_5;
+    AerosMenu.show<void>(
+      context,
+      anchorRect: Rect.fromLTWH(x, row.top - AerosPopover.gap, 0, 0),
+      semanticLabel: widget.item.label,
+      items: [AerosMenuLabel(widget.item.label), ..._menuEntries(widget.item.children!)],
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final a = context.aerosColors;
     final item = widget.item;
     final d = widget.density;
     final rail = widget.rail;
+    final top = widget.depth == 0;
     // In the rail a parent stands for its children: it is the current place when one of them is.
     final selected = item.selected || (rail && item._containsSelection);
 
-    // A child's label lines up with its parent's label: past the parent's icon and gap, then one
-    // step further per extra level.
-    final indent = widget.depth == 0
-        ? 0.0
-        : (widget.parentHasIcon ? d.iconSize + _iconGap : 0.0) + (widget.depth - 1) * AerosSpacing.s3;
-
     final VoidCallback? onTap = item.hasChildren
-        ? (rail ? widget.onExpandRequested : () => setState(() => _expanded = !_expanded))
-        : item.onTap;
+        ? (rail ? _openMenu : () => setState(() => _expanded = !_expanded))
+        : (item.onTap == null && widget.onNavigate == null ? null : () => _choose(item));
 
     final announced = item.count > 0 ? '${item.label}, ${item.count}' : item.label;
+    final countText = item.count > 99 ? '99+' : '${item.count}';
 
     Widget content(AerosInteraction state) {
       final strong = selected || state.hovered || state.pressed;
       final iconColor = selected ? a.fgPrimary : (strong ? a.fgSecondary : a.fgMuted);
+      // Top-level rows always lead with an icon-sized box centred on the rail's centre line: the
+      // icon, or the label's first letter when there is none.
+      final Widget? lead = !top
+          ? null
+          : SizedBox.square(
+              dimension: d.iconSize,
+              child: item.icon != null
+                  ? Icon(item.icon, size: d.iconSize, color: iconColor)
+                  : Center(
+                      child: Text(
+                        item.label.isEmpty ? '' : item.label.characters.first.toUpperCase(),
+                        style: d.labelStyle(color: strong ? a.fgPrimary : a.fgSecondary, weight: FontWeight.w600),
+                      ),
+                    ),
+            );
       if (rail) {
-        return Center(
-          child: item.icon != null
-              ? Icon(item.icon, size: d.iconSize, color: iconColor)
-              : Text(
-                  item.label.isEmpty ? '' : item.label.characters.first.toUpperCase(),
-                  style: d.labelStyle(color: strong ? a.fgPrimary : a.fgSecondary, weight: FontWeight.w600),
+        return Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              lead!,
+              if (item.count > 0)
+                // A count has no room here: a dot on the icon's corner, the number in the tooltip.
+                PositionedDirectional(
+                  top: -AerosSpacing.s0_5,
+                  end: -AerosSpacing.s0_5,
+                  child: Container(
+                    width: AerosSpacing.s2,
+                    height: AerosSpacing.s2,
+                    decoration: BoxDecoration(
+                      color: a.fgPrimary,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: a.bgSurface, width: AerosMetricTokens.borderHairline),
+                    ),
+                  ),
                 ),
+            ],
+          ),
         );
       }
       return Row(
         children: [
-          if (item.icon != null) ...[
-            Icon(item.icon, size: d.iconSize, color: iconColor),
-            const SizedBox(width: _iconGap),
-          ],
+          if (lead != null) ...[lead, const SizedBox(width: _iconGap)],
           Expanded(
             child: Text(
               item.label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: d.labelStyle(
-                color: strong ? a.fgPrimary : a.fgSecondary,
-                weight: selected ? FontWeight.w600 : FontWeight.w500,
-              ),
+              // The weight never changes with selection, so labels do not reflow.
+              style: top
+                  ? d.labelStyle(color: strong ? a.fgPrimary : a.fgSecondary, weight: FontWeight.w500)
+                  : (d == AerosSidenavDensity.pointer ? AerosTypography.bodySm : AerosTypography.bodyMd)(
+                      color: strong ? a.fgPrimary : a.fgSecondary,
+                    ),
             ),
           ),
-          if (item.count > 0) AerosCountBadge(count: item.count, density: d.density),
+          if (item.count > 0)
+            item.countEmphasis
+                ? AerosCountBadge(count: item.count, density: d.density)
+                : Padding(
+                    padding: const EdgeInsetsDirectional.only(end: AerosSpacing.s1),
+                    child: Text(
+                      countText,
+                      style: AerosTypography.caption(color: a.fgMuted)
+                          .copyWith(fontFeatures: const [FontFeature.tabularFigures()]),
+                    ),
+                  ),
           if (item.hasChildren)
             AnimatedRotation(
-              turns: _expanded ? 0.5 : 0,
+              turns: _expanded ? 0.25 : 0,
               duration: AerosMotion.resolve(context, AerosMotion.fast),
               curve: AerosMotion.standard,
-              child: Icon(Icons.keyboard_arrow_down_rounded, size: AerosSizeTokens.iconMd, color: a.fgMuted),
+              child: Icon(Icons.chevron_right_rounded, size: AerosSizeTokens.iconMd, color: a.fgMuted),
             ),
         ],
       );
     }
+
+    // The fill's hairline is part of the box, so it comes off the padding.
+    const hairline = AerosMetricTokens.borderHairline;
+    final lead = (top ? _leadFor(d.iconSize) : _pad) - hairline;
 
     Widget row = AerosPressable(
       onPressed: onTap,
       selected: selected,
       // The row brings its own height (the navRow token) and spans the rail.
       expandHitTarget: false,
-      builder: (context, state) => Semantics(
-        label: announced,
-        expanded: item.hasChildren && !rail ? _expanded : null,
-        child: ExcludeSemantics(
-          child: _RailFill(
-            state: state,
-            selected: selected,
-            height: d.rowHeight,
-            // The fill's hairline is part of the box, so it comes off the padding.
-            padding: rail
-                ? EdgeInsets.zero
-                : EdgeInsetsDirectional.only(
-                    start: _pad + indent - AerosMetricTokens.borderHairline,
-                    end: _pad - AerosMetricTokens.borderHairline,
-                  ),
-            child: content(state),
+      builder: (context, state) {
+        final fill = Semantics(
+          label: announced,
+          expanded: item.hasChildren && !rail ? _expanded : null,
+          child: ExcludeSemantics(
+            child: _RailFill(
+              state: state,
+              selected: selected,
+              height: d.rowHeight,
+              padding: EdgeInsetsDirectional.only(start: lead, end: rail ? 0 : _pad - hairline),
+              child: content(state),
+            ),
           ),
-        ),
-      ),
+        );
+        if (!rail) return fill;
+        return _SideTip(
+          show: state.hovered || state.focused,
+          message: item.count > 0 ? '${item.label} · ${item.count}' : item.label,
+          child: fill,
+        );
+      },
     );
-    if (rail) row = _withTooltip(context, item.label, row);
     row = Padding(key: item.key, padding: const EdgeInsets.only(bottom: _rowGap), child: row);
 
     if (rail || !item.hasChildren || !_expanded) return row;
@@ -452,15 +679,31 @@ class _NavEntryState extends State<_NavEntry> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         row,
-        for (final child in item.children!)
-          _NavEntry(
-            item: child,
-            depth: widget.depth + 1,
-            density: d,
-            parentHasIcon: widget.depth == 0 ? item.icon != null : widget.parentHasIcon,
-            rail: false,
-            onExpandRequested: widget.onExpandRequested,
+        // Children hang from a hairline guide under the parent's icon centre (or its text edge,
+        // one level further down).
+        Container(
+          margin: EdgeInsetsDirectional.only(
+            start: top ? _centre - _inset : _pad + AerosSpacing.s0_5,
           ),
+          padding: const EdgeInsetsDirectional.only(start: AerosSpacing.s2),
+          decoration: BoxDecoration(
+            border: BorderDirectional(start: BorderSide(color: a.borderDefault, width: hairline)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final child in item.children!)
+                _NavEntry(
+                  item: child,
+                  depth: widget.depth + 1,
+                  density: d,
+                  rail: false,
+                  onExpandRequested: widget.onExpandRequested,
+                  onNavigate: widget.onNavigate,
+                ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -603,7 +846,7 @@ class AerosSidenavHeader extends StatelessWidget {
         child: mark ?? AerosSidenavMark(letter: title!),
       );
       content = rail
-          ? Center(child: markBox)
+          ? Align(alignment: AlignmentDirectional.centerStart, child: markBox)
           : Row(
               children: [
                 markBox,
@@ -617,10 +860,13 @@ class AerosSidenavHeader extends StatelessWidget {
     const hairline = AerosMetricTokens.borderHairline;
     final label = semanticLabel ?? title;
 
-    Widget resting = Padding(
-      padding: EdgeInsets.symmetric(horizontal: rail ? 0 : _pad),
-      child: content,
-    );
+    // The mark is centred on the rail's centre line, expanded and collapsed. A custom child keeps
+    // the text edge when expanded and is centred in the rail.
+    final markLead = _leadFor(AerosSizeTokens.avatarSm);
+    final EdgeInsetsGeometry inner = custom != null
+        ? EdgeInsets.symmetric(horizontal: rail ? 0 : _pad)
+        : EdgeInsetsDirectional.only(start: markLead, end: rail ? 0 : _pad);
+    Widget resting = Padding(padding: inner, child: content);
     // A custom child with no label speaks for itself.
     if (label != null) resting = Semantics(label: label, excludeSemantics: true, child: resting);
 
@@ -639,7 +885,9 @@ class AerosSidenavHeader extends StatelessWidget {
               excludeSemantics: label != null,
               builder: (context, state) => _RailFill(
                 state: state,
-                padding: EdgeInsets.symmetric(horizontal: rail ? 0 : _pad - hairline),
+                padding: custom != null
+                    ? EdgeInsets.symmetric(horizontal: rail ? 0 : _pad - hairline)
+                    : EdgeInsetsDirectional.only(start: markLead - hairline, end: rail ? 0 : _pad - hairline),
                 child: content,
               ),
             ),
@@ -693,11 +941,17 @@ class AerosSidenavFooter extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: a.borderDefault, width: AerosMetricTokens.borderHairline)),
       ),
-      padding: rail
-          ? EdgeInsets.zero
-          : const EdgeInsetsDirectional.only(start: _inset + _pad, end: AerosSpacing.s2),
+      // The avatar is centred on the rail's centre line, expanded and collapsed.
+      padding: EdgeInsetsDirectional.only(
+        start: _centre - AerosSizeTokens.avatarSm / 2,
+        end: rail ? 0 : AerosSpacing.s2,
+      ),
       child: rail
-          ? Semantics(label: who, excludeSemantics: true, child: Center(child: avatarBox))
+          ? Semantics(
+              label: who,
+              excludeSemantics: true,
+              child: Align(alignment: AlignmentDirectional.centerStart, child: avatarBox),
+            )
           : Row(
               children: [
                 avatarBox,

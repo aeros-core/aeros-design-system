@@ -108,23 +108,21 @@ void main() {
       expect(tester.getTopLeft(find.text('Admin')).dx, 20);
     });
 
-    testWidgets('a parent holding the selection starts open; children align with its label', (tester) async {
+    testWidgets('a parent holding the selection starts open; children hang from a guide under its icon', (tester) async {
       await pumpSidenav(tester);
       expect(find.text('Industry Master'), findsOneWidget);
-      expect(
-        tester.getTopLeft(find.text('Units Master')).dx,
-        tester.getTopLeft(find.text('Masters')).dx,
-      );
+      // Rail inset 12 + guide at the icon centre (16 in) + hairline 1 + 8 to the row + 8 row padding.
+      expect(tester.getTopLeft(find.text('Units Master')).dx, 12 + 16 + 1 + 8 + 8);
 
       await tester.tap(find.text('Masters'));
       await tester.pumpAndSettle();
       expect(find.text('Industry Master'), findsNothing);
     });
 
-    testWidgets('the selected row is bold on the variable-font axis, the rest are medium', (tester) async {
+    testWidgets('selection never changes the weight of a label, so labels do not reflow', (tester) async {
       await pumpSidenav(tester);
       // Inter follows the wght axis, not fontWeight: a copyWith(fontWeight:) alone renders unchanged.
-      expect(wght(tester, 'Industry Master'), 600);
+      expect(wght(tester, 'Industry Master'), wght(tester, 'Units Master'));
       expect(wght(tester, 'Orders'), 500);
     });
 
@@ -136,11 +134,11 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('selected fills bgSubtle; hover is the state overlay on the rail, in both themes', (tester) async {
+    testWidgets('selected is the stateSelected overlay; hover is the state overlay on the rail, in both themes', (tester) async {
       for (final theme in [AerosTheme.light(), AerosTheme.dark()]) {
         await pumpSidenav(tester, theme: theme);
         final a = tester.element(find.text('Orders')).aerosColors;
-        expect(fillOf(tester, find.text('Industry Master')), a.bgSubtle);
+        expect(fillOf(tester, find.text('Industry Master')), Color.alphaBlend(a.stateSelected, a.bgSurface));
         // At rest a row is the rail itself.
         expect(fillOf(tester, find.text('Orders')), a.bgSurface);
 
@@ -161,7 +159,7 @@ void main() {
   });
 
   group('AerosSidenav blocks', () {
-    testWidgets('header and footer are one app header high; mark and avatar sit on the 20px line', (tester) async {
+    testWidgets('header and footer are one app header high; mark and avatar are centred 28px in', (tester) async {
       var switched = 0, signedOut = 0;
       await pumpSidenav(
         tester,
@@ -186,9 +184,9 @@ void main() {
       expect(tester.getSize(find.byType(AerosSidenavHeader)).height, header);
       expect(tester.getSize(find.byType(AerosSidenavFooter)).height, header);
       // Default mark = the title's first letter.
-      expect(tester.getTopLeft(find.byType(AerosSidenavMark)).dx, 20);
+      expect(tester.getCenter(find.byType(AerosSidenavMark)).dx, 28);
       expect(find.descendant(of: find.byType(AerosSidenavMark), matching: find.text('A')), findsOneWidget);
-      expect(tester.getCenter(find.text('P')).dx, 20 + 12);
+      expect(tester.getCenter(find.text('P')).dx, 28);
 
       // A switchable header says so with a chevron.
       expect(find.byIcon(Icons.unfold_more_rounded), findsOneWidget);
