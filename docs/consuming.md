@@ -164,8 +164,21 @@ export function Frame({ children }: { children: React.ReactNode }) {
 }
 ```
 
-- `SidebarProvider` owns the sidebar state. Expanded it is 240 wide; collapsed it is a 56px icon rail with tooltips. Below the `md` breakpoint it becomes a left sheet at touch density. `storageKey` remembers the rail state in `localStorage`. Cmd/Ctrl+B toggles it; pass `keyboardShortcut={false}` to turn that off. `useSidebar()` reads and sets the state.
-- `SidebarTrigger` collapses or expands on desktop and opens the sheet on mobile.
+- `SidebarProvider` owns the sidebar state, and the window width picks the presentation (full design: `docs/sidebar/spec.md`):
+  - below `md` (768): a left sheet at touch density, with a close button;
+  - `md` to `lg`: a 56px icon rail. The trigger floats the full sidebar over the page without reflowing it; it closes on Escape, a press outside, or choosing a destination;
+  - `lg` (1024) and up: 240 wide. The trigger collapses it to the rail and the choice is remembered.
+- Icons sit 28px from the edge in every state, so collapsing only fades the labels. In the rail every row has a tooltip, a count becomes a dot, and a `SidebarGroup` opens its children in a menu beside it.
+- `storageKey` remembers the choice in `localStorage` and in a cookie of the same name (`"1"` collapsed, `"0"` expanded). Use a cookie-safe key (letters, digits, `.`, `_`, `-`). In a server-rendered app read the cookie and pass it in, so the first paint is already right:
+  ```tsx
+  const collapsed = (await cookies()).get("app.sidebar")?.value === "1";
+  <SidebarProvider storageKey="app.sidebar" defaultCollapsed={collapsed}>
+  ```
+- Cmd/Ctrl+B toggles the sidebar, except while typing in a field; pass `keyboardShortcut={false}` to turn it off. `useSidebar()` reads and sets the state.
+- `SidebarTrigger` is the one control at every width. The sidebar's edge is also clickable with a pointer (`<Sidebar edgeToggle={false}>` turns that off).
+- `SidebarItem` takes `count` (a quiet number; `countTone="solid"` for a pill that needs attention) and `trailing` (for example a `<Kbd>` hint).
+- `SidebarGroup` can hold another `SidebarGroup`. Two levels is the design target.
+- `SidebarMenuButton` is the header or footer block that opens a menu (workspace switcher, account): `<DropdownMenuTrigger asChild><SidebarMenuButton leading={<Avatar … />} name="Meera Shah" sub="meera@example.com" /></DropdownMenuTrigger>`.
 - `SidebarItem` and `AppHeaderLink` take `asChild`, so a framework `<Link>` can be the row: `<SidebarItem asChild active><Link href="/orders">Orders</Link></SidebarItem>`.
 - The shell follows the theme. For dark chrome in a light app, use `<Sidebar data-theme="dark">`.
 - For a layout without a sidebar, put `AppHeaderBrand` and `AppHeaderNav` with `AppHeaderLink`s in the `AppHeader`.
@@ -276,7 +289,26 @@ AerosScaffold(
 )
 ```
 
-The sidenav is inline from the `md` breakpoint (768) and a drawer below it. `AerosSidenav(collapsed: true)` is the 56px icon rail.
+The viewport width picks the presentation, the same three as on the web (full design: `docs/sidebar/spec.md`):
+
+- below `md` (768): a drawer at touch sizes. It closes when a destination is chosen.
+- `md` to `lg`: the 56px icon rail. The top bar's button floats the full sidenav over the page; it closes on a tap outside, Escape, or choosing a destination. `railBreakpoint` moves the upper bound.
+- `lg` (1024) and up: 240 wide, collapsible to the rail.
+
+Icons, the header mark and the footer avatar sit 28px from the edge in every state, and the width change is animated. In the rail a row shows its name beside it on hover or keyboard focus, a count becomes a dot, and a parent opens its children in a menu.
+
+Give the scaffold an `AerosSidebarController` and it owns and remembers the wide-window choice. The package has no storage of its own, so plug yours in:
+
+```dart
+final sidebar = AerosSidebarController(
+  load: () => prefs.getBool('sidebar.collapsed'),
+  save: (collapsed) => prefs.setBool('sidebar.collapsed', collapsed),
+);
+
+AerosScaffold(sidebarController: sidebar, topnav: …, sidenav: …, body: …)
+```
+
+Cmd/Ctrl+B toggles the sidenav, except while typing in a text field (`keyboardShortcut: false` turns it off). Without a controller the app still owns the rail through `AerosSidenav(collapsed:)` and `onRailCollapsedChanged`, as before. `AerosNavItem(count:)` is a quiet number; add `countEmphasis: true` for a pill.
 
 ### 5. Overlays
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../theme/aeros_theme_extension.dart';
 import '../tokens/aeros_theme_tokens.g.dart';
 import '../tokens/aeros_viewport_scope.dart';
@@ -8,20 +9,28 @@ import '../tokens/motion.dart';
 import '../tokens/spacing.dart';
 import '../tokens/typography.dart';
 import 'aeros_button.dart';
+import 'aeros_sidebar_controller.dart';
 import 'aeros_sidenav.dart';
 
 /// Wraps a [Scaffold] with optional [AerosTopnav] and [AerosSidenav], styled
 /// from Aeros tokens.
 ///
-/// The sidenav sits inline, behind a 1px hairline, from the `md` breakpoint up
-/// ([AerosBreakpoints.md], 768) and moves into a drawer below it. The width
-/// that decides is the real viewport width: an [AerosViewportScope] above the
-/// scaffold wins over `MediaQuery`, exactly as for [AerosBreakpoints.of].
+/// One sidenav, three presentations, chosen by the viewport width (design:
+/// `docs/sidebar/spec.md`, shared with the web `Sidebar`):
 ///
-/// Inline it is [sidenavWidth] wide ([AerosMetricTokens.layoutSidebar], 240) —
-/// or [AerosMetricTokens.layoutSidebarRail] (56) when the sidenav is
-/// [AerosSidenav.collapsed]. The drawer is
-/// [AerosMetricTokens.layoutSidebarMobile] wide and always shows the full rail.
+/// - below [sidenavBreakpoint] (`md`, 768) it is a drawer,
+///   [AerosMetricTokens.layoutSidebarMobile] wide, at touch sizes; it closes
+///   when a destination is chosen;
+/// - from there up to [railBreakpoint] (`lg`, 1024) it is the icon rail
+///   ([AerosMetricTokens.layoutSidebarRail], 56), and the top bar's button
+///   floats the full sidenav over the page without reflowing it; it closes on
+///   a tap outside, Escape, or choosing a destination;
+/// - from [railBreakpoint] up it is [sidenavWidth] wide
+///   ([AerosMetricTokens.layoutSidebar], 240) and can be collapsed to the rail.
+///
+/// The width that decides is the real viewport width: an [AerosViewportScope]
+/// above the scaffold wins over `MediaQuery`, exactly as for
+/// [AerosBreakpoints.of]. The width change is animated; icons do not move.
 ///
 /// The top bar is one app header high ([AerosSizeTokens.header] for the
 /// density: 48 for a mouse, 56 for fingers) — the same height as the sidenav's
@@ -55,12 +64,14 @@ import 'aeros_sidenav.dart';
 ///
 /// ## Who owns the rail
 ///
-/// The app does. Whether the inline sidenav is collapsed to the icon rail is
-/// [AerosSidenav.collapsed], a value the app holds like any other (it usually
-/// wants to remember it). The scaffold reports it as
-/// [AerosScaffoldState.isRailCollapsed] and, when [onRailCollapsedChanged] is
-/// set, asks for a change through [AerosScaffoldState.toggleRail] — which is
-/// also what makes [AerosTopnav] show its collapse / expand button.
+/// Give the scaffold an [AerosSidebarController] ([sidebarController]) and it
+/// owns the wide-window choice: the top bar shows the collapse button,
+/// Cmd/Ctrl+B toggles it, and the controller remembers it through the storage
+/// you plug in.
+///
+/// Without a controller the app owns it, as before: whether the inline
+/// sidenav is collapsed is [AerosSidenav.collapsed], and the scaffold asks for
+/// a change through [onRailCollapsedChanged].
 class AerosScaffold extends StatefulWidget {
   const AerosScaffold({
     super.key,
@@ -69,7 +80,10 @@ class AerosScaffold extends StatefulWidget {
     this.sidenav,
     this.floatingActionButton,
     this.sidenavBreakpoint = AerosBreakpoints.md,
+    this.railBreakpoint = AerosBreakpoints.lg,
     this.sidenavWidth = AerosMetricTokens.layoutSidebar,
+    this.sidebarController,
+    this.keyboardShortcut = true,
     this.backgroundColor,
     this.onRailCollapsedChanged,
     this.onDrawerChanged,
@@ -84,8 +98,23 @@ class AerosScaffold extends StatefulWidget {
   /// `md` breakpoint token.
   final double sidenavBreakpoint;
 
+  /// The viewport width from which the inline sidenav is expanded by default.
+  /// Between [sidenavBreakpoint] and this it is a rail that floats open.
+  /// Defaults to the `lg` breakpoint token; set it equal to
+  /// [sidenavBreakpoint] for no rail-only range.
+  final double railBreakpoint;
+
   /// Width of the inline, expanded sidenav.
   final double sidenavWidth;
+
+  /// Owns and remembers whether the wide-window sidenav is collapsed. When
+  /// set, [AerosSidenav.collapsed] and [onRailCollapsedChanged] are not used
+  /// for the rail.
+  final AerosSidebarController? sidebarController;
+
+  /// Toggle the sidenav with Cmd/Ctrl+B (ignored while typing in a text
+  /// field). Default true.
+  final bool keyboardShortcut;
   final Color? backgroundColor;
 
   /// Called by [AerosScaffoldState.toggleRail] with the value
@@ -128,7 +157,61 @@ class AerosScaffold extends StatefulWidget {
 class AerosScaffoldState extends State<AerosScaffold> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>(debugLabel: 'AerosScaffold');
   bool _inline = false;
+  bool _tablet = false;
+  bool _floating = false;
   bool _drawerOpen = false;
+  bool _currentRoute = true;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.sidebarController?.addListener(_onController);
+    HardwareKeyboard.instance.addHandler(_onKey);
+  }
+
+  @override
+  void didUpdateWidget(AerosScaffold oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.sidebarController != widget.sidebarController) {
+      oldWidget.sidebarController?.removeListener(_onController);
+      widget.sidebarController?.addListener(_onController);
+    }
+  }
+
+  @override
+  void dispose() {
+    HardwareKeyboard.instance.removeHandler(_onKey);
+    widget.sidebarController?.removeListener(_onController);
+    super.dispose();
+  }
+
+  void _onController() {
+    if (mounted) setState(() {});
+  }
+
+  bool _onKey(KeyEvent event) {
+    if (event is! KeyDownEvent || !mounted || !hasSidenav || !_currentRoute) return false;
+    if (event.logicalKey == LogicalKeyboardKey.escape && isSidenavFloating) {
+      closeFloatingSidenav();
+      return true;
+    }
+    if (!widget.keyboardShortcut || event.logicalKey != LogicalKeyboardKey.keyB) return false;
+    final keys = HardwareKeyboard.instance;
+    if (!(keys.isMetaPressed || keys.isControlPressed) || keys.isShiftPressed || keys.isAltPressed) return false;
+    // In a text field Cmd/Ctrl+B means Bold: leave it alone.
+    final focused = FocusManager.instance.primaryFocus?.context;
+    if (focused != null && focused.findAncestorWidgetOfExactType<EditableText>() != null) return false;
+    if (isSidenavInDrawer) {
+      toggleDrawer();
+      return true;
+    }
+    if (!canToggleRail) return false;
+    toggleRail();
+    return true;
+  }
+
+  /// The wide-window choice: the controller's, or the app's own [AerosSidenav.collapsed].
+  bool get _collapsedChoice => widget.sidebarController?.collapsed ?? widget.sidenav?.collapsed ?? false;
 
   /// Whether the scaffold was given a sidenav at all.
   bool get hasSidenav => widget.sidenav != null;
@@ -144,14 +227,27 @@ class AerosScaffoldState extends State<AerosScaffold> {
   /// The drawer is open (or opening).
   bool get isDrawerOpen => isSidenavInDrawer && _drawerOpen;
 
-  /// The inline sidenav is collapsed to the icon rail — the app's
-  /// [AerosSidenav.collapsed], while the sidenav is inline. Always false in a
-  /// drawer, which shows the full sidenav.
-  bool get isRailCollapsed => isSidenavInline && widget.sidenav!.collapsed;
+  /// The viewport is between [AerosScaffold.sidenavBreakpoint] and
+  /// [AerosScaffold.railBreakpoint]: the sidenav rests as a rail and floats
+  /// open over the page.
+  bool get isSidenavRailOnly => isSidenavInline && _tablet;
 
-  /// [toggleRail] does something: the sidenav is inline and the app listens
-  /// through [AerosScaffold.onRailCollapsedChanged].
-  bool get canToggleRail => isSidenavInline && widget.onRailCollapsedChanged != null;
+  /// The full sidenav is floating over the page (only while
+  /// [isSidenavRailOnly]).
+  bool get isSidenavFloating => isSidenavRailOnly && _floating;
+
+  /// The inline sidenav is showing as the icon rail: collapsed on a wide
+  /// window, or resting in the rail-only range. Always false in a drawer,
+  /// which shows the full sidenav.
+  bool get isRailCollapsed => isSidenavInline && (_tablet ? !_floating : _collapsedChoice);
+
+  /// [toggleRail] does something: the sidenav is inline, and either it is in
+  /// the rail-only range (where it floats open), or there is an
+  /// [AerosScaffold.sidebarController], or the app listens through
+  /// [AerosScaffold.onRailCollapsedChanged].
+  bool get canToggleRail =>
+      isSidenavInline &&
+      (_tablet || widget.sidebarController != null || widget.onRailCollapsedChanged != null);
 
   /// Opens the drawer. Does nothing while the sidenav is inline.
   void openDrawer() {
@@ -167,11 +263,31 @@ class AerosScaffoldState extends State<AerosScaffold> {
   /// Opens the drawer when it is closed and closes it when it is open.
   void toggleDrawer() => isDrawerOpen ? closeDrawer() : openDrawer();
 
-  /// Asks the app to collapse or expand the inline rail, through
-  /// [AerosScaffold.onRailCollapsedChanged]. Does nothing when
-  /// [canToggleRail] is false.
+  /// Closes the floating sidenav. Does nothing when it is not floating.
+  void closeFloatingSidenav() {
+    if (_floating) setState(() => _floating = false);
+  }
+
+  /// Closes whatever is transient — the drawer or the floating sidenav. The
+  /// scaffold calls it when a destination is chosen.
+  void dismissSidenav() {
+    closeDrawer();
+    closeFloatingSidenav();
+  }
+
+  /// Collapses or expands the inline sidenav: floats it in the rail-only
+  /// range; otherwise through the [AerosScaffold.sidebarController], or by
+  /// asking the app through [AerosScaffold.onRailCollapsedChanged]. Does
+  /// nothing when [canToggleRail] is false.
   void toggleRail() {
-    if (canToggleRail) widget.onRailCollapsedChanged!(!isRailCollapsed);
+    if (!canToggleRail) return;
+    if (_tablet) {
+      setState(() => _floating = !_floating);
+    } else if (widget.sidebarController != null) {
+      widget.sidebarController!.toggle();
+    } else {
+      widget.onRailCollapsedChanged!(!isRailCollapsed);
+    }
   }
 
   void _onDrawerChanged(bool open) {
@@ -187,10 +303,13 @@ class AerosScaffoldState extends State<AerosScaffold> {
     final width = AerosViewportScope.of(context)?.width ?? MediaQuery.sizeOf(context).width;
     final sidenav = widget.sidenav;
     _inline = width >= widget.sidenavBreakpoint;
+    _tablet = _inline && width < widget.railBreakpoint;
+    _currentRoute = ModalRoute.of(context)?.isCurrent ?? true;
     final inline = sidenav != null && _inline;
     final drawer = sidenav != null && !inline;
-    // The drawer goes away with the layout that had it.
+    // Transient states go away with the layout that had them.
     if (!drawer) _drawerOpen = false;
+    if (!_tablet) _floating = false;
     final topnav = widget.topnav;
 
     return _AerosScaffoldScope(
@@ -200,6 +319,7 @@ class AerosScaffoldState extends State<AerosScaffold> {
       drawerOpen: isDrawerOpen,
       railCollapsed: isRailCollapsed,
       canToggleRail: canToggleRail,
+      floating: isSidenavFloating,
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: widget.backgroundColor ?? a.bgCanvas,
@@ -216,30 +336,93 @@ class AerosScaffoldState extends State<AerosScaffold> {
                 // A sheet over a scrim: square, and flat like every surface.
                 elevation: 0,
                 shape: const RoundedRectangleBorder(),
-                child: AerosSidenavExpanded(child: sidenav),
+                // Fingers use the drawer: touch sizes whatever the app's density, clear of the
+                // notch and the home indicator.
+                child: SafeArea(
+                  child: AerosDensityScope(
+                    density: AerosDensity.touch,
+                    child: AerosSidenavExpanded(
+                      child: sidenav.copyWith(density: AerosSidenavDensity.touch, onNavigate: _navigated(sidenav)),
+                    ),
+                  ),
+                ),
               )
             : null,
         onDrawerChanged: _onDrawerChanged,
         floatingActionButton: widget.floatingActionButton,
-        body: inline
-            ? Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    width: sidenav.collapsed ? AerosMetricTokens.layoutSidebarRail : widget.sidenavWidth,
-                    decoration: BoxDecoration(
-                      color: a.bgSurface,
-                      border: BorderDirectional(
-                        end: BorderSide(color: a.borderDefault, width: AerosMetricTokens.borderHairline),
-                      ),
-                    ),
-                    child: sidenav,
-                  ),
-                  Expanded(child: widget.body),
-                ],
-              )
-            : widget.body,
+        body: inline ? _inlineBody(context, sidenav) : widget.body,
       ),
+    );
+  }
+
+  /// The app's own [AerosSidenav.onNavigate], then closing what is transient.
+  VoidCallback _navigated(AerosSidenav sidenav) => () {
+        sidenav.onNavigate?.call();
+        dismissSidenav();
+      };
+
+  Widget _inlineBody(BuildContext context, AerosSidenav sidenav) {
+    final a = context.aerosColors;
+    const railWidth = AerosMetricTokens.layoutSidebarRail;
+    final fullWidth = widget.sidenavWidth;
+    final rail = isRailCollapsed;
+    final floating = isSidenavFloating;
+    return TweenAnimationBuilder<double>(
+      // 0 is the full sidenav, 1 the rail.
+      tween: Tween<double>(end: rail ? 1 : 0),
+      duration: AerosMotion.resolve(context, AerosMotion.base),
+      curve: AerosMotion.standard,
+      builder: (context, t, _) {
+        final panelWidth = fullWidth + (railWidth - fullWidth) * t;
+        // The rail's own layout only once it has settled. While the width moves, the full
+        // sidenav stays laid out at full width and is clipped: icons sit on the same line in
+        // both, so nothing jumps, and labels are revealed or covered by the edge.
+        final settledRail = t == 1;
+        final panel = DecoratedBox(
+          decoration: BoxDecoration(
+            color: a.bgSurface,
+            border: BorderDirectional(
+              end: BorderSide(color: a.borderDefault, width: AerosMetricTokens.borderHairline),
+            ),
+            // Only a floating layer takes a shadow.
+            boxShadow: _tablet && !settledRail ? context.aerosElevation.overlay : null,
+          ),
+          // The hairline is part of the panel's width, as it always was: the sidenav gets the rest.
+          child: Padding(
+            padding: const EdgeInsetsDirectional.only(end: AerosMetricTokens.borderHairline),
+            child: ClipRect(
+              child: OverflowBox(
+                alignment: AlignmentDirectional.centerStart,
+                minWidth: (settledRail ? railWidth : fullWidth) - AerosMetricTokens.borderHairline,
+                maxWidth: (settledRail ? railWidth : fullWidth) - AerosMetricTokens.borderHairline,
+                child: sidenav.copyWith(collapsed: settledRail, onNavigate: _navigated(sidenav)),
+              ),
+            ),
+          ),
+        );
+        return Stack(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // In the rail-only range the page keeps the rail's width: the sidenav floats.
+                SizedBox(width: _tablet ? railWidth : panelWidth),
+                Expanded(child: widget.body),
+              ],
+            ),
+            if (floating)
+              // A tap outside the floating sidenav closes it.
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: closeFloatingSidenav,
+                  child: const ExcludeSemantics(child: SizedBox.expand()),
+                ),
+              ),
+            PositionedDirectional(start: 0, top: 0, bottom: 0, width: panelWidth, child: panel),
+          ],
+        );
+      },
     );
   }
 }
@@ -254,6 +437,7 @@ class _AerosScaffoldScope extends InheritedWidget {
     required this.drawerOpen,
     required this.railCollapsed,
     required this.canToggleRail,
+    required this.floating,
     required super.child,
   });
 
@@ -263,6 +447,7 @@ class _AerosScaffoldScope extends InheritedWidget {
   final bool drawerOpen;
   final bool railCollapsed;
   final bool canToggleRail;
+  final bool floating;
 
   @override
   bool updateShouldNotify(_AerosScaffoldScope oldWidget) =>
@@ -271,7 +456,8 @@ class _AerosScaffoldScope extends InheritedWidget {
       oldWidget.drawer != drawer ||
       oldWidget.drawerOpen != drawerOpen ||
       oldWidget.railCollapsed != railCollapsed ||
-      oldWidget.canToggleRail != canToggleRail;
+      oldWidget.canToggleRail != canToggleRail ||
+      oldWidget.floating != floating;
 }
 
 /// Application top bar — title on the left, optional trailing actions.

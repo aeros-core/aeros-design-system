@@ -141,7 +141,7 @@ React names are exports of `@aeros-core/react`. Flutter names are exports of `pa
 |---|---|---|---|
 | Shell | `AppShell`, `AppMain`, `AppContent`, `AppFooter` | `AerosScaffold`, `AerosScaffoldState` | The page frame. `AerosScaffold` takes `topnav`, `sidenav` and `body`, and moves the sidenav into a drawer below the `md` breakpoint. |
 | Header | `AppHeader`, `AppHeaderBrand`, `AppHeaderTitle`, `AppHeaderNav`, `AppHeaderLink`, `AppHeaderActions` | `AerosTopnav` | One header high: 48 at pointer, 56 at touch. Composed parts on the web; `title`, `leading`, `actions` in Flutter. |
-| Sidebar | `Sidebar`, `SidebarProvider`, `useSidebar`, `SidebarHeader`, `SidebarContent`, `SidebarFooter`, `SidebarBrand`, `SidebarSection`, `SidebarItem`, `SidebarGroup`, `SidebarSubItem`, `SidebarTrigger` | `AerosSidenav`, `AerosNavItem`, `AerosSidenavHeader`, `AerosSidenavFooter`, `AerosSidenavMark`, `AerosSidenavDensity`, `AerosSidenavExpanded`, `AerosSidenavScope`, `kAerosSidenavBlockHeight` | 240 wide, 56 as an icon rail, one level of nesting, count pills. Web: `SidebarProvider` owns rail and sheet state, persists it under `storageKey`, and toggles on Cmd/Ctrl+B. Flutter: pass `collapsed` and handle `onExpandRequested`. `kAerosSidenavBlockHeight` is deprecated. |
+| Sidebar | `Sidebar`, `SidebarProvider`, `useSidebar`, `SidebarHeader`, `SidebarContent`, `SidebarFooter`, `SidebarBrand`, `SidebarMenuButton`, `SidebarSection`, `SidebarItem`, `SidebarGroup`, `SidebarSubItem`, `SidebarTrigger` | `AerosSidenav`, `AerosNavItem`, `AerosSidenavHeader`, `AerosSidenavFooter`, `AerosSidenavMark`, `AerosSidenavDensity`, `AerosSidenavExpanded`, `AerosSidenavScope`, `AerosSidebarController`, `kAerosSidenavBlockHeight` | One design on both platforms (`docs/sidebar/spec.md`): 240 wide, 56 as an icon rail; a sheet or drawer below `md`, a rail that floats open between `md` and `lg`, expanded from `lg`; icons 28px from the edge in every state; groups nest and open as a menu in the rail; Cmd/Ctrl+B toggles. Web: `SidebarProvider` owns the state and remembers it under `storageKey` (localStorage and a cookie). Flutter: `AerosScaffold` presents the sidenav, and an `AerosSidebarController` owns and remembers the choice through storage the app plugs in. Flutter: pass `collapsed` and handle `onExpandRequested`. `kAerosSidenavBlockHeight` is deprecated. |
 | Page header | `PageHeader` | `AerosPageHeader` | Title, description, back link and actions above page content. |
 | Scroll area | `ScrollArea` | — | Web only. The Flutter theme styles the platform scrollbar. |
 | Separator | `Separator` | — | Web only. In Flutter use `Divider`; the theme styles it. |
@@ -197,7 +197,7 @@ Type-only exports of `@aeros-core/react`, by source file. Every component's prop
 | `table.tsx` | `TableProps`, `TrProps`, `ThProps`, `TableStateRowProps`, `TableLoadingRowProps` |
 | `empty-state.tsx` | `EmptyStateProps` |
 | `app-shell.tsx` | `AppHeaderBrandProps`, `AppHeaderLinkProps` |
-| `sidebar.tsx` | `SidebarProviderProps`, `SidebarProps`, `SidebarBrandProps`, `SidebarSectionProps`, `SidebarItemProps`, `SidebarGroupProps`, `SidebarSubItemProps` |
+| `sidebar.tsx` | `SidebarProviderProps`, `SidebarProps`, `SidebarBrandProps`, `SidebarMenuButtonProps`, `SidebarSectionProps`, `SidebarItemProps`, `SidebarGroupProps`, `SidebarSubItemProps` |
 | `dot-matrix.tsx` | `DotMatrixProps` |
 | `spinner.tsx` | `SpinnerProps` |
 | `toast.tsx` | `ToastOptions` |
