@@ -520,7 +520,7 @@ export const SidebarSection = React.forwardRef<HTMLDivElement, SidebarSectionPro
         ref={ref}
         role="group"
         aria-labelledby={label ? labelId : undefined}
-        className={cn("grid gap-0.5 px-2 py-1", className)}
+        className={cn("group/section grid gap-0.5 px-2 py-1", className)}
         {...props}
       >
         {/* Sentence case, quiet: the label sorts the destinations, it does not compete with them.
@@ -530,7 +530,10 @@ export const SidebarSection = React.forwardRef<HTMLDivElement, SidebarSectionPro
             <span id={labelId} className={fade(rail)}>
               {label}
             </span>
-            {rail && <span aria-hidden className="absolute inset-x-2 top-1/2 h-px bg-border-default" />}
+            {/* Not on the first section: the header's own hairline is right above it. */}
+            {rail && (
+              <span aria-hidden className="absolute inset-x-2 top-1/2 h-px bg-border-default group-first/section:hidden" />
+            )}
           </div>
         )}
         {children}

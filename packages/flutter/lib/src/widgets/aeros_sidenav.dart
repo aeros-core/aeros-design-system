@@ -50,8 +50,7 @@ class AerosNavItem {
 
   bool get hasChildren => children != null && children!.isNotEmpty;
 
-  bool get _containsSelection =>
-      selected || (children?.any((c) => c._containsSelection) ?? false);
+  bool get _containsSelection => selected || (children?.any((c) => c._containsSelection) ?? false);
 }
 
 /// Row sizing for an [AerosSidenav], by the pointer that will use it.
@@ -116,8 +115,7 @@ const BorderRadius _itemRadius = BorderRadius.all(Radius.circular(AerosShapeToke
 class AerosSidenavExpanded extends InheritedWidget {
   const AerosSidenavExpanded({super.key, required super.child});
 
-  static bool _of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<AerosSidenavExpanded>() != null;
+  static bool _of(BuildContext context) => context.dependOnInheritedWidgetOfExactType<AerosSidenavExpanded>() != null;
 
   @override
   bool updateShouldNotify(AerosSidenavExpanded oldWidget) => false;
@@ -270,7 +268,7 @@ class AerosSidenav extends StatelessWidget {
     String? section;
     for (final item in items) {
       if (item.section != section) {
-        if (item.section != null) rows.add(_SectionLabel(item.section!, rail: rail));
+        if (item.section != null) rows.add(_SectionLabel(item.section!, rail: rail, first: rows.isEmpty));
         section = item.section;
       }
       rows.add(_NavEntry(
@@ -429,9 +427,12 @@ class _SideTipState extends State<_SideTip> {
 }
 
 class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.title, {required this.rail});
+  const _SectionLabel(this.title, {required this.rail, this.first = false});
   final String title;
   final bool rail;
+
+  /// The first row of the list: in the rail it draws no hairline, the header's is right above.
+  final bool first;
 
   @override
   Widget build(BuildContext context) {
@@ -459,13 +460,14 @@ class _SectionLabel extends StatelessWidget {
             else ...[
               // As tall as the words it replaces.
               SizedBox(height: MediaQuery.textScalerOf(context).scale(caption.fontSize!) * (caption.height ?? 1)),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s1),
-                child: ColoredBox(
-                  color: a.borderDefault,
-                  child: const SizedBox(height: AerosMetricTokens.borderHairline, width: double.infinity),
+              if (!first)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AerosSpacing.s1),
+                  child: ColoredBox(
+                    color: a.borderDefault,
+                    child: const SizedBox(height: AerosMetricTokens.borderHairline, width: double.infinity),
+                  ),
                 ),
-              ),
             ],
           ],
         ),
