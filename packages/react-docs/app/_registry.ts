@@ -801,7 +801,7 @@ toast({
     description:
       "The page frame: a sidebar beside a column of header, content and footer. The parts are plain layout elements, follow the theme, and can render in server components. This site is built from it.",
     imports: ["AppContent", "AppFooter", "AppHeader", "AppMain", "AppShell", "SidebarProvider"],
-    usage: `<SidebarProvider storageKey="app:sidebar">
+    usage: `<SidebarProvider storageKey="app.sidebar">
   <AppShell>
     <Sidebar>…</Sidebar>
     <AppMain>
@@ -833,7 +833,7 @@ toast({
     title: "Sidebar",
     family: "Layout",
     description:
-      "The app navigation, in three presentations from one tree: expanded with icon and label, a collapsed icon rail with tooltips, and a sheet at touch density below the md breakpoint. SidebarProvider owns the state and can remember it.",
+      "The app navigation, in three presentations from one tree: a sheet at touch density below md, an icon rail that floats open between md and lg, and a full column from lg that the user can collapse to the rail. Icons never move; labels fade. In the rail a group opens its pages in a menu. SidebarProvider owns the state and remembers it.",
     imports: [
       "Sidebar",
       "SidebarBrand",
@@ -842,6 +842,7 @@ toast({
       "SidebarGroup",
       "SidebarHeader",
       "SidebarItem",
+      "SidebarMenuButton",
       "SidebarSection",
       "SidebarSubItem",
       "SidebarTrigger",
@@ -853,7 +854,7 @@ toast({
   <SidebarContent>
     <SidebarSection label="Workspace">
       <SidebarItem href="/" active icon={<Home />}>Dashboard</SidebarItem>
-      <SidebarItem href="/inbox" icon={<Inbox />} count={3}>Inbox</SidebarItem>
+      <SidebarItem href="/inbox" icon={<Inbox />} count={3} countTone="solid">Inbox</SidebarItem>
       <SidebarItem asChild icon={<Box />} count={128}><Link href="/orders">Orders</Link></SidebarItem>
       <SidebarGroup label="Catalog" icon={<Tags />}>
         <SidebarSubItem href="/products">Products</SidebarSubItem>

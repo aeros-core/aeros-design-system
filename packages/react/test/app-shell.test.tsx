@@ -17,6 +17,7 @@ import {
   SidebarGroup,
   SidebarHeader,
   SidebarItem,
+  SidebarMenuButton,
   SidebarProvider,
   SidebarSection,
   SidebarSubItem,
@@ -77,9 +78,27 @@ function mockViewport(mobile: boolean) {
   );
 }
 
+/** A matchMedia that answers the sidebar's own queries for a given window width. */
+function mockWidth(width: number) {
+  vi.stubGlobal(
+    "matchMedia",
+    vi.fn().mockImplementation((query: string) => {
+      const min = /min-width:\s*(\d+)px/.exec(query);
+      const max = /max-width:\s*(\d+)px/.exec(query);
+      return {
+        matches: (!min || width >= Number(min[1])) && (!max || width <= Number(max[1])),
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn()
+      };
+    })
+  );
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
   window.localStorage.clear();
+  document.cookie = "test.sidebar=; path=/; max-age=0";
 });
 
 describe("AppShell landmarks", () => {
@@ -173,11 +192,142 @@ describe("Sidebar — nesting", () => {
     expect(screen.getByRole("link", { name: "Products" })).toHaveAttribute("aria-current", "page");
   });
 
-  it("in the rail, a group expands the sidebar instead of hiding its children", async () => {
+  it("in the rail, a group opens its children in a menu and the sidebar stays collapsed", async () => {
     mockViewport(false);
     render(<Shell defaultCollapsed />);
     await userEvent.click(screen.getByRole("button", { name: "Catalog" }));
+    const menu = await screen.findByRole("menu");
+    expect(within(menu).getByRole("menuitem", { name: "Products" })).toHaveAttribute("href", "#products");
+    expect(within(menu).getByRole("menuitem", { name: "Categories" })).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "Sidebar", hidden: true })).toHaveAttribute("data-collapsed");
+  });
+
+  it("a group can hold a further group", async () => {
+    mockViewport(false);
+    render(
+      <Sidebar>
+        <SidebarGroup label="Master" defaultOpen>
+          <SidebarGroup label="Locations" defaultOpen>
+            <SidebarSubItem href="#countries">Countries</SidebarSubItem>
+          </SidebarGroup>
+          <SidebarSubItem href="#units">Units</SidebarSubItem>
+        </SidebarGroup>
+      </Sidebar>
+    );
+    expect(screen.getByRole("button", { name: "Locations" })).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("link", { name: "Countries" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Units" })).toBeInTheDocument();
+  });
+});
+
+describe("Sidebar — remembered state and shortcut", () => {
+  it("writes a cookie of the same name, so a server render can start in the right state", async () => {
+    mockViewport(false);
+    render(<Shell storageKey="test.sidebar" />);
+    await userEvent.click(screen.getByRole("button", { name: "Toggle sidebar" }));
+    expect(document.cookie).toContain("test.sidebar=1");
+    await userEvent.click(screen.getByRole("button", { name: "Toggle sidebar" }));
+    expect(document.cookie).toContain("test.sidebar=0");
+  });
+
+  it("Cmd/Ctrl+B is left alone while typing in a field", async () => {
+    mockViewport(false);
+    render(
+      <>
+        <Shell />
+        <input aria-label="Note" />
+      </>
+    );
+    await userEvent.click(screen.getByRole("textbox", { name: "Note" }));
+    await userEvent.keyboard("{Control>}b{/Control}");
     expect(screen.getByRole("navigation", { name: "Sidebar" })).not.toHaveAttribute("data-collapsed");
+  });
+
+  it("the trigger points at the sidebar it controls", () => {
+    mockViewport(false);
+    render(<Shell />);
+    const nav = screen.getByRole("navigation", { name: "Sidebar" });
+    expect(nav.id).not.toBe("");
+    expect(screen.getByRole("button", { name: "Toggle sidebar" })).toHaveAttribute("aria-controls", nav.id);
+  });
+});
+
+describe("Sidebar — between md and lg", () => {
+  it("starts as a rail whatever the remembered choice, and the trigger floats it open without saving", async () => {
+    mockWidth(820);
+    render(<Shell storageKey="test.sidebar" />);
+    await act(async () => {});
+    const nav = screen.getByRole("navigation", { name: "Sidebar" });
+    const trigger = screen.getByRole("button", { name: "Toggle sidebar" });
+    expect(nav).toHaveAttribute("data-collapsed");
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.click(trigger);
+    expect(nav).not.toHaveAttribute("data-collapsed");
+    expect(nav).toHaveAttribute("data-floating");
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(window.localStorage.getItem("test.sidebar")).toBeNull();
+  });
+
+  it("the floating sidebar closes on Escape, on a press outside, and on choosing a destination", async () => {
+    mockWidth(820);
+    render(<Shell />);
+    await act(async () => {});
+    const nav = screen.getByRole("navigation", { name: "Sidebar" });
+    const trigger = screen.getByRole("button", { name: "Toggle sidebar" });
+
+    await userEvent.click(trigger);
+    await userEvent.keyboard("{Escape}");
+    expect(nav).not.toHaveAttribute("data-floating");
+
+    await userEvent.click(trigger);
+    await userEvent.click(screen.getByRole("main"));
+    expect(nav).not.toHaveAttribute("data-floating");
+
+    await userEvent.click(trigger);
+    expect(nav).toHaveAttribute("data-floating");
+    await userEvent.click(within(nav).getByRole("link", { name: /Inbox/ }));
+    expect(nav).not.toHaveAttribute("data-floating");
+  });
+
+  it("at lg and up the same window is expanded", async () => {
+    mockWidth(1280);
+    render(<Shell />);
+    await act(async () => {});
+    expect(screen.getByRole("navigation", { name: "Sidebar" })).not.toHaveAttribute("data-collapsed");
+  });
+});
+
+describe("Sidebar — counts and menu buttons", () => {
+  it("a count is quiet text by default and a solid pill on request, announced the same way", () => {
+    render(
+      <Sidebar>
+        <SidebarItem href="#a" count={128}>
+          Orders
+        </SidebarItem>
+        <SidebarItem href="#b" count={4} countTone="solid">
+          Messages
+        </SidebarItem>
+      </Sidebar>
+    );
+    expect(screen.getByRole("link", { name: /^Orders\s*,\s*99\+$/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /^Messages\s*,\s*4$/ })).toBeInTheDocument();
+  });
+
+  it("SidebarMenuButton is a button named by its name and sub line, and forwards props", async () => {
+    const onClick = vi.fn();
+    render(
+      <Sidebar>
+        <SidebarFooter>
+          <SidebarMenuButton leading={<span>MS</span>} name="Meera Shah" sub="meera@example.com" onClick={onClick} aria-haspopup="menu" />
+        </SidebarFooter>
+      </Sidebar>
+    );
+    const button = screen.getByRole("button", { name: /Meera Shah/ });
+    expect(button).toHaveAttribute("aria-haspopup", "menu");
+    expect(button).toHaveTextContent("meera@example.com");
+    await userEvent.click(button);
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -194,6 +344,16 @@ describe("Sidebar — mobile sheet", () => {
     expect(nav).toHaveAttribute("data-density", "touch");
 
     await userEvent.click(within(nav).getByRole("link", { name: /Inbox/ }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("has a visible close button", async () => {
+    mockViewport(true);
+    render(<Shell />);
+    await act(async () => {});
+    await userEvent.click(screen.getByRole("button", { name: "Toggle sidebar" }));
+    const sheet = await screen.findByRole("dialog", { name: "Sidebar" });
+    await userEvent.click(within(sheet).getByRole("button", { name: "Close sidebar" }));
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 

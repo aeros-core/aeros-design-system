@@ -1,5 +1,40 @@
 # aeros_design_system
 
+## 3.1.0
+
+### The uniform sidebar (`docs/sidebar/spec.md`)
+
+`AerosScaffold` now presents the sidenav three ways by viewport width, like the web `Sidebar`.
+
+- **Rail between `md` and `lg`.** From 768 to 1023 the sidenav rests as the 56px rail, and the top
+  bar's button floats the full sidenav over the page (closes on a tap outside, Escape, or choosing
+  a destination). It was the full 240 there. `railBreakpoint` sets the upper bound; set it to
+  `sidenavBreakpoint` for the old behaviour.
+- **`AerosSidebarController`** (new) owns and remembers the wide-window choice through `load` /
+  `save` callbacks. Pass it as `AerosScaffold.sidebarController`. Without one the app still owns
+  the rail through `AerosSidenav.collapsed` and `onRailCollapsedChanged`.
+- **Animated width**, at `AerosMotion.base`; instant when animations are disabled.
+- **Cmd/Ctrl+B** toggles the sidenav, except in a text field (`keyboardShortcut: false` to opt out).
+- **The drawer** uses touch rows whatever the app density, sits inside the safe area, and closes
+  when a destination is chosen.
+- New on `AerosScaffoldState`: `isSidenavRailOnly`, `isSidenavFloating`, `closeFloatingSidenav()`,
+  `dismissSidenav()`. `canToggleRail` is now also true in the rail-only range and with a controller.
+
+`AerosSidenav`:
+
+- **Icons never move.** Icons, the header mark and the footer avatar are centred 28px from the
+  edge, expanded and collapsed (the mark and avatar were 20px in; 20px touch icons move 2px).
+- **Selected row:** the `stateSelected` overlay at the label's normal weight (was `bgSubtle`, w600).
+- **Counts** are a quiet number; `AerosNavItem(countEmphasis: true)` keeps the pill. In the rail a
+  count is a dot on the icon.
+- **In the rail** a row shows its name beside it on hover or keyboard focus, with no delay, and a
+  parent opens its children in a menu instead of calling `onExpandRequested` (still called when
+  there is no Navigator to open a menu in).
+- **Children** hang from a hairline guide under the parent's icon; child labels are `bodySm`.
+- A parent opens when the selection moves into it, not only on first build.
+- `density` is nullable and follows an `AerosDensityScope` above it (pointer with none, as before).
+- New: `onNavigate`, `semanticLabel` (the sidenav is a navigation landmark), `copyWith`.
+
 ## 3.0.0
 
 ### The "Crisp precision" values
